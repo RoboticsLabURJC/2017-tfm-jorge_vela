@@ -55,21 +55,12 @@ int main(int argc, const char* argv[])
 {
 
 
-	cv::Mat imageRead = cv::imread("sample.jpg" , CV_LOAD_IMAGE_GRAYSCALE );
-
-
-  	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  	int width = imageRead.size().width;
-  	int height = imageRead.size().height;
-  	printf("%i %i \n", width, height);
-
-
-	const int h=height, w=width  , misalign=1; int x, y, d; //192   const int h=12, w=12,
+	const int h=128, w=128  , misalign=1; int x, y, d; //192   const int h=12, w=12,
   	/*float* I=imageRead.ptr<float>(0), *I0=I+misalign; 
   	cv::Mat dummy_query = cv::Mat(128, 128, CV_8UC1, I0);*/
-	Mat atom_image = Mat::zeros( height, width, CV_8UC1 );
-	MyEllipse( atom_image, 90 , width, height);
-	MyEllipse( atom_image, 0 , width, height);
+	Mat atom_image = Mat::zeros( h, w, CV_8UC1 );
+	MyEllipse( atom_image, 90 , w, h);
+	MyEllipse( atom_image, 0 , w, h);
 
 	//MyEllipse( atom_image, 45 , width, height);
 	//MyEllipse( atom_image, -45 , width, height);
