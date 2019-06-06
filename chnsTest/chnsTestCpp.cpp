@@ -11,12 +11,88 @@
 #include "imResampleMex.cpp"
 #include "gradientMex.cpp"
 
+#include <opencv2/highgui.hpp>
+#include "opencv2/opencv.hpp"
+#include <opencv2/imgproc.hpp>
+
+#include <iostream>
+#include <iomanip>
+
+
+#include <math.h>
+#include <typeinfo>
+
+
+using namespace cv;
+using namespace std;
+
+void print(Mat mat, int prec)
+{     
+    printf("%d %d \n", mat.size().height , mat.size().width );
+
+    for(int i=0; i<mat.size().height; i++)
+    {
+        cout << "[";
+        for(int j=0; j<mat.size().width; j++)
+        {
+            printf("%d",mat.at<int>(i,j));
+            cout << setprecision(prec) << mat.at<double>(i,j);
+            if(j != mat.size().width-1)
+                cout << ", ";
+            else
+                cout << "]" << endl; 
+        }
+    }
+}
+
 // compile and test standalone channels source code
 int main(int argc, const char* argv[])
 {
-	
+  cv::Mat imageRead;
+  //imageRead = cv::imread("sample.jpg" ,  CV_LOAD_IMAGE_COLOR);
+  imageRead = cv::imread("sample.jpg" , CV_LOAD_IMAGE_GRAYSCALE );
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  int width = imageRead.size().width;
+  int height = imageRead.size().height;
+
+  printf("%i %i \n", width, height);
+
+
+  float* buffer=imageRead.ptr<float>(0);  
+  cv::Mat dummy_query = cv::Mat(128, 128, CV_8UC1, buffer);
+
+
+  cv::imshow( "Display window", dummy_query );
+  cv::waitKey(0); 
+
+  int msalig=1;
+  int d_test = 1;
+  int sizefloat = sizeof(float);
+  int height1=height;
+  int width1=width ;
+  float* convT = (float*) wrCalloc(height1*width1*d_test+msalig,sizefloat) + msalig;
+
+  resample(buffer,convT,height1,height1,width1,width1,d_test,1.0f);
+  cv::Mat dummy_query_2 = cv::Mat(128,128, CV_8UC1, convT);
+
+  cv::imshow( "Display window", dummy_query_2);
+  cv::waitKey(0); 
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /*int pad_test = 2;
+  float *imgPad = (float*) wrCalloc(height1*width1*d_test+msalig,sizefloat) + msalig;
+  imPad(buffer,imgPad,height1,width1,d_test,pad_test,pad_test,pad_test,pad_test,0,0.0f);
+
+
+  dummy_query_2 = cv::Mat(130,130 , CV_8UC1, imgPad);
+
+  cv::imshow( "Display window", dummy_query_2);
+  cv::waitKey(0);*/ 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // initialize test array (misalign controls memory mis-alignment)
-  const int h=12, w=12, misalign=1; int x, y, d;
+  const int h=256, w=256  , misalign=1; int x, y, d; //192   const int h=12, w=12,
   float I[h*w*3+misalign], *I0=I+misalign;
   for( x=0; x<h*w*3; x++ ) I0[x]=0;
   for( d=0; d<3; d++ ) I0[int(h*w/2+h/2)+d*h*w]=1;
@@ -34,14 +110,17 @@ int main(int argc, const char* argv[])
   O  = (float*) wrCalloc(h2*w2*d+misalign,sf) + misalign;
   H  = (float*) wrCalloc(h3*w3*d*6+misalign,sf) + misalign;
   G  = (float*) wrCalloc(h3*w3*d*24+misalign,sf) + misalign;
+ 
+
 
   // perform tests of imPad, rgbConvert, convConst, resample and gradient
   imPad(I0,I1,h,w,d,pad,pad,pad,pad,0,0.0f);
-  
+
   //Entra una imagen RGB y sale una imagen en otro espacio de color segun el parametro flag 
   //0 = gray, 1 = luv, 2 = hsv. 
   I2 = rgbConvert(I1,h1*w1,d,0,1.0f); d=1;
-  
+  //cv::Mat imageReadGray;
+
   // Convolucion rapida de la imagen utilizando un filtro triangular. Util para 
   // realizar el suavizado de la imagen. 
   convTri(I2,I3,h1,w1,d,rad,1); 
@@ -64,12 +143,18 @@ int main(int argc, const char* argv[])
   hog(M,O,H,h2,w2,20,4,6,true, .2f);
   //hog(H,G,h2,w2,4,6,.2f);
   
+
+  /*
   // print some test arrays
   printf("---------------- M: ----------------\n");
   for(y=0;y<h2;y++){ for(x=0;x<w2;x++) printf("%.4f ",M[x*h2+y]); printf("\n");}
   printf("---------------- O: ----------------\n");
   for(y=0;y<h2;y++){ for(x=0;x<w2;x++) printf("%.4f ",O[x*h2+y]); printf("\n");}
+  */
 
+  /*cv::Mat image = cv::Mat(h, w, CV_8UC4, (unsigned*)O);
+  cv::imshow( "Display window", image );
+  cv::waitKey(0);*/
   // free memory and return
   wrFree(I1-misalign); wrFree(I2); wrFree(I3-misalign); wrFree(I4-misalign);
   wrFree(Gx-misalign); wrFree(Gy-misalign); wrFree(M-misalign);

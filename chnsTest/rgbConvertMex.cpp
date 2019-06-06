@@ -132,6 +132,7 @@ template<class iT, class oT> void rgb2hsv( iT *I, oT *J, int n, oT nrm ) {
 template<class iT, class oT> void rgb2gray( iT *I, oT *J, int n, oT nrm ) {
   oT *GR=J; iT *R=I, *G=R+n, *B=G+n; int i;
   oT mr=(oT).2989360213*nrm, mg=(oT).5870430745*nrm, mb=(oT).1140209043*nrm;
+  printf("ENTRA 4\n");
   for(i=0; i<n; i++) *(GR++)=(oT)*(R++)*mr + (oT)*(G++)*mg + (oT)*(B++)*mb;
 }
 
