@@ -5,6 +5,9 @@ FILE(
   CHANNELS_EXTRACTION_SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.h
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorMex.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorMex.h
   )
 
 # Set the sources for the main target

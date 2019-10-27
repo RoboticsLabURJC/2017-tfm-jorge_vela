@@ -19,8 +19,8 @@ class ChannelsLUVExtractor
 public:
   ChannelsLUVExtractor
     (
-    float smooth = false;
-    int smooth_kernel_size = 1;
+    float smooth = false,
+    int smooth_kernel_size = 1
     ) {};
 
   std::vector<cv::Mat> extractFeatures

@@ -35,7 +35,7 @@ TEST_F(TestChannelsExtractorLUV, TestWhiteImage)
   cv::Mat img_white(cv::Size(COLS, ROWS), CV_8UC3, cv::Scalar(255, 255, 255));
   cv::Mat img_white_luv_gt = cv::Mat::zeros(cv::Size(COLS, ROWS), CV_32FC3);
 
-//  std::cout << "img_white=" << img_white << std::endl;
+  //std::cout << "img_white=" << img_white << std::endl;
 
   for (int i=0; i<ROWS; i++)
   {
@@ -313,7 +313,7 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalRGBImage)
   cv::imshow("V", channels[2]);
   cv::waitKey();
 #endif
-
+  //printf("NumCols %d %d \n", img_natural.rows, img_natural.cols);
   for (int i=0; i<img_natural.rows; i++)
   {
     for (int j=0; j<img_natural.cols; j++)
