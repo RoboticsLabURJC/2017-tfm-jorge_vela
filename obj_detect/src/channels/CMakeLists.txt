@@ -6,8 +6,11 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.h
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorMex.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorMex.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.h
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMag.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMag.h
   )
 
 # Set the sources for the main target
