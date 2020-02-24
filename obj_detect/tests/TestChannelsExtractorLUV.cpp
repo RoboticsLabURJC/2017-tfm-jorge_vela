@@ -18,7 +18,7 @@ class TestChannelsExtractorLUV: public testing::Test
 
   const int ROWS = 2;
   const int COLS = 4;
-  ChannelsLUVExtractor channExtract;
+  ChannelsLUVExtractor channExtract{false, 1};
 
   virtual void SetUp()
   {
@@ -47,7 +47,6 @@ TEST_F(TestChannelsExtractorLUV, TestWhiteImage)
       img_white_luv_gt.at<cv::Vec3f>(i,j) = cv::Vec3f(0.3703704f, 0.3259259f, 0.4962940f);
     }
   }
-
   std::vector<cv::Mat> channels = channExtract.extractFeatures(img_white);
 
 #ifdef VISUALIZE_RESULTS
@@ -314,6 +313,7 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalRGBImage)
   cv::waitKey();
 #endif
   //printf("NumCols %d %d \n", img_natural.rows, img_natural.cols);
+  
   for (int i=0; i<img_natural.rows; i++)
   {
     for (int j=0; j<img_natural.cols; j++)
@@ -321,12 +321,63 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalRGBImage)
       cv::Vec3f gt = img_luv_gt.at<cv::Vec3f>(i,j);
       cv::Vec3f estimated(channels[0].at<float>(i,j), channels[1].at<float>(i,j), channels[2].at<float>(i,j));
 
-//      std::cout << "gt (" << i << "," << j << ") = " << gt << std::endl;
-//      std::cout << "estimated (" << i << "," << j << ") = " << estimated << std::endl;
+      //std::cout << "gt (" << i << "," << j << ") = " << gt << std::endl;
+      //std::cout << "estimated (" << i << "," << j << ") = " << estimated << std::endl;
 
       ASSERT_TRUE(abs(gt[0] - estimated[0]) < 1.e-6f);
       ASSERT_TRUE(abs(gt[1] - estimated[1]) < 1.e-6f);
       ASSERT_TRUE(abs(gt[2] - estimated[2]) < 1.e-6f);
+    }
+  }
+}
+
+
+TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImage)
+{  
+  cv::Mat img_natural;
+  img_natural = cv::imread("index2.jpeg");
+
+  std::vector<cv::Mat> vec_luv_gt(3);
+
+  cv::FileStorage fs("luv_matlab_index.jpeg.yml", cv::FileStorage::READ);
+  fs["luv_1"] >> vec_luv_gt[0];
+  fs["luv_2"] >> vec_luv_gt[1];
+  fs["luv_3"] >> vec_luv_gt[2];
+
+  cv::Mat img_luv_gt;
+  cv::merge(vec_luv_gt, img_luv_gt);
+
+
+  ASSERT_FALSE(img_natural.empty());
+  std::vector<cv::Mat> channels = channExtract.extractFeatures(img_natural);
+
+#ifdef VISUALIZE_RESULTS
+  cv::imshow("L,gt", vec_luv_gt[0]);
+  cv::imshow("U,gt", vec_luv_gt[1]);
+  cv::imshow("V,gt", vec_luv_gt[2]);
+  cv::waitKey();
+
+  cv::imshow("L", channels[0]);
+  cv::imshow("U", channels[1]);
+  cv::imshow("V", channels[2]);
+  cv::waitKey();
+#endif
+  //printf("NumCols %d %d \n", img_natural.rows, img_natural.cols);
+  
+  for (int i=0; i<img_natural.rows; i++)
+  {
+    for (int j=0; j<img_natural.cols; j++)
+    {
+      cv::Vec3f gt = img_luv_gt.at<cv::Vec3f>(i,j);
+      //printf("%f %f %f \n", channels[0].at<float>(i,j), channels[1].at<float>(i,j), channels[2].at<float>(i,j));
+      cv::Vec3f estimated(channels[0].at<float>(i,j), channels[1].at<float>(i,j), channels[2].at<float>(i,j));
+
+      //std::cout << "gt (" << i << "," << j << ") = " << gt << std::endl;
+      //std::cout << "estimated (" << i << "," << j << ") = " << estimated << std::endl;
+
+      //ASSERT_TRUE(abs(gt[0] - estimated[0]) < 1.e-6f);
+      //ASSERT_TRUE(abs(gt[1] - estimated[1]) < 1.e-6f);
+      //ASSERT_TRUE(abs(gt[2] - estimated[2]) < 1.e-6f);
     }
   }
 }
