@@ -12,11 +12,11 @@
 #include <channels/ChannelsExtractorGradMag.h>
 #include <opencv/cv.hpp>
 
-#include "wrappers.hpp"
-#include <math.h>
-#include "string.h"
 #include "sse.hpp"
-#include <iostream>
+
+using namespace cv;
+using namespace std;
+
 
 #define PI 3.14159265f
 
@@ -45,12 +45,12 @@ void grad1( float *I, float *Gx, float *Gy, int h, int w, int x ) {
   #undef GRADY
 }
 
-/*// compute x and y gradients at each location (uses sse)
+// compute x and y gradients at each location (uses sse)
 void grad2( float *I, float *Gx, float *Gy, int h, int w, int d ) {
   int o, x, c, a=w*h; for(c=0; c<d; c++) for(x=0; x<w; x++) {
     o=c*a+x*h; grad1( I+o, Gx+o, Gy+o, h, w, x );
   }
-}*/
+}
 
 // build lookup table a[] s.t. a[x*n]~=acos(x) for x in [-1,1]
 float* acosTable() {
@@ -64,20 +64,30 @@ float* acosTable() {
   init=true; return a1;
 }
 
+
+
 // compute gradient magnitude and orientation at each location (uses sse)
 void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
   int x, y, y1, c, h4, s; float *Gx, *Gy, *M2; __m128 *_Gx, *_Gy, *_M2, _m;
   float *acost = acosTable(), acMult=10000.0f;
   // allocate memory for storing one column of output (padded so h4%4==0)
   h4=(h%4==0) ? h : h-(h%4)+4; s=d*h4*sizeof(float);
-  M2=(float*) alMalloc(s,16); _M2=(__m128*) M2;
-  Gx=(float*) alMalloc(s,16); _Gx=(__m128*) Gx;
-  Gy=(float*) alMalloc(s,16); _Gy=(__m128*) Gy;
+
+  M2= new float[s+16](); _M2=(__m128*) M2;
+  Gx= new float[s+16](); _Gx=(__m128*) Gx;
+  Gy= new float[s+16](); _Gy=(__m128*) Gy;
+
+
+  //M2=(float*) malloc(s+16); _M2=(__m128*) M2;
+  //Gx=(float*) malloc(s+16); _Gx=(__m128*) Gx;
+  //Gy=(float*) malloc(s+16); _Gy=(__m128*) Gy;
   // compute gradient magnitude and orientation for each column
   for( x=0; x<w; x++ ) {
     // compute gradients (Gx, Gy) with maximum squared magnitude (M2)
     for(c=0; c<d; c++) {
       grad1( I+x*h+c*w*h, Gx+c*h4, Gy+c*h4, h, w, x );
+
+      //grad1( I+x*h+c*w*h, Gx+c*h4, Gy+c*h4, h, w, x );
       for( y=0; y<h4/4; y++ ) {
         y1=h4/4*c+y;
         _M2[y1]=ADD(MUL(_Gx[y1],_Gx[y1]),MUL(_Gy[y1],_Gy[y1]));
@@ -96,7 +106,9 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
     };
     memcpy( M+x*h, M2, h*sizeof(float) );
     // compute and store gradient orientation (O) via table lookup
+
     if( O!=0 ) for( y=0; y<h; y++ ) O[x*h+y] = acost[(int)Gx[y]]; //error en esta linea ??
+
     if( O!=0 && full ) {
       y1=((~size_t(O+x*h)+1)&15)/4; y=0;
       for( ; y<y1; y++ ) O[y+x*h]+=(Gy[y]<0)*PI;
@@ -105,18 +117,13 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
       for( ; y<h; y++ ) O[y+x*h]+=(Gy[y]<0)*PI;
     }
   }
-  alFree(Gx); alFree(Gy); alFree(M2);
+  free(Gx); free(Gy); free(M2);
 }
 
 
-/*****************************************************************************************************/
- /*void ChannelsMexExtractor::allocW(float *var, int size, int sf, int misalign){
- 	var  = (float*) wrCalloc(h*w*d+misalign,sf) + misalign;
- }*/
-
-  float* GradMagExtractor::allocW(int size , int sf, int misalign){
+ float* GradMagExtractor::allocW(int size , int sf, int misalign){
    float *var;
-   var  = (float*) wrCalloc(size+misalign,sf) + misalign;
+   var  = (float*) calloc(size+misalign,sf) + misalign;
    return var;
  }
 
@@ -125,3 +132,24 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
 	const int h=12, w=12  , misalign=1; int x, y, d=3; 
   	gradMag( I, M, O, h, w, d ,  false ); 
  }	
+
+ void GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O){
+    int h = image.size().height;
+    int w = image.size().width;
+    int nChannels = image.channels();
+
+    int size = h*w*nChannels;
+    int sizeData = sizeof(float);
+    int misalign=1;
+
+    float I[h*w*1+misalign], *I0=I+misalign;
+    for(int x=0; x<h*w*1; x++ ) I0[x]=0;
+
+    cv::Mat dst;
+    image.convertTo(dst, CV_32F);
+    transpose(dst, dst);
+    dst = dst/255.0;
+    float *data = dst.ptr<float>();
+
+    gradMag(data, M, O, h, w, nChannels,  false ); 
+ }  

@@ -11,13 +11,22 @@
 #include <channels/ChannelsExtractorGradHist.h>
 #include <opencv/cv.hpp>
 
-#include "wrappers.hpp"
+//#include "alloc.cpp"
+/*#include "wrappers.hpp"
 #include <math.h>
 #include "string.h"
 #include "sse.hpp"
 #include <iostream>
+*/
+#include "sse.hpp"
 
 
+#include <math.h>
+#include "string.h"
+#include <iostream>
+
+using namespace cv;
+using namespace std;
 #define PI 3.14159265f
 
 
@@ -64,8 +73,11 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
   const int hb=h/bin, wb=w/bin, h0=hb*bin, w0=wb*bin, nb=wb*hb;
   const float s=(float)bin, sInv=1/s, sInv2=1/s/s;
   float *H0, *H1, *M0, *M1; int x, y; int *O0, *O1; float xb, init;
-  O0=(int*)alMalloc(h*sizeof(int),16); M0=(float*) alMalloc(h*sizeof(float),16);
-  O1=(int*)alMalloc(h*sizeof(int),16); M1=(float*) alMalloc(h*sizeof(float),16);
+
+  O0 = new int[h*sizeof(int)+16]();M0 = new float[h*sizeof(int)+16]();
+  O1 = new int[h*sizeof(int)+16]();M1 = new float[h*sizeof(int)+16]();
+  /*O0=(int*)malloc(h*sizeof(int)+16); M0=(float*) malloc(h*sizeof(float)+16);
+  O1=(int*)malloc(h*sizeof(int)+16); M1=(float*) malloc(h*sizeof(float)+16);*/
   // main loop
   for( x=0; x<w0; x++ ) {
     // compute target orientation bins for entire column - very fast
@@ -133,7 +145,7 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
       #undef GH
     }
   }
-  alFree(O0); alFree(O1); alFree(M0); alFree(M1);
+  free(O0); free(O1); free(M0); free(M1);
   // normalize boundary bins which only get 7/8 of weight of interior bins
   if( softBin%2!=0 ) for( int o=0; o<nOrients; o++ ) {
     x=0; for( y=0; y<hb; y++ ) H[o*nb+x*hb+y]*=8.f/7.f;
@@ -145,12 +157,27 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
 
 
  float* GradHistExtractor::allocW(int size , int sf, int misalign){
- 	float *var;
- 	var  = (float*) wrCalloc(size+misalign,sf) + misalign;
- 	return var;
+   //float* var = allocConflict(size,sf, misalign );
+   //return var;
+   	float *var;
+   	var  = (float*) calloc(size+misalign,sf) + misalign;
+   	return var;
  }
 
  void GradHistExtractor::gradH(float *M, float *O, float *H){
  	const int h=12, w=12  , misalign=1; int x, y, d=3; 
  	gradHist(M,O,H,h,w,8,9,1, true);
  }
+
+
+void GradHistExtractor::gradHAdv(cv::Mat image, float *M, float *O, float *H){
+  int h = image.size().height;
+  int w = image.size().width;
+  int nChannels = image.channels();
+
+  int size = h*w*nChannels;
+  int sizeData = sizeof(float);
+  int misalign=1;
+
+  gradHist(M,O,H,h,w,8,9,1, true);
+ }  

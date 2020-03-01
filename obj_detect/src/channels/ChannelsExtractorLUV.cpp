@@ -113,6 +113,20 @@ std::vector<cv::Mat> ChannelsLUVExtractor::bgr2luv
   return luv;
 }
 
+std::vector<cv::Mat> ChannelsLUVExtractor::smoothImage
+(
+  std::vector<cv::Mat> inputImg
+)
+{
+
+    std::vector<cv::Mat> channelsLUV_output = inputImg;
+    cv::GaussianBlur(inputImg[0], channelsLUV_output[0], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
+    cv::GaussianBlur(inputImg[1], channelsLUV_output[1], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
+    cv::GaussianBlur(inputImg[2], channelsLUV_output[2], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
+
+    return channelsLUV_output;
+}
+
 std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
   (
   cv::Mat img
@@ -125,6 +139,11 @@ std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
   cv::Mat imgLUV;
 
   channelsLUV = bgr2luv(img, 1.0f/255.0f);
+
+  
+  if(m_smooth){
+    channelsLUV = smoothImage(channelsLUV);
+  }
 
   return channelsLUV;
 }
