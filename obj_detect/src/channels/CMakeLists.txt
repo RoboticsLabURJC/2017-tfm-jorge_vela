@@ -12,11 +12,8 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMag.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMag.h
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/ImageResample.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ImageResample.h
-
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsCompute.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsCompute.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utils.h
   )
 
 # Set the sources for the main target
