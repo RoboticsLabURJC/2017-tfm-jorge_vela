@@ -17,6 +17,9 @@
 
 class GradHistExtractor
 {
+//#include "../src/channels/sse.hpp"
+
+
 public:
   GradHistExtractor
     (
@@ -41,6 +44,14 @@ public:
     	float* M,
     	float* O,
     	float* H
+    );
+
+  void gradHAdv
+    (
+      cv::Mat image,
+      float* M,
+      float* O,
+      float* H
     );
 
 private:
