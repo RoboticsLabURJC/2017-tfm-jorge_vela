@@ -69,12 +69,12 @@ TEST_F(TestChannelsExtractorGradHist, TestMexImage)
 	
  	//channExtract.HOG(M, O, H);
 
- 	printf("---------------- M: ----------------\n");
-	for(y=0;y<h;y++){ for(x=0;x<w;x++) printf("%.4f ",M[x*h+y]); printf("\n");}
-	printf("---------------- O: ----------------\n");
-	for(y=0;y<h;y++){ for(x=0;x<w;x++) printf("%.4f ",O[x*h+y]); printf("\n");}
-	printf("---------------- O: ----------------\n");
-	for(y=0;y<h2;y++){ for(x=0;x<w2;x++) printf("%.4f ",H[x*h2+y]); printf("\n");}
+ 	//printf("---------------- M: ----------------\n");
+	//for(y=0;y<h;y++){ for(x=0;x<w;x++) printf("%.4f ",M[x*h+y]); printf("\n");}
+	//printf("---------------- O: ----------------\n");
+	//for(y=0;y<h;y++){ for(x=0;x<w;x++) printf("%.4f ",O[x*h+y]); printf("\n");}
+	//printf("---------------- O: ----------------\n");
+	//for(y=0;y<h2;y++){ for(x=0;x<w2;x++) printf("%.4f ",H[x*h2+y]); printf("\n");}
 
 	//printf("%f \n", H[0]);
 
@@ -104,7 +104,7 @@ TEST_F(TestChannelsExtractorGradHist, TestRealImage){
 	int h2 = h/4;
 	int w2 = w/4;
 	int sizeH = h2*w2*nChannels*6; //Valor obtenido de su ejemplo chnsTestCpp.cpp
-	H = gradHistExtract.allocW(sizeH, sizeData, misalign);
+	H = new float[sizeH]();
 
 
 	FileStorage fs;
@@ -137,11 +137,11 @@ TEST_F(TestChannelsExtractorGradHist, TestRealImage){
 		} 
 	}
 
-	printf("%.4f\n", H[0]);
+	//printf("%.4f\n", H[0]);
 
 	gradHistExtract.gradHAdv(image, M, O, H);
 
-	printf("%.4f\n", H[0]);
+	//printf("%.4f\n", H[0]);
 }
 
 
