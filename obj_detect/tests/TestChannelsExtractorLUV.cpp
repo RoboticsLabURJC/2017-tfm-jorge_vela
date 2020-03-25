@@ -19,6 +19,7 @@ class TestChannelsExtractorLUV: public testing::Test
   const int ROWS = 2;
   const int COLS = 4;
   ChannelsLUVExtractor channExtract{false, 1};
+  ChannelsLUVExtractor channExtractSmooth{true, 5};
 
   virtual void SetUp()
   {
@@ -335,7 +336,8 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalRGBImage)
 TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImage)
 {  
   cv::Mat img_natural;
-  img_natural = cv::imread("index2.jpeg");
+  img_natural = cv::imread("index.jpeg");
+
 
   std::vector<cv::Mat> vec_luv_gt(3);
 
@@ -349,7 +351,8 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImage)
 
 
   ASSERT_FALSE(img_natural.empty());
-  std::vector<cv::Mat> channels = channExtract.extractFeatures(img_natural);
+  std::vector<cv::Mat> channels = channExtractSmooth.extractFeatures(img_natural);
+
 
 #ifdef VISUALIZE_RESULTS
   cv::imshow("L,gt", vec_luv_gt[0]);
@@ -363,21 +366,21 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImage)
   cv::waitKey();
 #endif
   //printf("NumCols %d %d \n", img_natural.rows, img_natural.cols);
-  
-  for (int i=0; i<img_natural.rows; i++)
-  {
-    for (int j=0; j<img_natural.cols; j++)
-    {
-      cv::Vec3f gt = img_luv_gt.at<cv::Vec3f>(i,j);
-      //printf("%f %f %f \n", channels[0].at<float>(i,j), channels[1].at<float>(i,j), channels[2].at<float>(i,j));
-      cv::Vec3f estimated(channels[0].at<float>(i,j), channels[1].at<float>(i,j), channels[2].at<float>(i,j));
+  //printf("%.4f\n", channels[0].at<float>(0,0));
 
-      //std::cout << "gt (" << i << "," << j << ") = " << gt << std::endl;
-      //std::cout << "estimated (" << i << "," << j << ") = " << estimated << std::endl;
+  cv::FileStorage fs_smooth;
 
-      //ASSERT_TRUE(abs(gt[0] - estimated[0]) < 1.e-6f);
-      //ASSERT_TRUE(abs(gt[1] - estimated[1]) < 1.e-6f);
-      //ASSERT_TRUE(abs(gt[2] - estimated[2]) < 1.e-6f);
+  fs.open("smoothImage_L.yaml", cv::FileStorage::READ);
+
+  cv::FileNode rows = fs["smoothL"]["rows"];
+  cv::FileNode cols = fs["smoothL"]["cols"];
+  cv::FileNode smoothMatlab = fs["smoothL"]["data"];
+
+  for(int i=0; i< (int)10; i++){
+    for(int j=0; j<(int)2; j++){
+      ASSERT_TRUE(abs(channels[0].at<float>(j,i) - (float)smoothMatlab[i*(int)rows+j]) < 1.e-4f);
+      //printf("%.4f %.4f\n", channels[0].at<float>(j,i), (float)smoothMatlab[i*(int)rows+j]);
     }
   }
+
 }

@@ -35,19 +35,117 @@ class TestUtils: public testing::Test
 
 TEST_F(TestUtils, TestResample)
 {
+  cv::Mat imageMatlab = cv::imread("mask_image.jpg", cv::IMREAD_COLOR); 
   cv::Mat image = cv::imread("index.jpeg", cv::IMREAD_COLOR); 
-  int h = 40;
-  int w = 37;
+  int h = 0;
+  int w = 0;
+  if(image.size().height % 2 == 0){
+    h = image.size().height / 2;
+  }else{
+    h = image.size().height / 2 + 1;
+  }
+
+  if(image.size().height % 2 == 0){
+    w = image.size().width / 2;
+  }else{
+    w = image.size().width / 2 + 1;
+  }
+
+  //int h = 40;
+  //int w = 37;
   cv:Mat dst = ImgResample(image, w, h, 3);
-  //printf("%d %d \n", dst.size().width, dst.size().height);
+
+  //printf("%d %d %d \n",  dst.at<char>(0,0), dst.at<char>(0,1), dst.at<char>(0,2));
+  //printf("%d %d %d \n",  dst.at<char>(0,3), dst.at<char>(0,4), dst.at<char>(0,5));
+
+  cv::Mat bgr_dst[3];
+  split(dst,bgr_dst);
+
+
+  cv::Mat bgr_resample[3];
+  split(imageMatlab,bgr_resample);
+
+  //printf("%d %d\n", imageMatlab.at<char>(2,0), dst.at<char>(0,0));
+  
+  FileStorage fs1;
+  FileStorage fs2;
+  FileStorage fs3;
+  fs1.open("imresample_1.yaml", FileStorage::READ);
+  fs2.open("imresample_2.yaml", FileStorage::READ);
+  fs3.open("imresample_3.yaml", FileStorage::READ);
+
+  FileNode rows = fs1["res1"]["rows"];
+  FileNode cols = fs1["res1"]["cols"];
+  
+  FileNode imReample1 = fs1["res1"]["data"];
+  FileNode imReample2 = fs2["res2"]["data"];
+  FileNode imReample3 = fs3["res3"]["data"];
+
+
+  cv::Mat bgr_dst0_chng;
+  bgr_dst[0].convertTo(bgr_dst0_chng, CV_32F);
+  //transpose(bgr_dst0_chng, bgr_dst0_chng);
+  float *data = bgr_dst0_chng.ptr<float>();
+
+  int difPixels = 0;
+  for(int j = 0; j < (int)cols; j++){
+    for(int i = 0; i < (int)rows; i++){
+      if(abs(data[i + j] -  (float)imReample3[i + j])> 10){
+        difPixels = difPixels + 1;
+      }
+    }
+  }
+  ASSERT_TRUE(difPixels < 350);
+
+  cv::Mat bgr_dst1_chng;
+  bgr_dst[1].convertTo(bgr_dst1_chng, CV_32F);
+  //transpose(bgr_dst1_chng, bgr_dst1_chng);
+  float *data2 = bgr_dst1_chng.ptr<float>();
+
+  int difPixels2 = 0;
+  for(int j = 0; j < (int)cols; j++){
+    for(int i = 0; i < (int)rows; i++){
+      if(abs(data2[i + j] -  (float)imReample2[i + j])> 10){
+        difPixels2 = difPixels2 + 1;
+      }
+    }
+  }
+  ASSERT_TRUE(difPixels2 < 350);
+
+
+  cv::Mat bgr_dst2_chng;
+  bgr_dst[2].convertTo(bgr_dst2_chng, CV_32F);
+  //transpose(bgr_dst2_chng, bgr_dst2_chng);
+  float *data3 = bgr_dst2_chng.ptr<float>();
+
+  int difPixels3 = 0;
+  for(int j = 0; j < (int)cols; j++){
+    for(int i = 0; i < (int)rows; i++){
+      if(abs(data3[i + j] -  (float)imReample1[i + j])> 10){
+        difPixels3 = difPixels3 + 1;
+      }
+    }
+  }
+  ASSERT_TRUE(difPixels3 < 350);
+
+
+  int difPixels4 = 0;
+  for(int j = 0; j < (int)cols; j++){
+    for(int i = 0; i < (int)rows; i++){
+      if(abs(data3[i + j] -  (float)imReample1[i + j])> 10 or abs(data2[i + j] -  (float)imReample2[i + j])> 10 or abs(data[i + j] -  (float)imReample3[i + j])> 10){
+        difPixels4 = difPixels4 + 1;
+      }
+    }
+  }
+  ASSERT_TRUE(difPixels4 < 350);
+
+  //printf("%d %d %d %d\n",  difPixels,difPixels2, difPixels3,difPixels4); //Pixeles diferentes = 341 > 3% de los pixeles
 }
 
 
 TEST_F(TestUtils, TestChannelsCompute)
 {
-  cv::Mat image = cv::imread("index.jpeg", cv::IMREAD_COLOR); 
-  int h = 40;
-  int w = 37;
+  cv::Mat image = cv::imread("index3.jpeg", cv::IMREAD_COLOR); 
   channelsCompute(image, 3);
 }
 

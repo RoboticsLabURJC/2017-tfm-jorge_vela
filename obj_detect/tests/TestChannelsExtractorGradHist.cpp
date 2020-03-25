@@ -38,6 +38,7 @@ class TestChannelsExtractorGradHist: public testing::Test
   }
 };
 
+/*
 TEST_F(TestChannelsExtractorGradHist, TestMexImage)
 {
 	const int h=12, w=12  , misalign=1; int x, y, d; //192   const int h=12, w=12,
@@ -78,7 +79,7 @@ TEST_F(TestChannelsExtractorGradHist, TestMexImage)
 
 	//printf("%f \n", H[0]);
 
-	//EXPECT_TRUE(M1==ExpectedValue);*/
+	//EXPECT_TRUE(M1==ExpectedValue);* /
 }
 
 
@@ -143,7 +144,24 @@ TEST_F(TestChannelsExtractorGradHist, TestRealImage){
 
 	//printf("%.4f\n", H[0]);
 }
+*/
 
+
+TEST_F(TestChannelsExtractorGradHist, TestColorImage){
+	cv::Mat image;
+	image = cv::imread("index3.jpeg", cv::IMREAD_COLOR); 
+
+	int size = image.size().height*image.size().width*1;
+	float *M = new float[size](); // (size, sizeData, misalign)??
+	float *O = new float[size]();
+
+	float *H= new float[size*6]();
+
+	gradMagExtract.gradMAdv(image,M,O);
+
+	printf("%.4f %.4f\n", M[0], O[0] );
+	gradHistExtract.gradHAdv(image, M, O, H);
+}
 
 
 

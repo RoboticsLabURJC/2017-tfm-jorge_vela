@@ -195,7 +195,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImage)
 
   	float *M, *O, *H;
 
-	int size = image.cols*image.rows*3;
+	int size = image.cols*image.rows*1;
 	int sizeData = sizeof(float);
 
 	M = new float[size](); // (size, sizeData, misalign)??
@@ -247,5 +247,35 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImage)
 	M = NULL; O = NULL;
 	free(M); free(O);	
 
+}
+
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor)
+{
+	cv::Mat image;
+	image = cv::imread("index3.jpeg", cv::IMREAD_COLOR); //IMREAD_COLOR);
+
+  	float *M, *O, *H;
+
+	int size = image.cols*image.rows*3;
+	int sizeData = sizeof(float);
+
+	M = new float[size](); // (size, sizeData, misalign)??
+	O = new float[size]();
+	
+	gradMagExtract.gradMAdv(image,M,O);
+
+	FileStorage fs;
+    fs.open("M_colorScale.yaml", FileStorage::READ);
+
+    FileNode rows = fs["M"]["rows"];
+    FileNode cols = fs["M"]["cols"];
+    FileNode MMatrix = fs["M"]["data"];
+
+	int tot = (int)rows*(int)cols;
+	for(int i=0; i < tot; i++){
+		float valorMatlab = (float)MMatrix[i];
+		ASSERT_TRUE(abs(M[i] - valorMatlab) < 1.e-4f);
+	}
+	free(M); free(O);	
 }
 
