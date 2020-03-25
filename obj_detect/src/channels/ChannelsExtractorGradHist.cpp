@@ -76,13 +76,13 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
 
   O0 = new int[h*sizeof(int)+16]();M0 = new float[h*sizeof(int)+16]();
   O1 = new int[h*sizeof(int)+16]();M1 = new float[h*sizeof(int)+16]();
+
   /*O0=(int*)malloc(h*sizeof(int)+16); M0=(float*) malloc(h*sizeof(float)+16);
   O1=(int*)malloc(h*sizeof(int)+16); M1=(float*) malloc(h*sizeof(float)+16);*/
   // main loop
   for( x=0; x<w0; x++ ) {
     // compute target orientation bins for entire column - very fast
     gradQuantize(O+x*h,M+x*h,O0,O1,M0,M1,nb,h0,sInv2,nOrients,full,softBin>=0);
-
     if( softBin<0 && softBin%2==0 ) {
       // no interpolation w.r.t. either orienation or spatial bin
       H1=H+(x/bin)*hb;
@@ -179,5 +179,5 @@ void GradHistExtractor::gradHAdv(cv::Mat image, float *M, float *O, float *H){
   int sizeData = sizeof(float);
   int misalign=1;
 
-  gradHist(M,O,H,h,w,8,9,1, true);
+  gradHist(M,O,H,h,w,2,6,0,false);
  }  

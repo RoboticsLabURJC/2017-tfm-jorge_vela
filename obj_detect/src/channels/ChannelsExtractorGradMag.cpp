@@ -65,6 +65,14 @@ float* acosTable() {
 }
 
 
+void GradMagExtractor::gradMagNorm( float *M, float *S, int h, int w, float norm ) {
+  __m128 *_M, *_S, _norm; int i=0, n=h*w, n4=n/4;
+  _S = (__m128*) S; _M = (__m128*) M; _norm = SET(norm);
+  bool sse = !(size_t(M)&15) && !(size_t(S)&15);
+  if(sse) for(; i<n4; i++) { *_M=MUL(*_M,RCP(ADD(*_S++,_norm))); _M++; }
+  if(sse) i*=4; for(; i<n; i++) M[i] /= (S[i] + norm);
+}
+
 
 // compute gradient magnitude and orientation at each location (uses sse)
 void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
@@ -142,14 +150,89 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
     int sizeData = sizeof(float);
     int misalign=1;
 
-    float I[h*w*1+misalign], *I0=I+misalign;
-    for(int x=0; x<h*w*1; x++ ) I0[x]=0;
+    //float I[h*w*nChannels+misalign], *I0=I+misalign;
+    //for(int x=0; x<h*w*nChannels; x++ ) I0[x]=0;
 
-    cv::Mat dst;
-    image.convertTo(dst, CV_32F);
-    transpose(dst, dst);
-    dst = dst/255.0;
-    float *data = dst.ptr<float>();
+    if(nChannels == 1){
+        cv::Mat dst;
+        image.convertTo(dst, CV_32F);
+        transpose(dst, dst);
+        dst = dst/255.0;
+        float *data = dst.ptr<float>();
 
-    gradMag(data, M, O, h, w, nChannels,  false ); 
+        gradMag(data, M, O, h, w, nChannels,  false ); 
+
+    }else if(nChannels == 3){
+        float *M1 = new float[size](); 
+        float *O1 = new float[size]();
+
+        float *M2 = new float[size](); 
+        float *O2 = new float[size]();
+
+        float *M3 = new float[size](); 
+        float *O3 = new float[size]();
+
+        cv::Mat image_split[3];
+        split(image,image_split);
+
+        cv::Mat dst;
+        image_split[0].convertTo(dst, CV_32F);
+        transpose(dst, dst);
+        dst = dst/255.0;
+        float *data = dst.ptr<float>();
+        gradMag(data, M1, O1, h, w, 1,  false ); 
+
+        cv::Mat dst2;
+        image_split[1].convertTo(dst2, CV_32F);
+        transpose(dst2, dst2);
+        dst2 = dst2/255.0;
+        float *data2 = dst2.ptr<float>();
+        gradMag(data2, M2, O2, h, w, 1,  false ); 
+
+
+        cv::Mat dst3;
+        image_split[2].convertTo(dst3, CV_32F);
+        transpose(dst3, dst3);
+        dst3 = dst3/255.0;
+        float *data3 = dst3.ptr<float>();
+        gradMag(data3, M3, O3, h, w, 1,  false ); 
+
+        int tot = h*w;
+        for(int i=0; i < tot; i++){
+
+          float Mfinal = 0;
+          if(M1[i] > Mfinal){
+            Mfinal = M1[i];
+          }
+
+          if(M2[i] > Mfinal){
+            Mfinal = M2[i];
+          }
+
+          if(M3[i] > Mfinal){
+            Mfinal = M3[i];
+          }
+          M[i] = Mfinal;
+        }
+
+        for(int i=0; i < tot; i++){
+
+          float Ofinal = 999999;
+          if(O1[i] < Ofinal){
+            Ofinal = O1[i];
+          }
+
+          if(O2[i] < Ofinal){
+            Ofinal = O2[i];
+          }
+
+          if(O3[i] < Ofinal){
+            Ofinal = O3[i];
+          }
+          O[i] = Ofinal;
+        }      
+
+        //printf("%.4f %.4f %.4f\n", O1[0], O2[0], O[0]);
+    }
+    
  }  

@@ -11,6 +11,7 @@
 #include <channels/ChannelsExtractorLUV.h>
 #include <opencv/cv.hpp>
 
+#include <channels/Utils.h>
 // ------------------- Adapted from Piotr Dollar Matlab Toolbox --------------------
 // Constants for rgb2luv conversion and lookup table for y-> l conversion
 cv::Mat ChannelsLUVExtractor::bgr2luvSetup
@@ -118,11 +119,15 @@ std::vector<cv::Mat> ChannelsLUVExtractor::smoothImage
   std::vector<cv::Mat> inputImg
 )
 {
+    std::vector<cv::Mat> channelsLUV_output(3);
 
-    std::vector<cv::Mat> channelsLUV_output = inputImg;
-    cv::GaussianBlur(inputImg[0], channelsLUV_output[0], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
-    cv::GaussianBlur(inputImg[1], channelsLUV_output[1], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
-    cv::GaussianBlur(inputImg[2], channelsLUV_output[2], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
+    channelsLUV_output[0] = convTri(inputImg[0], 5);
+    channelsLUV_output[1] = convTri(inputImg[1], 5);
+    channelsLUV_output[2] = convTri(inputImg[2], 5);
+
+    //cv::GaussianBlur(inputImg[0], channelsLUV_output[0], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
+    //cv::GaussianBlur(inputImg[1], channelsLUV_output[1], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
+    //cv::GaussianBlur(inputImg[2], channelsLUV_output[2], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
 
     return channelsLUV_output;
 }
