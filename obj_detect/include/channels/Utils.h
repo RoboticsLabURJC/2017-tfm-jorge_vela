@@ -30,4 +30,9 @@ void channelsCompute
 	int shrink
 );
 
+cv::Mat convTri
+(
+	cv::Mat input_image,
+	int kernel_size
+);
 #endif

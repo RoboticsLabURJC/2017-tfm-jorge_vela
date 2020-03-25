@@ -29,6 +29,11 @@ public:
     cv::Mat img
     );
 
+  std::vector<cv::Mat> bgr2luv
+    (
+    cv::Mat bgr_img,
+    float scaling_factor // if image values uint8 -> 1.0/255.0, if float -> 1.0.
+    );
 private:
   float m_smooth;
   int m_smooth_kernel_size;
@@ -52,11 +57,7 @@ protected:
       float& vn
     );
 
-  std::vector<cv::Mat> bgr2luv
-    (
-    cv::Mat bgr_img,
-    float scaling_factor // if image values uint8 -> 1.0/255.0, if float -> 1.0.
-    );
+
 
   std::vector<cv::Mat> smoothImage
   (

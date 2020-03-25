@@ -17,8 +17,6 @@
 
 class GradHistExtractor
 {
-//#include "../src/channels/sse.hpp"
-
 
 public:
   GradHistExtractor
@@ -86,7 +84,6 @@ protected:
   		int nOrients, 
   		bool full, 
   		bool interpolate );
-
 };
 
 #endif

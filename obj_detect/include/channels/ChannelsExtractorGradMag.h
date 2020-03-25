@@ -43,12 +43,22 @@ public:
     	float* O
     );
 
-    void gradMAdv
-    (
-      cv::Mat image,
-      float* M,
-      float* O
-    );
+  void gradMAdv
+  (
+    cv::Mat image,
+    float* M,
+    float* O
+  );
+
+  void gradMagNorm
+  (
+      float *M, 
+      float *S, 
+      int h, 
+      int w, 
+      float norm 
+  );
+
 };
 
 #endif
