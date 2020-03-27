@@ -11,13 +11,12 @@
 #include <channels/ChannelsExtractorGradHist.h>
 #include <opencv/cv.hpp>
 
-//#include "alloc.cpp"
-/*#include "wrappers.hpp"
+#include "wrappers.hpp"
 #include <math.h>
 #include "string.h"
 #include "sse.hpp"
 #include <iostream>
-*/
+
 #include "sse.hpp"
 
 
@@ -28,6 +27,67 @@
 using namespace cv;
 using namespace std;
 #define PI 3.14159265f
+
+
+float* hogNormMatrix( float *H, int nOrients, int hb, int wb, int bin ) {
+  float *N, *N1, *n; int o, x, y, dx, dy, hb1=hb+1, wb1=wb+1;
+  float eps = 1e-4f/4/bin/bin/bin/bin; // precise backward equality
+  N = new float[hb1*wb1*sizeof(float)]();N1=N+hb1+1; //(float*) wrCalloc(hb1*wb1,sizeof(float)); 
+  for( o=0; o<nOrients; o++ ) for( x=0; x<wb; x++ ) for( y=0; y<hb; y++ )
+    N1[x*hb1+y] += H[o*wb*hb+x*hb+y]*H[o*wb*hb+x*hb+y];
+  for( x=0; x<wb-1; x++ ) for( y=0; y<hb-1; y++ ) {
+    n=N1+x*hb1+y; *n=1/float(sqrt(n[0]+n[1]+n[hb1]+n[hb1+1]+eps)); }
+  x=0;     dx= 1; dy= 1; y=0;                  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  x=0;     dx= 1; dy= 0; for(y=0; y<hb1; y++)  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  x=0;     dx= 1; dy=-1; y=hb1-1;              N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  x=wb1-1; dx=-1; dy= 1; y=0;                  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  x=wb1-1; dx=-1; dy= 0; for( y=0; y<hb1; y++) N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  x=wb1-1; dx=-1; dy=-1; y=hb1-1;              N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  y=0;     dx= 0; dy= 1; for(x=0; x<wb1; x++)  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  y=hb1-1; dx= 0; dy=-1; for(x=0; x<wb1; x++)  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
+  return N;
+}
+
+void hogChannels( float *H, const float *R, const float *N,
+  int hb, int wb, int nOrients, float clip, int type )
+{
+  #define GETT(blk) t=R1[y]*N1[y-(blk)]; if(t>clip) t=clip; c++;
+  const float r=.2357f; int o, x, y, c; float t;
+  const int nb=wb*hb, nbo=nOrients*nb, hb1=hb+1;
+  for( o=0; o<nOrients; o++ ) for( x=0; x<wb; x++ ) {
+    const float *R1=R+o*nb+x*hb, *N1=N+x*hb1+hb1+1;
+    float *H1 = (type<=1) ? (H+o*nb+x*hb) : (H+x*hb);
+    if( type==0) for( y=0; y<hb; y++ ) {
+      // store each orientation and normalization (nOrients*4 channels)
+      c=-1; GETT(0); H1[c*nbo+y]=t; GETT(1); H1[c*nbo+y]=t;
+      GETT(hb1); H1[c*nbo+y]=t; GETT(hb1+1); H1[c*nbo+y]=t;
+    } else if( type==1 ) for( y=0; y<hb; y++ ) {
+      // sum across all normalizations (nOrients channels)
+      c=-1; GETT(0); H1[y]+=t*.5f; GETT(1); H1[y]+=t*.5f;
+      GETT(hb1); H1[y]+=t*.5f; GETT(hb1+1); H1[y]+=t*.5f;
+    } else if( type==2 ) for( y=0; y<hb; y++ ) {
+      // sum across all orientations (4 channels)
+      c=-1; GETT(0); H1[c*nb+y]+=t*r; GETT(1); H1[c*nb+y]+=t*r;
+      GETT(hb1); H1[c*nb+y]+=t*r; GETT(hb1+1); H1[c*nb+y]+=t*r;
+    }
+  }
+  #undef GETT
+}
+
+
+void GradHistExtractor::hog( float *M, float *O, float *H, int h, int w, int binSize,
+  int nOrients, int softBin, bool full, float clip )
+{
+  float *N, *R; const int hb=h/binSize, wb=w/binSize, nb=hb*wb;
+  // compute unnormalized gradient histograms
+  R = new float[wb*hb*nOrients*sizeof(int)](); //(float*) wrCalloc(wb*hb*nOrients,sizeof(float));
+  gradHist( M, O, R, h, w, binSize, nOrients, softBin, full );
+  // compute block normalization values
+  N = hogNormMatrix( R, nOrients, hb, wb, binSize );
+  // perform four normalizations per spatial block
+  hogChannels( H, R, N, hb, wb, nOrients, clip, 0 );
+  free(N); free(R);
+}
 
 
 // helper for gradHist, quantize O and M into O0, O1 and M0, M1 (uses sse)
@@ -179,5 +239,7 @@ void GradHistExtractor::gradHAdv(cv::Mat image, float *M, float *O, float *H){
   int sizeData = sizeof(float);
   int misalign=1;
 
-  gradHist(M,O,H,h,w,2,6,0,false);
+  printf("%d %d\n",w,h );
+  gradHist(M,O,H,w,h,4,6,0,0);
+  //hog(M,O,H,h,w,2,6,0,false, 0.02);
  }  
