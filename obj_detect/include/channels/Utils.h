@@ -24,7 +24,15 @@ cv::Mat ImgResample
 );
 
 
-void channelsCompute
+struct productChnsCompute {
+  cv::Mat image;
+  float* M;
+  float* O;
+  float* H;
+} ;
+
+
+productChnsCompute channelsCompute
 (
 	cv::Mat src,
 	int shrink
@@ -34,5 +42,14 @@ cv::Mat convTri
 (
 	cv::Mat input_image,
 	int kernel_size
+);
+
+void getScales
+(
+	int nPerOct,
+	int nOctUp,
+	int minDs[],
+	int shrink,
+	int sz[]
 );
 #endif

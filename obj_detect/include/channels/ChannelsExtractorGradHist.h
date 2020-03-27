@@ -84,6 +84,9 @@ protected:
   		int nOrients, 
   		bool full, 
   		bool interpolate );
+
+  void hog( float *M, float *O, float *H, int h, int w, int binSize,
+  int nOrients, int softBin, bool full, float clip );
 };
 
 #endif
