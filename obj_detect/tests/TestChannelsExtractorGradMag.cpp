@@ -191,7 +191,7 @@ TEST_F(TestChannelsExtractorGradMag, TestGradMagLinear)
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImage)
 {
 	cv::Mat image;
-	image = cv::imread("index2.jpeg", cv::IMREAD_GRAYSCALE); //IMREAD_COLOR);
+	image = cv::imread("images/index2.jpeg", cv::IMREAD_GRAYSCALE); //IMREAD_COLOR);
 
   	float *M, *O, *H;
 
@@ -206,7 +206,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImage)
 	//cv::FileStorage fs("MRealImage.yaml", cv::FileStorage::READ);
 	//FileNode n = fs["M"]; 
 	FileStorage fs;
-    fs.open("MRealImage.yaml", FileStorage::READ);
+    fs.open("yaml/MRealImage.yaml", FileStorage::READ);
 
     FileNode rows = fs["M"]["rows"];
     FileNode cols = fs["M"]["cols"];
@@ -226,7 +226,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImage)
 	}
 	fs.release();
 
-    fs.open("ORealImage.yaml", FileStorage::READ);
+    fs.open("yaml/ORealImage.yaml", FileStorage::READ);
 
     rows = fs["O"]["rows"];
     cols = fs["O"]["cols"];
@@ -252,7 +252,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImage)
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor)
 {
 	cv::Mat image;
-	image = cv::imread("index3.jpeg", cv::IMREAD_COLOR); //IMREAD_COLOR);
+	image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); //IMREAD_COLOR);
 
   	float *M, *O, *H;
 
@@ -265,7 +265,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor)
 	gradMagExtract.gradMAdv(image,M,O);
 
 	FileStorage fs;
-    fs.open("M_colorScale.yaml", FileStorage::READ);
+    fs.open("yaml/M_colorScale.yaml", FileStorage::READ);
 
     FileNode rows = fs["M"]["rows"];
     FileNode cols = fs["M"]["cols"];

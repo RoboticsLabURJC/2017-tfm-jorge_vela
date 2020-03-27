@@ -35,8 +35,8 @@ class TestUtils: public testing::Test
 
 TEST_F(TestUtils, TestResample)
 {
-  cv::Mat imageMatlab = cv::imread("mask_image.jpg", cv::IMREAD_COLOR); 
-  cv::Mat image = cv::imread("index.jpeg", cv::IMREAD_COLOR); 
+  cv::Mat imageMatlab = cv::imread("images/mask_image.jpg", cv::IMREAD_COLOR); 
+  cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR); 
   int h = 0;
   int w = 0;
   if(image.size().height % 2 == 0){
@@ -70,9 +70,9 @@ TEST_F(TestUtils, TestResample)
   FileStorage fs1;
   FileStorage fs2;
   FileStorage fs3;
-  fs1.open("imresample_1.yaml", FileStorage::READ);
-  fs2.open("imresample_2.yaml", FileStorage::READ);
-  fs3.open("imresample_3.yaml", FileStorage::READ);
+  fs1.open("yaml/imresample_1.yaml", FileStorage::READ);
+  fs2.open("yaml/imresample_2.yaml", FileStorage::READ);
+  fs3.open("yaml/imresample_3.yaml", FileStorage::READ);
 
   FileNode rows = fs1["res1"]["rows"];
   FileNode cols = fs1["res1"]["cols"];
@@ -145,8 +145,25 @@ TEST_F(TestUtils, TestResample)
 
 TEST_F(TestUtils, TestChannelsCompute)
 {
-  cv::Mat image = cv::imread("index3.jpeg", cv::IMREAD_COLOR); 
-  channelsCompute(image, 3);
+  cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
+  productChnsCompute pChnsCompute;
+
+  pChnsCompute = channelsCompute(image, 4);
 }
+
+
+TEST_F(TestUtils, TestGetScales)
+{
+
+  int nPerOct = 1;
+  int nOctUp = 1;
+  int shrink = 1;
+  int size[2] = {7,9};
+  int minDS[2] = {2,4};
+  getScales(nPerOct, nOctUp, minDS, shrink, size);
+
+}
+
+
 
 

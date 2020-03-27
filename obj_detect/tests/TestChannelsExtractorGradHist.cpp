@@ -149,7 +149,7 @@ TEST_F(TestChannelsExtractorGradHist, TestRealImage){
 
 TEST_F(TestChannelsExtractorGradHist, TestColorImage){
 	cv::Mat image;
-	image = cv::imread("index3.jpeg", cv::IMREAD_COLOR); 
+	image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); 
 
 	int size = image.size().height*image.size().width*1;
 	float *M = new float[size](); // (size, sizeData, misalign)??
@@ -160,7 +160,8 @@ TEST_F(TestChannelsExtractorGradHist, TestColorImage){
 	gradMagExtract.gradMAdv(image,M,O);
 
 	printf("%.4f %.4f\n", M[0], O[0] );
-	gradHistExtract.gradHAdv(image, M, O, H);
+	//gradHistExtract.gradHAdv(image, M, O, H);
+	//printf("%.4f\n", H[0]);
 }
 
 

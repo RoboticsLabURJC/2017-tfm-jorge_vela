@@ -286,11 +286,11 @@ TEST_F(TestChannelsExtractorLUV, TestGreenImage)
 TEST_F(TestChannelsExtractorLUV, TestNaturalRGBImage)
 {  
   cv::Mat img_natural;
-  img_natural = cv::imread("index.jpeg");
+  img_natural = cv::imread("images/index.jpeg");
 
   std::vector<cv::Mat> vec_luv_gt(3);
 
-  cv::FileStorage fs("luv_matlab_index.jpeg.yml", cv::FileStorage::READ);
+  cv::FileStorage fs("yaml/luv_matlab_index.jpeg.yml", cv::FileStorage::READ);
   fs["luv_1"] >> vec_luv_gt[0];
   fs["luv_2"] >> vec_luv_gt[1];
   fs["luv_3"] >> vec_luv_gt[2];
@@ -336,12 +336,12 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalRGBImage)
 TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImage)
 {  
   cv::Mat img_natural;
-  img_natural = cv::imread("index.jpeg");
+  img_natural = cv::imread("images/index.jpeg");
 
 
   std::vector<cv::Mat> vec_luv_gt(3);
 
-  cv::FileStorage fs("luv_matlab_index.jpeg.yml", cv::FileStorage::READ);
+  cv::FileStorage fs("yaml/luv_matlab_index.jpeg.yml", cv::FileStorage::READ);
   fs["luv_1"] >> vec_luv_gt[0];
   fs["luv_2"] >> vec_luv_gt[1];
   fs["luv_3"] >> vec_luv_gt[2];
@@ -370,7 +370,7 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImage)
 
   cv::FileStorage fs_smooth;
 
-  fs.open("smoothImage_L.yaml", cv::FileStorage::READ);
+  fs.open("yaml/smoothImage_L.yaml", cv::FileStorage::READ);
 
   cv::FileNode rows = fs["smoothL"]["rows"];
   cv::FileNode cols = fs["smoothL"]["cols"];
