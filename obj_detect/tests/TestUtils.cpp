@@ -149,18 +149,35 @@ TEST_F(TestUtils, TestChannelsCompute)
   productChnsCompute pChnsCompute;
 
   pChnsCompute = channelsCompute(image, 4);
+
+
+
+  /*
+  FileStorage fs;
+    fs.open("yaml/HchnsCompute.yaml", FileStorage::READ);
+
+    FileNode rows = fs["H"]["rows"];
+    FileNode cols = fs["H"]["cols"];
+    FileNode HMatrix = fs["H"]["data"];
+
+  for(int y=0;y<(int)rows*(int)cols;y++)
+  { 
+    printf("-- %.4f %.4f \n", H[y], (float)HMatrix[y]);
+  }*/
+
+
 }
 
 
 TEST_F(TestUtils, TestGetScales)
 {
 
-  int nPerOct = 1;
-  int nOctUp = 1;
-  int shrink = 1;
-  int size[2] = {7,9};
-  int minDS[2] = {2,4};
-  getScales(nPerOct, nOctUp, minDS, shrink, size);
+  int nPerOct = 8;
+  int nOctUp = 0;
+  int shrink = 4;
+  int size[2] = {1,1};
+  int minDS[2] = {16,16};
+  //getScales(nPerOct, nOctUp, minDS, shrink, size);
 
 }
 
