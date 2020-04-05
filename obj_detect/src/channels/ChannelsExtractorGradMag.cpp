@@ -199,40 +199,25 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
 
         int tot = h*w;
         for(int i=0; i < tot; i++){
-
+          float Ofinal = 999999;
           float Mfinal = 0;
           if(M1[i] > Mfinal){
             Mfinal = M1[i];
+            Ofinal = O1[i];
           }
 
           if(M2[i] > Mfinal){
             Mfinal = M2[i];
+            Ofinal = O2[i];
           }
 
           if(M3[i] > Mfinal){
             Mfinal = M3[i];
-          }
-          M[i] = Mfinal;
-        }
-
-        for(int i=0; i < tot; i++){
-
-          float Ofinal = 999999;
-          if(O1[i] < Ofinal){
-            Ofinal = O1[i];
-          }
-
-          if(O2[i] < Ofinal){
-            Ofinal = O2[i];
-          }
-
-          if(O3[i] < Ofinal){
             Ofinal = O3[i];
           }
+          M[i] = Mfinal;
           O[i] = Ofinal;
-        }      
-
-        //printf("%.4f %.4f %.4f\n", O1[0], O2[0], O[0]);
+        }
     }
     
  }  

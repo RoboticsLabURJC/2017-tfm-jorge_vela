@@ -15,6 +15,7 @@
 
 #include <opencv/cv.hpp>
 #include <channels/Utils.h>
+#include <math.h>
 
 using namespace cv;
 
@@ -67,7 +68,8 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 
 	productChnsCompute productCompute;
 
-	ChannelsLUVExtractor channExtract{false, 1};
+	int smooth = 1;
+	ChannelsLUVExtractor channExtract{false, smooth};
   	GradMagExtractor gradMagExtract;
   	GradHistExtractor gradHistExtract;
 
@@ -86,9 +88,8 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 	Rect cropImage = Rect(0,0,w, h);
 	cv::Mat imageCropped = src(cropImage);
 
-	h = imageCropped.size().height;
-	w = imageCropped.size().width;
-
+	//h = imageCropped.size().height;
+	//w = imageCropped.size().width;
 
 	std::vector<cv::Mat> luvImage = channExtract.extractFeatures(imageCropped); //IMAGENES ESCALA DE GRISES??
 
@@ -98,52 +99,45 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 	cv::Mat dst2;
 	luvImage[2].copyTo(dst2);
 
-	//dst2.copyTo(luvImage[0]);
-	//dst.copyTo(luvImage[2]);
-	
+	luvImage[0] = dst2;
+	luvImage[2] = dst;
+
+
 	cv::Mat luv_image;
 	merge(luvImage, luv_image);
 
+	luv_image = convTri(luv_image, smooth);
 
 	int size = imageCropped.cols*imageCropped.rows*dChan;
 	float *M = new float[size](); // (size, sizeData, misalign)??
 	float *O = new float[size]();
 
-
-	printf("%d %d \n", w, h);
 	gradMagExtract.gradMAdv(luv_image*255,M,O);
 
-	printf("M: %.4f %.4f\n",  M[0], M[1]);
-	printf("O: %.4f %.4f\n",  O[0], O[1]);
-
 	cv::Mat dummy_query = cv::Mat(w,h,  CV_32F, M);
-
 	cv::Mat M_to_img = convTri(dummy_query, 5);
-
 	cv::Mat newM;
     M_to_img.convertTo(newM, CV_32F);
     float *dataM = newM.ptr<float>();
 
 	gradMagExtract.gradMagNorm(M, dataM, w,h, 0.005);
 
-	printf("M 0 modificada: %f \n", M[0]);
-	printf("M 1 modificada: %f \n", M[1]);
-	//for(int y=0;y<h;y++){ for(int x=0;x<w;x++) printf("%f ",M[x*w+y]); printf("\n");}
-    //for(int y=0;y<h;y++){ for(int x=0;x<w;x++) printf("%.4f ",M[x*h+y]); printf("\n");}
+
 	int h2 = h/4;
 	int w2 = w/4;
 	int sizeH = h2*w2*dChan*6;
 	float *H = new float[sizeH]();
 
+
 	gradHistExtract.gradHAdv(luv_image, M, O, H);
-	printf("%f \n", H[0]);
-	printf("%f \n", H[1]);
-	printf("%f \n", H[2]);
 
 	productCompute.image = luv_image;
 	productCompute.M = M;
 	productCompute.O = O;
 	productCompute.H = H;
+	printf("%.4f %.4f\n", M[1], M[3] );
+
+	printf("%.4f\n", H[15] );
 
 	return productCompute;
 }
@@ -165,28 +159,73 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
 	int nScales = floor(nPerOct*(nOctUp+log2(min))+1);
 	printf("minValue %.4f %d \n", min, nScales);
 
-	int d0 = 0;
-	int d1 = 0;
+	float d0 = 0;
+	float d1 = 0;
 	if(sz[0] < sz[1]){
-		int d0 = sz[0];
-		int d1 = sz[1];
+		d0 = (float)sz[0];
+		d1 = (float)sz[1];
 	}else{
-		int d0 = sz[1];
-		int d1 = sz[0];
+		d0 = (float)sz[1];
+		d1 = (float)sz[0];
 	}
 
-	int scales[nScales];
-	int scaleshw[nScales];
+	printf("%f %f\n", d0, d1);
+	//int scales[nScales];
+	//int scaleshw[nScales];
+
+	
+	float s = (-float(0-1)/float(nPerOct+nOctUp));
+	float p = pow(2,s);
+	
+	for (int scale = 0; scale < 100/*abs(nScales)*/; scale++){
+		printf("-----------------------------------------------------------\n");
+	    float valueIn = (-(float(scale))/float(nPerOct)+float(nOctUp));
+		float s = pow(2,valueIn);
 
 
-	for(int s = 0; s < nScales; s++){
-		float s0=(round(d0*s/shrink)*shrink-.25*shrink)/d0;
-		float s1=(round(d0*s/shrink)*shrink+.25*shrink)/d0;
+		float srk = (float)shrink;
+		float s0=(round(d0*s/srk)*srk-.25*srk)/d0;
+		float s1=(round(d0*s/srk)*srk+.25*srk)/d0;
+		//printf("%f -- %f -- %f -- %f \n",valueIn, s, s0, s1);
+
+	    printf("%f %f %f %f \n", d0, s, srk , s0);
+
+		float ss = 0.0;
+		//float arr_es0[100];
+		//float arr_es1[100];
+
+		float xMin = 999999.99999;
+		int pos = 0;
+		float arrayPositions[1]; //1 se sustituirá por abs(nScales)
+		while(ss < 100){
+			float ss_mod = ss*(s1 - s0)+s0;
+			float es0=d0*ss_mod; es0=abs(es0-round(es0/shrink)*shrink);
+			//arr_es0[(int)(ss*100)] = es0;
+
+			float es1=d1*ss_mod; es1=abs(es1-round(es1/shrink)*shrink);
+			//arr_es0[(int)(ss*100)] = es1;
+			ss = ss + 0.01;
+
+			float x = max(es0, es1); 
+			//arr_es0[(int)(ss*100)] = x;
+			if(x < xMin){
+				xMin = x;
+				pos = (int)(ss*100);
+			}
+		}
+		arrayPositions[scale] = pos*0.01;
+		printf("%f %d \n", xMin, pos ); //FUNCION MIN DE MATLAB RETORNA EL VALOR Y LA POSICION DEL ARRAY EN LA QUE SE ENCUENTRA
 	}
+
+
 }
 
 
-
+//for(int s = 0; s > nScales; s--){
+//float s = (-(0-1)/nPerOct+nOctUp);
+//float s0=(round(d0*s/shrink)*shrink-.25*shrink)/d0;
+//float s1=(round(d0*s/shrink)*shrink+.25*shrink)/d0;
+//}
 
 
 

@@ -239,7 +239,6 @@ void GradHistExtractor::gradHAdv(cv::Mat image, float *M, float *O, float *H){
   int sizeData = sizeof(float);
   int misalign=1;
 
-  printf("%d %d\n",w,h );
-  gradHist(M,O,H,w,h,4,6,0,0);
+  gradHist(M,O,H,h,w,4,6,0,0);
   //hog(M,O,H,h,w,2,6,0,false, 0.02);
  }  
