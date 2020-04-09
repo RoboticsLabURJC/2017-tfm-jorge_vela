@@ -117,51 +117,54 @@ TEST_F(TestChannelsExtractorGradHist, TestRealImage){
     FileNode cols = fs["M"]["cols"];
 
 
-	for(int y=0;y<(int)rows;y++){ 
-		for(int x=0;x<(int)cols;x++){
-			M[x*(int)cols+y] = (float)MMatrix[i];
-			i++;	
-		} 
-	}
+  for(int y=0;y<(int)rows;y++)
+  { 
+	for(int x=0;x<(int)cols;x++)
+	  {
+        M[x*(int)cols+y] = (float)MMatrix[i];
+        i++;	
+    } 
+  }
 
-    fs.open("ORealImage.yaml", FileStorage::READ);
+  fs.open("ORealImage.yaml", FileStorage::READ);
 
-    rows = fs["O"]["rows"];
-    cols = fs["O"]["cols"];
-    FileNode OMatrix = fs["O"]["data"];	
+  rows = fs["O"]["rows"];
+  cols = fs["O"]["cols"];
+  FileNode OMatrix = fs["O"]["data"];	
 
-	i = 0;
-	for(int y=0;y<(int)rows;y++){ 
-		for(int x=0;x<(int)cols;x++){
-			O[x*(int)cols+y] = (float)OMatrix[i];
-			i++;	
-		} 
-	}
+  i = 0;
+  for(int y=0;y<(int)rows;y++)
+  { 
+    for(int x=0;x<(int)cols;x++)
+    {
+      O[x*(int)cols+y] = (float)OMatrix[i];
+      i++;	
+	} 
+  }
+  //printf("%.4f\n", H[0]);
 
-	//printf("%.4f\n", H[0]);
+  gradHistExtract.gradHAdv(image, M, O, H);
 
-	gradHistExtract.gradHAdv(image, M, O, H);
-
-	//printf("%.4f\n", H[0]);
+  //printf("%.4f\n", H[0]);
 }
 */
 
 
 TEST_F(TestChannelsExtractorGradHist, TestColorImage){
-	cv::Mat image;
-	image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); 
+  cv::Mat image;
+  image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); 
 
-	int size = image.size().height*image.size().width*1;
-	float *M = new float[size](); // (size, sizeData, misalign)??
-	float *O = new float[size]();
+  int size = image.size().height*image.size().width*1;
+  float *M = new float[size](); // (size, sizeData, misalign)??
+  float *O = new float[size]();
 
-	float *H= new float[size*6]();
+  float *H= new float[size*6]();
 
-	gradMagExtract.gradMAdv(image,M,O);
+  gradMagExtract.gradMAdv(image,M,O);
 
-	printf("%.4f %.4f\n", M[0], O[0] );
-	//gradHistExtract.gradHAdv(image, M, O, H);
-	//printf("%.4f\n", H[0]);
+  printf("%.4f %.4f\n", M[0], O[0] );
+  //gradHistExtract.gradHAdv(image, M, O, H);
+  //printf("%.4f\n", H[0]);
 }
 
 
