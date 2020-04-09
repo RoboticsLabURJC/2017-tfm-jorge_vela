@@ -215,22 +215,18 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
   }
 }
 
-
- float* GradHistExtractor::allocW(int size , int sf, int misalign){
-   //float* var = allocConflict(size,sf, misalign );
-   //return var;
-   	float *var;
-   	var  = (float*) calloc(size+misalign,sf) + misalign;
-   	return var;
- }
-
- void GradHistExtractor::gradH(float *M, float *O, float *H){
- 	const int h=12, w=12  , misalign=1; int x, y, d=3; 
- 	gradHist(M,O,H,h,w,8,9,1, true);
+float* GradHistExtractor::allocW(int size , int sf, int misalign)
+{
+  //float* var = allocConflict(size,sf, misalign );
+  //return var;
+  float *var;
+  var  = (float*) calloc(size+misalign,sf) + misalign;
+  return var;
  }
 
 
-void GradHistExtractor::gradHAdv(cv::Mat image, float *M, float *O, float *H){
+void GradHistExtractor::gradH(cv::Mat image, float *M, float *O, float *H, int bin, int nOrients, int softBin, bool full)
+{
   int h = image.size().height;
   int w = image.size().width;
   int nChannels = image.channels();
@@ -239,6 +235,6 @@ void GradHistExtractor::gradHAdv(cv::Mat image, float *M, float *O, float *H){
   int sizeData = sizeof(float);
   int misalign=1;
 
-  gradHist(M,O,H,h,w,4,6,0,0);
+  gradHist(M,O,H,h,w,bin,nOrients,softBin,full);
   //hog(M,O,H,h,w,2,6,0,false, 0.02);
- }  
+}  
