@@ -14,27 +14,20 @@
 
 #include <opencv/cv.hpp>
 #include <vector>
-//#include "../src/channels/alloc.cpp"
-
 
 class GradMagExtractor
 {
-
-
 public:
   GradMagExtractor
     (
     ){};
-
-    void test();
-
     
   float* allocW
-  (
-  	int size, 
-  	int sf,
-  	int misalign
-  );
+    (
+  	  int size, 
+  	  int sf,
+  	  int misalign
+    );
 
   void gradM
     (
@@ -44,20 +37,20 @@ public:
     );
 
   void gradMAdv
-  (
-    cv::Mat image,
-    float* M,
-    float* O
-  );
+    (
+      cv::Mat image,
+      float* M,
+      float* O
+    );
 
   void gradMagNorm
-  (
+    (
       float *M, 
       float *S, 
       int h, 
       int w, 
       float norm 
-  );
+    );
 
 };
 

@@ -25,31 +25,32 @@ public:
     	int nOrients = 8,
     	int softBin = 1,
     	int full = 0
-    ) {m_binSize = binSize;
-       m_nOrients = nOrients;
-       m_softBin = softBin;
-       m_full = full;};
+    ) 
+    {
+      m_binSize = binSize;
+      m_nOrients = nOrients;
+      m_softBin = softBin;
+      m_full = full;
+    };
 
   float* allocW
-  (
-  	int size, 
-  	int sf,
-  	int misalign
-  );
-
-  void gradH
     (
-    	float* M,
-    	float* O,
-    	float* H
+  	  int size, 
+    	int sf,
+    	int misalign
     );
 
-  void gradHAdv
+
+  void gradH
     (
       cv::Mat image,
       float* M,
       float* O,
-      float* H
+      float* H,
+      int bin = 4,
+      int nOrients = 6,
+      int softBin = 0,
+      bool full = false
     );
 
 private:
@@ -59,31 +60,34 @@ private:
 	int m_full;
 
 protected:
-	void gradHist(
-		float *M, 
-		float *O, 
-		float *H, 
-		int h,
-		int w,
+	void gradHist
+    (
+		  float *M, 
+	  	float *O, 
+  		float *H, 
+		  int h,
+		  int w,
   		int bin, 
   		int nOrients, 
   		int softBin, 
   		bool full
-  		);
+    );
 
-	void gradQuantize( 
-		float *O, 
-		float *M, 
-		int *O0, 
-		int *O1, 
-		float *M0, 
-		float *M1,
+	void gradQuantize
+    ( 
+		  float *O, 
+	  	float *M, 
+		  int *O0, 
+  		int *O1, 
+	  	float *M0, 
+		  float *M1,
   		int nb, 
   		int n, 
   		float norm, 
   		int nOrients, 
   		bool full, 
-  		bool interpolate );
+  		bool interpolate 
+    );
 
   void hog( float *M, float *O, float *H, int h, int w, int binSize,
   int nOrients, int softBin, bool full, float clip );

@@ -19,20 +19,23 @@ class ChannelsLUVExtractor
 public:
   ChannelsLUVExtractor
     (
-    float smooth = false,
-    int smooth_kernel_size = 1
-    ) {m_smooth = smooth; 
-      m_smooth_kernel_size = smooth_kernel_size;};
+      float smooth = false,
+      int smooth_kernel_size = 1
+    ) 
+    {
+      m_smooth = smooth; 
+      m_smooth_kernel_size = smooth_kernel_size;
+    };
 
   std::vector<cv::Mat> extractFeatures
     (
-    cv::Mat img
+      cv::Mat img
     );
 
   std::vector<cv::Mat> bgr2luv
     (
-    cv::Mat bgr_img,
-    float scaling_factor // if image values uint8 -> 1.0/255.0, if float -> 1.0.
+      cv::Mat bgr_img,
+      float scaling_factor // if image values uint8 -> 1.0/255.0, if float -> 1.0.
     );
 private:
   float m_smooth;
