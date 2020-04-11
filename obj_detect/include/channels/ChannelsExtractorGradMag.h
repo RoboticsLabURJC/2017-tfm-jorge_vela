@@ -40,7 +40,8 @@ public:
     (
       cv::Mat image,
       float* M,
-      float* O
+      float* O,
+      int normRad = 0
     );
 
   void gradMagNorm

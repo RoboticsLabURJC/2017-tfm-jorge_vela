@@ -71,6 +71,7 @@ protected:
   		int nOrients, 
   		int softBin, 
   		bool full
+      /* CON RESPECTO A MATLAB, NO ESTAN AÑADIDAS useHOG y clipHOG*/
     );
 
 	void gradQuantize
