@@ -236,5 +236,20 @@ void GradHistExtractor::gradH(cv::Mat image, float *M, float *O, float *H, int b
   int misalign=1;
 
   gradHist(M,O,H,h,w,bin,nOrients,softBin,full);
+
   //hog(M,O,H,h,w,2,6,0,false, 0.02);
+  int hConv = h/bin;
+  int wConv = w/bin;
+  printf("%d %d \n", hConv, wConv);
+  float H2[h][w][nOrients];
+  for(int numArr  = 0; numArr < nOrients; numArr++)
+  {
+   for(int i = 0; i < hConv; i++)
+    {
+      for(int j = 0; j < wConv; j++)
+      {
+        H2[i][j][numArr] = H[j*h+i + (hConv*wConv*numArr)];
+      }
+    }   
+  }
 }  

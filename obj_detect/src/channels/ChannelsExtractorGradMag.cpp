@@ -14,6 +14,8 @@
 
 #include "sse.hpp"
 
+#include <channels/Utils.h>
+
 using namespace cv;
 using namespace std;
 
@@ -137,7 +139,7 @@ void GradMagExtractor::gradM(float *I, float *M, float *O){
   gradMag( I, M, O, h, w, d ,  false ); 
 }	
 
-void GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O){
+void GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O, int normRad){
   int h = image.size().height;
   int w = image.size().width;
   int nChannels = image.channels();
@@ -211,10 +213,39 @@ void GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O){
       {
         Mfinal = M3[i];
         Ofinal = O3[i];
-      }
-          
+      }   
       M[i] = Mfinal;
       O[i] = Ofinal;
     }
   }  
+
+  if(normRad != 0){
+    cv::Mat dummy_query = cv::Mat(w,h,  CV_32F, M);
+    cv::Mat M_to_img = convTri(dummy_query, normRad);
+    cv::Mat newM;
+    M_to_img.convertTo(newM, CV_32F);    
+    float *dataM = newM.ptr<float>();
+    gradMagNorm(M, dataM, w,h, 0.005);
+  }
+
+  // SI HAY QUE RETORNAR EL ARRAY DOBLE
+  float M2[h][w];
+  float O2[h][w];
+  for(int i = 0; i < h; i++)
+  {
+    for(int j = 0; j < w; j++)
+    {
+      M2[i][j] = M[j*h+i];
+      O2[i][j] = O[j*h+i];
+    }
+  }
+  //for(int y=0;y<h;y++){ for(int x=0;x<w;x++) printf("%.4f ",M[x*h+y]); printf("\n");}
+  printf("%d %d \n",h,w );
+  printf("COLUMNA 0 --> %.4f %.4f %.4f %.4f %.4f\n", M2[0][0], M2[1][0], M2[2][0], M2[3][0], M2[4][0]);
+  printf("FILA 0 --> %.4f %.4f %.4f %.4f %.4f\n", M2[0][0], M2[0][1], M2[0][2], M2[0][3], M2[0][4]);
+  printf("COLUMNA 0 --> %.4f %.4f %.4f %.4f %.4f\n", O2[0][0], O2[1][0], O2[2][0], O2[3][0], O2[4][0]);
+  printf("FILA 0 --> %.4f %.4f %.4f %.4f %.4f\n", O2[0][0], O2[0][1], O2[0][2], O2[0][3], O2[0][4]);
+
+
+
 }  

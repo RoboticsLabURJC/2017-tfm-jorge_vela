@@ -79,16 +79,16 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
   int h = src.size().height;
   int w = src.size().width;
 
-  int crop_h = h % shrink;
+  /*int crop_h = h % shrink;
   int crop_w = w % shrink;
 
   h = h - crop_h;
   w = w - crop_w;
 	
   Rect cropImage = Rect(0,0,w, h);
-  cv::Mat imageCropped = src(cropImage);
+  cv::Mat imageCropped = src(cropImage);*/
 
-  std::vector<cv::Mat> luvImage = channExtract.extractFeatures(imageCropped); //IMAGENES ESCALA DE GRISES??
+  std::vector<cv::Mat> luvImage = channExtract.extractFeatures(src); //IMAGENES ESCALA DE GRISES??
 
   cv::Mat dst;
   luvImage[0].copyTo(dst);
@@ -99,25 +99,16 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
   luvImage[0] = dst2;
   luvImage[2] = dst;
 
-
   cv::Mat luv_image;
   merge(luvImage, luv_image);
 
   luv_image = convTri(luv_image, smooth);
 
-  int size = imageCropped.cols*imageCropped.rows*dChan;
-  float *M = new float[size](); // (size, sizeData, misalign)??
+  int size = src.cols*src.rows*dChan;
+  float *M = new float[size](); 
   float *O = new float[size]();
 
-  gradMagExtract.gradMAdv(luv_image*255,M,O);
-
-  cv::Mat dummy_query = cv::Mat(w,h,  CV_32F, M);
-  cv::Mat M_to_img = convTri(dummy_query, 5);
-  cv::Mat newM;
-  M_to_img.convertTo(newM, CV_32F);
-  float *dataM = newM.ptr<float>();
-
-  gradMagExtract.gradMagNorm(M, dataM, w,h, 0.005);
+  gradMagExtract.gradMAdv(luv_image*255,M,O,5);
 
   int h2 = h/4;
   int w2 = w/4;
@@ -126,13 +117,17 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 
   gradHistExtract.gradH(luv_image, M, O, H);
 
+
+  /*for(int i = 0; i < 14*17; i++){
+    printf("%.4f \n", H[i]);
+  }*/
+
+
+
   productCompute.image = luv_image;
   productCompute.M = M;
   productCompute.O = O;
   productCompute.H = H;
-  printf("%.4f %.4f\n", M[1], M[3] );
-
-  printf("%.4f\n", H[15] );
 
   return productCompute;
 }
