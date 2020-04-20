@@ -71,7 +71,7 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
-  GradMagExtractor gradMagExtract;
+  GradMagExtractor gradMagExtract{5};
   GradHistExtractor gradHistExtract;
 
 
@@ -90,24 +90,29 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(src); //IMAGENES ESCALA DE GRISES??
 
-  cv::Mat dst;
+  /*cv::Mat dst;
   luvImage[0].copyTo(dst);
 
   cv::Mat dst2;
   luvImage[2].copyTo(dst2);
 
   luvImage[0] = dst2;
-  luvImage[2] = dst;
+  luvImage[2] = dst;*/
 
   cv::Mat luv_image;
   merge(luvImage, luv_image);
 
   luv_image = convTri(luv_image, smooth);
 
-  int size = src.cols*src.rows*dChan;
-  float *M = new float[size](); 
-  float *O = new float[size]();
+  std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image*255);
 
+  //cv::imshow("m", gMagOrient[0]);
+  //cv::imshow("o", gMagOrient[1]);
+  //cv::waitKey(0);
+
+  gradHistExtract.extractFeatures(luv_image, gMagOrient[0], gMagOrient[1]);
+
+  /*
   gradMagExtract.gradMAdv(luv_image*255,M,O,5);
 
   int h2 = h/4;
@@ -120,7 +125,7 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 
   /*for(int i = 0; i < 14*17; i++){
     printf("%.4f \n", H[i]);
-  }*/
+  }* /
 
 
 
@@ -128,7 +133,7 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
   productCompute.M = M;
   productCompute.O = O;
   productCompute.H = H;
-
+  */
   return productCompute;
 }
 

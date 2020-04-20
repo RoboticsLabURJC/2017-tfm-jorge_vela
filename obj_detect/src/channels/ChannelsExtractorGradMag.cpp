@@ -113,7 +113,7 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
     memcpy( M+x*h, M2, h*sizeof(float) );
     // compute and store gradient orientation (O) via table lookup
 
-    if( O!=0 ) for( y=0; y<h; y++ ) O[x*h+y] = acost[(int)Gx[y]]; //error en esta linea ??
+    if( O!=0 ) for( y=0; y<h; y++ ) O[x*h+y] = acost[(int)Gx[y]]; 
 
     if( O!=0 && full ) {
       y1=((~size_t(O+x*h)+1)&15)/4; y=0;
@@ -139,7 +139,7 @@ void GradMagExtractor::gradM(float *I, float *M, float *O){
   gradMag( I, M, O, h, w, d ,  false ); 
 }	
 
-void GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O, int normRad){
+std::vector<cv::Mat> GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O){
   int h = image.size().height;
   int w = image.size().width;
   int nChannels = image.channels();
@@ -161,91 +161,75 @@ void GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O, int normRad){
   }
   else if(nChannels == 3)
   {
-    float *M1 = new float[size](); 
-    float *O1 = new float[size]();
-    float *M2 = new float[size](); 
-    float *O2 = new float[size]();
-    float *M3 = new float[size](); 
-    float *O3 = new float[size]();
+    //std::vector<cv::Mat> channelsGradMag(2);
 
+    std::vector<float*> MVal{new float[size](), new float[size](), new float[size]() };
+    std::vector<float*> OVal{new float[size](), new float[size](), new float[size]() };
+
+    transpose(image, image);  //cambio que se hacia por cada canal
+    image = image/255;        //cambio que se hacia por cada canal
     cv::Mat image_split[3];
-    split(image,image_split);
+    split(image,image_split); 
 
     cv::Mat dst;
     image_split[0].convertTo(dst, CV_32F);
-    transpose(dst, dst);
-    dst = dst/255.0;
     float *data = dst.ptr<float>();
-    gradMag(data, M1, O1, h, w, 1,  false ); 
+    gradMag(data, MVal[0], OVal[0], h, w, 1,  false ); 
 
     cv::Mat dst2;
     image_split[1].convertTo(dst2, CV_32F);
-    transpose(dst2, dst2);
-    dst2 = dst2/255.0;
     float *data2 = dst2.ptr<float>();
-    gradMag(data2, M2, O2, h, w, 1,  false ); 
+    gradMag(data2, MVal[1], OVal[1], h, w, 1,  false ); 
 
     cv::Mat dst3;
     image_split[2].convertTo(dst3, CV_32F);
-    transpose(dst3, dst3);
-    dst3 = dst3/255.0;
     float *data3 = dst3.ptr<float>();
-    gradMag(data3, M3, O3, h, w, 1,  false ); 
+    gradMag(data3, MVal[2], OVal[2], h, w, 1,  false ); 
+
 
     int tot = h*w;
     for(int i=0; i < tot; i++)
     {
-      float Ofinal = 999999;
-      float Mfinal = 0;
-      if(M1[i] > Mfinal)
-      {
-        Mfinal = M1[i];
-        Ofinal = O1[i];
-      }
+      float max = ( MVal[0][i] < MVal[1][i] ) ? MVal[1][i] : MVal[0][i];
+      M[i] = ( max < MVal[2][i] ) ? MVal[2][i] : max;
 
-      if(M2[i] > Mfinal)
-      {
-        Mfinal = M2[i];
-        Ofinal = O2[i];
-      }
-
-      if(M3[i] > Mfinal)
-      {
-        Mfinal = M3[i];
-        Ofinal = O3[i];
-      }   
-      M[i] = Mfinal;
-      O[i] = Ofinal;
+      float maxO = ( MVal[0][i] < MVal[1][i] ) ? OVal[1][i] : OVal[0][i];
+      O[i] = ( max < MVal[2][i] ) ? OVal[2][i] : maxO;
     }
   }  
 
-  if(normRad != 0){
+  if(m_normRad != 0){
     cv::Mat dummy_query = cv::Mat(w,h,  CV_32F, M);
-    cv::Mat M_to_img = convTri(dummy_query, normRad);
+    cv::Mat M_to_img = convTri(dummy_query, m_normRad);
     cv::Mat newM;
     M_to_img.convertTo(newM, CV_32F);    
     float *dataM = newM.ptr<float>();
     gradMagNorm(M, dataM, w,h, 0.005);
   }
 
-  // SI HAY QUE RETORNAR EL ARRAY DOBLE
-  float M2[h][w];
-  float O2[h][w];
-  for(int i = 0; i < h; i++)
-  {
-    for(int j = 0; j < w; j++)
-    {
-      M2[i][j] = M[j*h+i];
-      O2[i][j] = O[j*h+i];
-    }
-  }
-  //for(int y=0;y<h;y++){ for(int x=0;x<w;x++) printf("%.4f ",M[x*h+y]); printf("\n");}
-  printf("%d %d \n",h,w );
-  printf("COLUMNA 0 --> %.4f %.4f %.4f %.4f %.4f\n", M2[0][0], M2[1][0], M2[2][0], M2[3][0], M2[4][0]);
-  printf("FILA 0 --> %.4f %.4f %.4f %.4f %.4f\n", M2[0][0], M2[0][1], M2[0][2], M2[0][3], M2[0][4]);
-  printf("COLUMNA 0 --> %.4f %.4f %.4f %.4f %.4f\n", O2[0][0], O2[1][0], O2[2][0], O2[3][0], O2[4][0]);
-  printf("FILA 0 --> %.4f %.4f %.4f %.4f %.4f\n", O2[0][0], O2[0][1], O2[0][2], O2[0][3], O2[0][4]);
+  std::vector<cv::Mat> channelsGradMag(2);
+  cv::Mat gradM = cv::Mat(w,h, CV_32F, M);
+  transpose(gradM, gradM);
+  channelsGradMag[0] = gradM;
+  cv::Mat gradO = cv::Mat(w,h, CV_32F, O);
+  transpose(gradO, gradO);
+  channelsGradMag[1] = gradO;
+
+  return channelsGradMag;
+}
 
 
+std::vector<cv::Mat> GradMagExtractor::extractFeatures(cv::Mat img){
+  int dChan = img.channels();
+  int width = img.size().width;
+  int height = img.size().height;
 
+  int size = width*height*dChan;
+  float *M = new float[size](); 
+  float *O = new float[size]();  
+
+  std::vector<cv::Mat> channelsGradMag(2);
+  channelsGradMag = gradMAdv(img,M,O);
+
+  return channelsGradMag;
 }  
