@@ -152,8 +152,9 @@ TEST_F(TestUtils, TestResample)
 TEST_F(TestUtils, TestChannelsCompute)
 {
   cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
-  productChnsCompute pChnsCompute;
+  std::vector<cv::Mat> pChnsCompute;
   pChnsCompute = channelsCompute(image, 4);
+
 
   /*
   FileStorage fs;
