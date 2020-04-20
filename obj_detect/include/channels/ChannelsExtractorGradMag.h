@@ -17,10 +17,16 @@
 
 class GradMagExtractor
 {
+
+private:
+  int m_normRad;
 public:
   GradMagExtractor
     (
-    ){};
+      int normRad = 0
+    ){
+      m_normRad = normRad;
+    };
     
   float* allocW
     (
@@ -40,8 +46,7 @@ public:
     (
       cv::Mat image,
       float* M,
-      float* O,
-      int normRad = 0
+      float* O
     );
 
   void gradMagNorm
