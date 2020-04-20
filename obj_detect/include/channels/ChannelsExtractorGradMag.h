@@ -36,7 +36,7 @@ public:
     	float* O
     );
 
-  void gradMAdv
+  std::vector<cv::Mat> gradMAdv
     (
       cv::Mat image,
       float* M,
@@ -53,6 +53,10 @@ public:
       float norm 
     );
 
+  std::vector<cv::Mat> extractFeatures
+    (
+      cv::Mat img 
+    );
 };
 
 #endif

@@ -41,7 +41,7 @@ public:
     );
 
 
-  void gradH
+  std::vector<cv::Mat> gradH
     (
       cv::Mat image,
       float* M,
@@ -51,6 +51,13 @@ public:
       int nOrients = 6,
       int softBin = 0,
       bool full = false
+    );
+
+  std::vector<cv::Mat> extractFeatures
+    (
+      cv::Mat img, 
+      cv::Mat M,
+      cv::Mat O
     );
 
 private:
