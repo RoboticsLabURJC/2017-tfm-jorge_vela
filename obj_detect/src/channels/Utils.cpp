@@ -65,7 +65,7 @@ cv::Mat convTri(cv::Mat input_image, int kernel_size){
 
 
 
-productChnsCompute channelsCompute(cv::Mat src, int shrink){
+std::vector<cv::Mat> channelsCompute(cv::Mat src, int shrink){
 
   productChnsCompute productCompute;
 
@@ -106,35 +106,26 @@ productChnsCompute channelsCompute(cv::Mat src, int shrink){
 
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image*255);
 
-  //cv::imshow("m", gMagOrient[0]);
-  //cv::imshow("o", gMagOrient[1]);
-  //cv::waitKey(0);
-
-  gradHistExtract.extractFeatures(luv_image, gMagOrient[0], gMagOrient[1]);
-
-  /*
-  gradMagExtract.gradMAdv(luv_image*255,M,O,5);
-
-  int h2 = h/4;
-  int w2 = w/4;
-  int sizeH = h2*w2*dChan*6;
-  float *H = new float[sizeH]();
-
-  gradHistExtract.gradH(luv_image, M, O, H);
 
 
-  /*for(int i = 0; i < 14*17; i++){
-    printf("%.4f \n", H[i]);
-  }* /
+  std::vector<cv::Mat> gMagHistory = gradHistExtract.extractFeatures(luv_image, gMagOrient[0], gMagOrient[1]);
 
 
+  int lenVector = luvImage.size() +  gMagOrient.size() +  gMagHistory.size();
 
-  productCompute.image = luv_image;
-  productCompute.M = M;
-  productCompute.O = O;
-  productCompute.H = H;
-  */
-  return productCompute;
+  printf("%d\n", lenVector);
+  std::vector<cv::Mat> chnsCompute(lenVector);
+
+  for(int i=0; i<3; i++)
+    chnsCompute[i] = luvImage[i];
+
+  for(int i=0; i<2; i++)
+    chnsCompute[i+3] = gMagOrient[i];
+
+  for(int i =0; i <  gMagHistory.size(); i++) 
+    chnsCompute[i+5] = gMagHistory[i];
+
+  return chnsCompute;
 }
 
 
