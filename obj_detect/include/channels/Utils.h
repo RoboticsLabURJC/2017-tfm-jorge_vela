@@ -33,7 +33,7 @@ struct productChnsCompute
   } ;
 
 
-productChnsCompute channelsCompute
+std::vector<cv::Mat> channelsCompute
   (
     cv::Mat src,
     int shrink
