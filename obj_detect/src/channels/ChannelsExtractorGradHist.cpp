@@ -225,7 +225,7 @@ float* GradHistExtractor::allocW(int size , int sf, int misalign)
  }
 
 
-void GradHistExtractor::gradH(cv::Mat image, float *M, float *O, float *H, int bin, int nOrients, int softBin, bool full)
+std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O, float *H, int bin, int nOrients, int softBin, bool full)
 {
   int h = image.size().height;
   int w = image.size().width;
@@ -241,15 +241,50 @@ void GradHistExtractor::gradH(cv::Mat image, float *M, float *O, float *H, int b
   int hConv = h/bin;
   int wConv = w/bin;
   printf("%d %d \n", hConv, wConv);
-  float H2[h][w][nOrients];
-  for(int numArr  = 0; numArr < nOrients; numArr++)
-  {
-   for(int i = 0; i < hConv; i++)
-    {
-      for(int j = 0; j < wConv; j++)
-      {
-        H2[i][j][numArr] = H[j*h+i + (hConv*wConv*numArr)];
-      }
-    }   
+  //float H2[h][w][nOrients];
+
+  std::vector<cv::Mat> H2(nOrients);
+
+  for(int numArr = 0; numArr < nOrients; numArr++){
+    float* HT = new float[hConv*wConv*sizeData];
+    for(int i=0; i < hConv* wConv; i++){
+      HT[i] = H[i + (hConv*wConv*numArr)];
+    }
+    H2[numArr] = *HT;
+    cv::Mat gradH = cv::Mat(wConv,hConv, CV_32F, HT);
+    transpose(gradH, gradH);
+    H2[numArr] = gradH;
   }
-}  
+
+  return H2;
+}
+
+std::vector<cv::Mat> GradHistExtractor::extractFeatures(cv::Mat img, std::vector<cv::Mat> gradMag)
+{
+  cv::Mat dstM;
+  gradMag[0].convertTo(dstM, CV_32F);
+  transpose(dstM, dstM);
+  float *dataM = dstM.ptr<float>();
+
+  cv::Mat dstO;
+  gradMag[1].convertTo(dstO, CV_32F);
+  transpose(dstO, dstO);
+  float *dataO = dstO.ptr<float>();
+
+
+  int dChan = img.channels();
+  int width = img.size().width;
+  int height = img.size().height;
+
+  int size = width/4*height/4*dChan*6;
+
+  float *H = new float[size]();
+
+  
+  std::vector<cv::Mat> channelsGradHist;
+  channelsGradHist = gradH(img, dataM, dataO, H);
+
+
+  return channelsGradHist;
+}
+

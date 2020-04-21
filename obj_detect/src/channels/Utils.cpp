@@ -106,12 +106,10 @@ std::vector<cv::Mat> channelsCompute(cv::Mat src, int shrink){
 
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image*255);
 
+  std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
 
 
-  std::vector<cv::Mat> gMagHistory = gradHistExtract.extractFeatures(luv_image, gMagOrient[0], gMagOrient[1]);
-
-
-  int lenVector = luvImage.size() +  gMagOrient.size() +  gMagHistory.size();
+  int lenVector = luvImage.size() +  gMagOrient.size() +  gMagHist.size();
 
   printf("%d\n", lenVector);
   std::vector<cv::Mat> chnsCompute(lenVector);
@@ -119,11 +117,11 @@ std::vector<cv::Mat> channelsCompute(cv::Mat src, int shrink){
   for(int i=0; i<3; i++)
     chnsCompute[i] = luvImage[i];
 
-  for(int i=0; i<2; i++)
-    chnsCompute[i+3] = gMagOrient[i];
+  for(int i=0; i<1; i++)
+    chnsCompute[i+3] = gMagOrient[i]; //Meter solo la magnitud, no añadir la orientación
 
-  for(int i =0; i <  gMagHistory.size(); i++) 
-    chnsCompute[i+5] = gMagHistory[i];
+  for(int i =0; i <  gMagHist.size(); i++) 
+    chnsCompute[i+4] = gMagHist[i];
 
   return chnsCompute;
 }
@@ -182,7 +180,7 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     //float arr_es0[100];
     //float arr_es1[100];
 
-    float xMin = 999999.99999;
+    float xMin = 999999.99999; //AÑADIR LIMITS
     int pos = 0;
     float arrayPositions[1]; //1 se sustituirá por abs(nScales)
     while(ss < 100){
@@ -205,6 +203,8 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     arrayPositions[scale] = pos*0.01;
     printf("%f %d \n", xMin, pos ); //FUNCION MIN DE MATLAB RETORNA EL VALOR Y LA POSICION DEL ARRAY EN LA QUE SE ENCUENTRA
   }
+
+
 }
 
 

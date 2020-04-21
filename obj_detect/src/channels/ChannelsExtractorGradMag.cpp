@@ -123,7 +123,7 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
       for( ; y<h; y++ ) O[y+x*h]+=(Gy[y]<0)*PI;
     }
   }
-  free(Gx); free(Gy); free(M2);
+  free(Gx); free(Gy); free(M2); //DELETE    
 }
 
 
