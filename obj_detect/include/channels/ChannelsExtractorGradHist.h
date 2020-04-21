@@ -56,8 +56,7 @@ public:
   std::vector<cv::Mat> extractFeatures
     (
       cv::Mat img, 
-      cv::Mat M,
-      cv::Mat O
+      std::vector<cv::Mat> gradMag
     );
 
 private:
