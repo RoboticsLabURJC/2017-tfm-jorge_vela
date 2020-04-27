@@ -154,20 +154,6 @@ TEST_F(TestUtils, TestChannelsCompute)
   cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
   std::vector<cv::Mat> pChnsCompute;
   pChnsCompute = channelsCompute(image, 4);
-
-
-  /*
-  FileStorage fs;
-    fs.open("yaml/HchnsCompute.yaml", FileStorage::READ);
-
-    FileNode rows = fs["H"]["rows"];
-    FileNode cols = fs["H"]["cols"];
-    FileNode HMatrix = fs["H"]["data"];
-
-  for(int y=0;y<(int)rows*(int)cols;y++)
-  { 
-    printf("-- %.4f %.4f \n", H[y], (float)HMatrix[y]);
-  }*/
 }
 
 
@@ -175,11 +161,11 @@ TEST_F(TestUtils, TestGetScales)
 {
 
   int nPerOct = 8;
-  int nOctUp = 0;
+  int nOctUp = 1;
   int shrink = 4;
-  int size[2] = {1,1};
+  int size[2] = {19,22};
   int minDS[2] = {16,16};
-  //getScales(nPerOct, nOctUp, minDS, shrink, size);
+  getScales(nPerOct, nOctUp, minDS, shrink, size);
 }
 
 
