@@ -277,10 +277,8 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     float s0=(round(d0*s/ (float)shrink)* (float)shrink-.25* (float)shrink)/d0;
     float s1=(round(d0*s/ (float)shrink)* (float)shrink+.25* (float)shrink)/d0;
 
-    //printf("s0: %.4f s1:%.4f \n",s0, s1 );
     float ssLoop = 0.0;
-    //float xMin = 999999.99999; //AÑADIR LIMITS
-    //int pos = 0;
+
     std::vector<float> arrayPositions; //1 se sustituirá por abs(nScales)
    
     std::vector<float> ss;
@@ -301,9 +299,10 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
       ssLoop = ssLoop + 0.01;
 
     }
+
     std::vector<float> x = max(es0, es1);
     int pos = 0;
-    float xMin = 999999.99999; 
+    float xMin = std::numeric_limits<float>::max(); 
     for(int i=0; i < x.size(); i++){
       if( x[i] < xMin){
         xMin = x[i];
