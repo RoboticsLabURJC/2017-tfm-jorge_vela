@@ -127,6 +127,108 @@ std::vector<cv::Mat> channelsCompute(cv::Mat src, int shrink){
 }
 
 
+
+void chnsPyramid(cv::Mat img){
+  printf("channelsPyramids\n");
+
+  int smooth = 1;
+  ChannelsLUVExtractor channExtract{false, smooth};
+
+
+  //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
+  std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
+  cv::Mat luv_image;
+  merge(luvImage, luv_image);
+  //EN ESTAS LINEAS EL COMPRUEBA QUE HA HECHO BIEN LA CONVERSION DE COLORES...?
+
+  //-------------------------------------------------------------------------
+
+  int nOctUp=0;
+  int nPerOct=8;
+  int nApprox = -1;
+  int sz;
+  int shrink = 4;
+
+  //GET SCALES AT WHICH TO COMPUTE FEATURES---------------------------------
+  std::vector<int> scales, scaleshs;
+  
+  int nScales = scales.size();
+  int isR;
+  if(1){
+    isR = 1;
+  }else{
+    isR = 1+nOctUp*nPerOct;
+  }
+ 
+  int sizeisR = nScales/(nApprox+1);
+  std::vector<int> isRarr;
+
+  
+  int iLoop = 0;
+  while(iLoop<sizeisR){
+    isRarr.push_back(1 + iLoop*(nApprox+1)); //(0) =  1 + iLoop*(nApprox+1);
+    //iLoop = iLoop + nApprox+1;
+  }
+
+ 
+  std::vector<int> arrJ;
+  arrJ.push_back(0); //[0] = 0;
+  for(int i = 0; i < isRarr.size() - 1; i++){
+    arrJ.push_back((isRarr[i] + isRarr[i+1])/2);//[i+1] = (isRarr[i] + isRarr[i+1])/2;
+  }
+  arrJ.push_back(nScales); //[sizeisR+1]= nScales;
+  
+
+  std::vector<int> isN;//[nScales];
+
+  for(int i=0; i< isRarr.size(); i++){
+    int val1 = arrJ[i];
+    int val2 = arrJ[i+1];
+    int lenghtArr = val2 - val1;
+    std::vector<int> isNval;//[lenghtArr];
+    for(int j = val1; j = val2; j++){
+      isNval.push_back(j); //[j-vala1] = j;
+    }
+    isN.push_back(lenghtArr); //[i] = isNval;
+  }
+  //-------------------------------------------------------------------------
+
+  //COMPUTE IMAGE PYRAMID----------------------------------------------------
+  for(int i=0; i<isRarr.size(); i++){
+    int s = scales[i];int sz1=round(sz*s/shrink)*shrink;
+
+    cv::Mat I1;
+    if(sz==sz1){
+      I1 = img;
+    } else {
+      I1=ImgResample(img,sz1,sz1,1);
+    }
+
+    if(s==.5 && (nApprox>0 || nPerOct==1)){
+      img = I1;
+    }
+    channelsCompute(I1,shrink);
+  }
+
+  //-------------------------------------------------------------------------
+
+  //if lambdas not specified compute image specific lambdas.. SE OBVIA------
+
+  //SUPONEMOS QUE NO SE DARÁ ESTE CASO---------------------------------------
+
+
+  //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
+  std::vector<int> isA; //MODIFICAR
+  for(int i=0; i < isA.size(); i++){
+    //isRarr = isN[i];
+    //int sz1=round(sz*scales[i]/shrink)*shrink;
+
+    printf("hoola %d\n",i );
+  }
+
+  //-------------------------------------------------------------------------
+
+}
 void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
   if(sz[0]==0 || sz[1]==0)
   {
@@ -139,9 +241,18 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
 
   printf("%f %f \n", val1, val2 );
 
-  float min = std::min(val1, val2);
-  int nScales = floor(nPerOct*(nOctUp+log2(min))+1);
-  printf("minValue %.4f %d \n", min, nScales);
+  //float min = std::min(val1, val2);
+  int nScales = floor(nPerOct*(nOctUp+log2(std::min(val1, val2)))+1);
+  //printf("nScales %d \n", nScales);
+
+  std::vector<float> scales;
+  for(int i = 0; i< nScales; i++){
+    float scalesValFloat = (-(float(i)/float(nPerOct))+float(nOctUp));
+    float scalesVal = pow(2,scalesValFloat);
+    scales.push_back(scalesVal);
+  }
+
+  printf("%d\n", (int)scales.size());
 
   float d0 = 0;
   float d1 = 0;
@@ -160,59 +271,79 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
 	//int scales[nScales];
 	//int scaleshw[nScales];
 
-	
-  float s = (-float(0-1)/float(nPerOct+nOctUp));
-  float p = pow(2,s);
-	
-  for (int scale = 0; scale < 100/*abs(nScales)*/; scale++){
-    printf("-----------------------------------------------------------\n");
-    float valueIn = (-(float(scale))/float(nPerOct)+float(nOctUp));
-    float s = pow(2,valueIn);
+  for (int i = 0; i <  nScales; i ++){
+    float s = scales[i];
 
-    float srk = (float)shrink;
-    float s0=(round(d0*s/srk)*srk-.25*srk)/d0;
-    float s1=(round(d0*s/srk)*srk+.25*srk)/d0;
-		//printf("%f -- %f -- %f -- %f \n",valueIn, s, s0, s1);
+    float s0=(round(d0*s/ (float)shrink)* (float)shrink-.25* (float)shrink)/d0;
+    float s1=(round(d0*s/ (float)shrink)* (float)shrink+.25* (float)shrink)/d0;
 
-    printf("%f %f %f %f \n", d0, s, srk , s0);
+    //printf("s0: %.4f s1:%.4f \n",s0, s1 );
+    float ssLoop = 0.0;
+    //float xMin = 999999.99999; //AÑADIR LIMITS
+    //int pos = 0;
+    std::vector<float> arrayPositions; //1 se sustituirá por abs(nScales)
+   
+    std::vector<float> ss;
+    std::vector<float> es0;
+    std::vector<float> es1;
 
-    float ss = 0.0;
-    //float arr_es0[100];
-    //float arr_es1[100];
+    while(ssLoop < 1){
+      float ssVal = ssLoop*(s1-s0)+s0;
+      ss.push_back(ssVal);
+      float es0val = d0*ssVal;  es0val=abs(es0val-round(es0val/shrink)*shrink);
+      float es1val = d1*ssVal;  es1val=abs(es1val-round(es1val/shrink)*shrink);
 
-    float xMin = 999999.99999; //AÑADIR LIMITS
+      es0.push_back(es0val);
+      es1.push_back(es1val);
+
+      //printf("Valores --> %.4f %.4f %.4f \n", es0val, es1val, ssVal);
+
+      ssLoop = ssLoop + 0.01;
+
+    }
+    std::vector<float> x = max(es0, es1);
     int pos = 0;
-    float arrayPositions[1]; //1 se sustituirá por abs(nScales)
-    while(ss < 100){
-      float ss_mod = ss*(s1 - s0)+s0;
-      float es0=d0*ss_mod; es0=abs(es0-round(es0/shrink)*shrink);
-      //arr_es0[(int)(ss*100)] = es0;
-
-      float es1=d1*ss_mod; es1=abs(es1-round(es1/shrink)*shrink);
-      //arr_es0[(int)(ss*100)] = es1;
-      ss = ss + 0.01;
-
-      float x = max(es0, es1); 
-      //arr_es0[(int)(ss*100)] = x;
-      if(x < xMin)
-      {
-        xMin = x;
-        pos = (int)(ss*100);
+    float xMin = 999999.99999; 
+    for(int i=0; i < x.size(); i++){
+      if( x[i] < xMin){
+        xMin = x[i];
+        pos = i;
       }
     }
-    arrayPositions[scale] = pos*0.01;
-    printf("%f %d \n", xMin, pos ); //FUNCION MIN DE MATLAB RETORNA EL VALOR Y LA POSICION DEL ARRAY EN LA QUE SE ENCUENTRA
+    scales[i] = ss[pos];
   }
 
+  /*for(int i=0; i< scales.size(); i++){
+    printf("scale: %.4f\n", scales[i] );
+  }*/
 
+  std::vector<float> kp;
+  std::vector<float> scales2;
+  for(int i = 0; i < scales.size()-1; i++){
+    //printf("--> %.4f %.4f\n",scales[i],  scales[i+1] );
+    int kpVal = (scales[i] != scales[i+1]);
+    if(kpVal == 1){
+      //printf("%.4f\n",scales[i] );
+      scales2.push_back(scales[i]);
+    }
+    kp.push_back(kpVal);
+  }
+  scales2.push_back(scales[scales.size()-1]);
+
+
+  //std::vector<float> scaleshw;
+  int sizeScaleshw = scales2.size();
+  float scaleshw[sizeScaleshw][sizeScaleshw];
+  for(int i = 0; i < sizeScaleshw; i++){
+    float h = round(sz[0]*scales2[i]/shrink)*shrink/sz[0];
+    float w = round(sz[1]*scales2[i]/shrink)*shrink/sz[1];
+    scaleshw[i][0] = h;
+    scaleshw[i][1] = w;
+  }
+  for(int i =0; i < sizeScaleshw; i++){
+    printf("%.4f %.4f\n", scaleshw[i][0], scaleshw[i][1]);
+  }
 }
-
-
-//for(int s = 0; s > nScales; s--){
-//float s = (-(0-1)/nPerOct+nOctUp);
-//float s0=(round(d0*s/shrink)*shrink-.25*shrink)/d0;
-//float s1=(round(d0*s/shrink)*shrink+.25*shrink)/d0;
-//}
 
 
 
