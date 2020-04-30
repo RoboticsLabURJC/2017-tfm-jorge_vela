@@ -98,7 +98,6 @@ std::vector<cv::Mat> channelsCompute(cv::Mat src, int shrink){
 
   luvImage[0] = dst2;
   luvImage[2] = dst;*/
-
   cv::Mat luv_image;
   merge(luvImage, luv_image);
 
@@ -109,127 +108,170 @@ std::vector<cv::Mat> channelsCompute(cv::Mat src, int shrink){
   std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
 
 
-  int lenVector = luvImage.size() +  gMagOrient.size() +  gMagHist.size();
+  //int lenVector = luvImage.size() +  gMagOrient.size() +  gMagHist.size();
 
-  printf("%d\n", lenVector);
-  std::vector<cv::Mat> chnsCompute(lenVector);
+  //printf("%d\n", lenVector);
+  std::vector<cv::Mat> chnsCompute;
 
-  for(int i=0; i<3; i++)
-    chnsCompute[i] = luvImage[i];
+  for(int i = 0; i < luvImage.size(); i++){
+    chnsCompute.push_back(luvImage[i]);
+  }
+  chnsCompute.push_back(gMagOrient[0]);
 
-  for(int i=0; i<1; i++)
-    chnsCompute[i+3] = gMagOrient[i]; //Meter solo la magnitud, no añadir la orientación
+  for(int i = 0; i < gMagHist.size(); i++){
+    chnsCompute.push_back(gMagHist[i]);
+  }
+  //for(int i=0; i<3; i++)
+  //  chnsCompute[i] = luvImage[i];
 
-  for(int i =0; i <  gMagHist.size(); i++) 
-    chnsCompute[i+4] = gMagHist[i];
+  //for(int i=0; i<1; i++)
+  //  chnsCompute[i+3] = gMagOrient[i]; //Meter solo la magnitud, no añadir la orientación
+
+  //for(int i =0; i <  gMagHist.size(); i++) 
+  //  chnsCompute[i+4] = gMagHist[i];
 
   return chnsCompute;
 }
 
-
-
-void chnsPyramid(cv::Mat img){
+void chnsPyramids(cv::Mat img){
   printf("channelsPyramids\n");
 
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
 
 
+
+  int nOctUp=0;
+  int nPerOct=8;
+  int nApprox = 7;
+  int sz[2] = {img.size().height, img.size().width};
+  int shrink = 4;
+  int minDs[2] = {16,16};
+  int lambdas = {};
+
+  //printf("%d %d\n",sz[0], sz[1] );
   //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
   merge(luvImage, luv_image);
-  //EN ESTAS LINEAS EL COMPRUEBA QUE HA HECHO BIEN LA CONVERSION DE COLORES...?
+  //EN ESTAS LINEAS EL COMPRUEBA QUE SE CUMPLEN LOS REQUISITOS PARA LA CONVERSION
 
+ 
   //-------------------------------------------------------------------------
 
-  int nOctUp=0;
-  int nPerOct=8;
-  int nApprox = -1;
-  int sz;
-  int shrink = 4;
-
   //GET SCALES AT WHICH TO COMPUTE FEATURES---------------------------------
-  std::vector<int> scales, scaleshs;
+  std::vector<float> scales;
   
+  scales = getScales(nPerOct, nOctUp, minDs, shrink, sz);
+
   int nScales = scales.size();
   int isR;
-  if(1){
+  if(1){ //PREGUNTAR ESTE IF EN MATLAB
     isR = 1;
   }else{
     isR = 1+nOctUp*nPerOct;
   }
  
-  int sizeisR = nScales/(nApprox+1);
+  //int sizeisR = nScales/(nApprox+1);
   std::vector<int> isRarr;
-
   
+  //printf("%d\n", nScales);
   int iLoop = 0;
-  while(iLoop<sizeisR){
-    isRarr.push_back(1 + iLoop*(nApprox+1)); //(0) =  1 + iLoop*(nApprox+1);
-    //iLoop = iLoop + nApprox+1;
+  while(iLoop<nScales){
+    isRarr.push_back(1 + iLoop);
+    iLoop = iLoop + nApprox +1;
   }
 
- 
+  std::vector<int> isA;
+  int valIsRArr = 0;
+  for(int i = 0; i < nScales; i++){
+    if(i+1 != isRarr[valIsRArr]){
+      isA.push_back(i+1);
+    }else{
+      valIsRArr = valIsRArr + 1;
+    }
+  }
+
   std::vector<int> arrJ;
   arrJ.push_back(0); //[0] = 0;
   for(int i = 0; i < isRarr.size() - 1; i++){
-    arrJ.push_back((isRarr[i] + isRarr[i+1])/2);//[i+1] = (isRarr[i] + isRarr[i+1])/2;
+    arrJ.push_back((floor(isRarr[i] + isRarr[i+1]))/2);//[i+1] = (isRarr[i] + isRarr[i+1])/2;
   }
   arrJ.push_back(nScales); //[sizeisR+1]= nScales;
-  
 
-  std::vector<int> isN;//[nScales];
-
-  for(int i=0; i< isRarr.size(); i++){
-    int val1 = arrJ[i];
-    int val2 = arrJ[i+1];
-    int lenghtArr = val2 - val1;
-    std::vector<int> isNval;//[lenghtArr];
-    for(int j = val1; j = val2; j++){
-      isNval.push_back(j); //[j-vala1] = j;
+  std::vector<int> isN;
+  for(int i = 0; i <= isRarr.size(); i++){
+    for(int j = arrJ[i]+1; j <= arrJ[i+1]; j++ ){
+      int val = i+j;
+      isN.push_back(isRarr[i]);
     }
-    isN.push_back(lenghtArr); //[i] = isNval;
   }
-  //-------------------------------------------------------------------------
 
   //COMPUTE IMAGE PYRAMID----------------------------------------------------
-  for(int i=0; i<isRarr.size(); i++){
-    int s = scales[i];int sz1=round(sz*s/shrink)*shrink;
-
+  std::vector<cv::Mat> pChnsCompute;
+  for(int i=0; i< isRarr.size(); i++){
+    float s=scales[isRarr[i]-1];
+    int sz_1 = round(sz[0]*s/shrink)*shrink;
+    int sz_2 = round(sz[1]*s/shrink)*shrink;
+    int sz1[2] = {sz_1, sz_2};
+    printf("-->%d %d\n",sz1[0], sz1[1] );
     cv::Mat I1;
-    if(sz==sz1){
+    if(sz[0] == sz1[0] && sz[1] == sz1[1]){
       I1 = img;
-    } else {
-      I1=ImgResample(img,sz1,sz1,1);
+    }else{
+      I1 = ImgResample(img, sz1[0] , sz1[1] , 3);
+      //printf("%d %d \n",I1.rows, I1.cols );
     }
 
     if(s==.5 && (nApprox>0 || nPerOct==1)){
       img = I1;
     }
-    channelsCompute(I1,shrink);
-  }
+    pChnsCompute = channelsCompute(I1,shrink);
+  } 
 
-  //-------------------------------------------------------------------------
-
+  cv::Mat data[pChnsCompute.size()][nScales];
   //if lambdas not specified compute image specific lambdas.. SE OBVIA------
 
   //SUPONEMOS QUE NO SE DARÁ ESTE CASO---------------------------------------
 
 
+  //std::vector<cv::Mat> data;
   //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
-  std::vector<int> isA; //MODIFICAR
-  for(int i=0; i < isA.size(); i++){
-    //isRarr = isN[i];
-    //int sz1=round(sz*scales[i]/shrink)*shrink;
-
-    printf("hoola %d\n",i );
+  for(int i=0; i< isA.size(); i++){
+    int x = isA[i] -1;
+    int iR =  isN[x];
+    int sz_1 = round(sz[0]*scales[x]/shrink);
+    int sz_2 = round(sz[1]*scales[x]/shrink);
+    int sz1[2] = {sz_1, sz_2};
+    for(int j=0; j < pChnsCompute.size(); j++){
+      cv::Mat dataResample = pChnsCompute[j];
+      cv::Mat resample = ImgResample(dataResample, sz1[0] , sz1[1] , 3); //RATIO
+      data[j][i] = resample;  //ACORDARSE DE UNIR LOS ANTERIORES DATA Y LA PREGUNTA DEL RESIZE
+      //printf("%d  ",   data[j][i].size().height);
+    }
+    //printf("\n" );
+    //printf("%d %d %d %d\n",resample.size().height, resample.size().width, iR, x );
   }
 
+  //smooth channels, optionally pad and concatenate channels
+  for(int i = 0; i < nScales; i++){
+    for(int j=0; j < pChnsCompute.size();j++){
+      data[j][i] = convTri(luv_image, 1);
+    }
+  }
+  //FALTA EL OPTINALLY PAD
+  //CONCATENA TODOS LOS CANALES
+    for(int i = 0; i < nScales; i++){
+    for(int j=0; j < pChnsCompute.size();j++){
+      std::vector<cv::Mat> channelsConcat;
+      channelsConcat.push_back(data[j][i]); //prueba --> que si se hace [i][j] da fallo por los tamaños, 
+      cv::Mat concat;
+      merge(channelsConcat, concat);
+    }
+  }
   //-------------------------------------------------------------------------
-
 }
-void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
+std::vector<float> getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
   if(sz[0]==0 || sz[1]==0)
   {
     int scales[0];
@@ -239,11 +281,10 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
   float val1 = (float)sz[0]/(float)minDs[0];  
   float val2 = (float)sz[1]/(float)minDs[1];
 
-  printf("%f %f \n", val1, val2 );
+  //printf("%f %f \n", val1, val2 );
 
   //float min = std::min(val1, val2);
   int nScales = floor(nPerOct*(nOctUp+log2(std::min(val1, val2)))+1);
-  //printf("nScales %d \n", nScales);
 
   std::vector<float> scales;
   for(int i = 0; i< nScales; i++){
@@ -252,7 +293,7 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     scales.push_back(scalesVal);
   }
 
-  printf("%d\n", (int)scales.size());
+  //printf("%d\n", (int)scales.size());
 
   float d0 = 0;
   float d1 = 0;
@@ -266,10 +307,6 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     d0 = (float)sz[1];
     d1 = (float)sz[0];
   }
-
-	printf("%f %f\n", d0, d1);
-	//int scales[nScales];
-	//int scaleshw[nScales];
 
   for (int i = 0; i <  nScales; i ++){
     float s = scales[i];
@@ -293,9 +330,7 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
 
       es0.push_back(es0val);
       es1.push_back(es1val);
-
       //printf("Valores --> %.4f %.4f %.4f \n", es0val, es1val, ssVal);
-
       ssLoop = ssLoop + 0.01;
 
     }
@@ -304,7 +339,10 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     int pos = 0;
     float xMin = std::numeric_limits<float>::max(); 
     for(int i=0; i < x.size(); i++){
-      if( x[i] < xMin){
+      float valMax = ( es0[i] <  es1[i] ) ?  es1[i] : es0[i];
+      //printf("%.4f %.4f %.4f \n",valMax, es0[i], es1[i]);
+      if( valMax <= xMin){
+        //printf("%.4f\n", x[i]);
         xMin = x[i];
         pos = i;
       }
@@ -322,7 +360,6 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     //printf("--> %.4f %.4f\n",scales[i],  scales[i+1] );
     int kpVal = (scales[i] != scales[i+1]);
     if(kpVal == 1){
-      //printf("%.4f\n",scales[i] );
       scales2.push_back(scales[i]);
     }
     kp.push_back(kpVal);
@@ -339,9 +376,12 @@ void getScales(	int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
     scaleshw[i][0] = h;
     scaleshw[i][1] = w;
   }
-  for(int i =0; i < sizeScaleshw; i++){
-    printf("%.4f %.4f\n", scaleshw[i][0], scaleshw[i][1]);
-  }
+  /*for(int i =0; i < sizeScaleshw; i++){
+    printf("%.4f \n", scales2[i]);// scaleshw[i][0], scaleshw[i][1]);
+    //printf("%.4f %.4f \n", scaleshw[i][0], scaleshw[i][1]);
+  }*/
+
+  return scales2;
 }
 
 
