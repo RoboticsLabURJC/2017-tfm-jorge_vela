@@ -9,6 +9,8 @@
 
 #include <iostream>
 #include <channels/ChannelsExtractorLUV.h>
+#include <channels/Utils.h>
+
 #include <opencv/cv.hpp>
 
 #include <channels/Utils.h>
@@ -120,10 +122,10 @@ std::vector<cv::Mat> ChannelsLUVExtractor::smoothImage
 )
 {
     std::vector<cv::Mat> channelsLUV_output(3);
-
-    channelsLUV_output[0] = convTri(inputImg[0], 5);
-    channelsLUV_output[1] = convTri(inputImg[1], 5);
-    channelsLUV_output[2] = convTri(inputImg[2], 5);
+    Utils utils;
+    channelsLUV_output[0] = utils.convTri(inputImg[0], 5);
+    channelsLUV_output[1] = utils.convTri(inputImg[1], 5);
+    channelsLUV_output[2] = utils.convTri(inputImg[2], 5);
 
     //cv::GaussianBlur(inputImg[0], channelsLUV_output[0], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
     //cv::GaussianBlur(inputImg[1], channelsLUV_output[1], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);

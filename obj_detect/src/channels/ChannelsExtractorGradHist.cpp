@@ -1,6 +1,6 @@
 /** ------------------------------------------------------------------------
  *
- *  @brief Implementation of Channel feature extractors for LUV color space.
+ *  @brief Implementation of Channel feature extractors for histogram gradients
  *  @author Jorge Vela
  *  @author Jose M. Buenaposada (josemiguel.buenaposada@urjc.es)
  *  @date 2019/07/08
@@ -127,6 +127,22 @@ void GradHistExtractor::gradQuantize( float *O, float *M, int *O0, int *O1, floa
 }
 
 // compute nOrients gradient histograms per bin x bin block of pixels
+/**
+ *
+ * Funcion gradHist: Calcula los histogramas del gradiente de nOrients
+ * en bloques de binxbin pixeles
+ *
+ * @param M: Magnitud del gradiente
+ * @pamar O: Orientacion del gradiente
+ * @param H: Dirección de memoria donde se guarda el histograma del gradiente
+ * @param h: Altura de la imagen de la que se calcula el histograma
+ * @param w: Ancho de la imagen de la que se calcula el histograma
+ * @param bin: Tamaño de los bloques (binxbin) de los que se calcula los pixeles
+ * @param nOrients: Numero de orientaciónes de los bin.
+ * @param softBin: Tamaño del suavizado de los bloques ??
+ * @param full: Si es verdadero calcula ángulos en [0,2*pi), sino en [0,pi)
+ *
+ */
 void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
   int bin, int nOrients, int softBin, bool full )
 {
@@ -137,8 +153,6 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
   O0 = new int[h*sizeof(int)+16]();M0 = new float[h*sizeof(int)+16]();
   O1 = new int[h*sizeof(int)+16]();M1 = new float[h*sizeof(int)+16]();
 
-  /*O0=(int*)malloc(h*sizeof(int)+16); M0=(float*) malloc(h*sizeof(float)+16);
-  O1=(int*)malloc(h*sizeof(int)+16); M1=(float*) malloc(h*sizeof(float)+16);*/
   // main loop
   for( x=0; x<w0; x++ ) {
     // compute target orientation bins for entire column - very fast
@@ -205,7 +219,7 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
       #undef GH
     }
   }
-  free(O0); free(O1); free(M0); free(M1);
+  delete(O0); delete(O1); delete(M0); delete(M1);
   // normalize boundary bins which only get 7/8 of weight of interior bins
   if( softBin%2!=0 ) for( int o=0; o<nOrients; o++ ) {
     x=0; for( y=0; y<hb; y++ ) H[o*nb+x*hb+y]*=8.f/7.f;
@@ -215,17 +229,18 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
   }
 }
 
-float* GradHistExtractor::allocW(int size , int sf, int misalign)
-{
-  //float* var = allocConflict(size,sf, misalign );
-  //return var;
-  float *var;
-  var  = (float*) calloc(size+misalign,sf) + misalign;
-  return var;
- }
-
-
-std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O, float *H, int bin, int nOrients, int softBin, bool full)
+/**
+ * Funcion gradH. Encargada de calcular el histograma del gradiente, teniendo la imagen
+ * y las direcciones de memoria con la magnitud y orientación del gradiente.
+ *
+ * @param image: Image de la cual se desea calcular el histograma
+ * @param M: Magnitud del gradiente
+ * @param O: Orientación del gradiente
+ * @param H: Donde se guardan valores del histograma con los valores como float
+ *
+ * @retunr std::vector<cv::Mat>: Vector con los histogramas del gradiente como cv::Mat
+ */
+std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O, float *H)
 {
   int h = image.size().height;
   int w = image.size().width;
@@ -235,17 +250,14 @@ std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O,
   int sizeData = sizeof(float);
   int misalign=1;
 
-  gradHist(M,O,H,h,w,bin,nOrients,softBin,full);
+  gradHist(M,O,H,h,w,m_binSize,m_nOrients,m_softBin,m_full);
 
-  //hog(M,O,H,h,w,2,6,0,false, 0.02);
-  int hConv = h/bin;
-  int wConv = w/bin;
-  printf("%d %d \n", hConv, wConv);
-  //float H2[h][w][nOrients];
+  int hConv = h/m_binSize;
+  int wConv = w/m_binSize;
 
-  std::vector<cv::Mat> H2(nOrients);
+  std::vector<cv::Mat> H2(m_nOrients);
 
-  for(int numArr = 0; numArr < nOrients; numArr++){
+  for(int numArr = 0; numArr < m_nOrients; numArr++){
     float* HT = new float[hConv*wConv*sizeData];
     for(int i=0; i < hConv* wConv; i++){
       HT[i] = H[i + (hConv*wConv*numArr)];
@@ -255,10 +267,18 @@ std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O,
     transpose(gradH, gradH);
     H2[numArr] = gradH;
   }
-
   return H2;
 }
 
+
+/**
+ * Función extractFeatures. 
+ * Se le pasa una imagen, junto a la magnitud y orientación del gradiente y se encarga de calcular el histograma del gradiente.
+ *
+ * @param img: Contiene la imagen de la cual se quieren obtener las características
+ * @param gradMag: Vector con los cv::Mat correspondientes a la magnitud y orientacion del gradiente.
+ * @return std::vector<cv::Mat>: Vector los distintos cv::Mat correspondientes a los histogramas del gradiente
+ */
 std::vector<cv::Mat> GradHistExtractor::extractFeatures(cv::Mat img, std::vector<cv::Mat> gradMag)
 {
   cv::Mat dstM;

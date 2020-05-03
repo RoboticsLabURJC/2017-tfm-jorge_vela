@@ -1,28 +1,29 @@
 /** ------------------------------------------------------------------------
  *
- *  @brief Implementation of Channel feature extractors for LUV color space.
+ *  @brief Implementation of Channel feature extractors for magnitude and orient gradients.
  *  @author Jorge Vela
  *  @author Jose M. Buenaposada (josemiguel.buenaposada@urjc.es)
  *  @date 2019/07/08
  *
  *  ------------------------------------------------------------------------ */
 
-//ChanExtractorMex.cpp
 #include <iostream>
 #include <channels/ChannelsExtractorGradMag.h>
+#include <channels/Utils.h>
+
 #include <opencv/cv.hpp>
 
 #include "sse.hpp"
 
 #include <channels/Utils.h>
 
-using namespace cv;
-using namespace std;
-
-
 #define PI 3.14159265f
 
 // compute x and y gradients for just one column (uses sse)
+/**
+ * Funcion grad1. Calcula los gradientes x e y por cada columna
+ *
+ */
 void grad1( float *I, float *Gx, float *Gy, int h, int w, int x ) {
   int y, y1; float *Ip, *In, r; __m128 *_Ip, *_In, *_G, _r;
   // compute column of Gx
@@ -48,6 +49,11 @@ void grad1( float *I, float *Gx, float *Gy, int h, int w, int x ) {
 }
 
 // compute x and y gradients at each location (uses sse)
+/**
+ * Calcula los gradientes x e y en cada píxel
+ * 
+ *
+ */
 void grad2( float *I, float *Gx, float *Gy, int h, int w, int d ) {
   int o, x, c, a=w*h; for(c=0; c<d; c++) for(x=0; x<w; x++) {
     o=c*a+x*h; grad1( I+o, Gx+o, Gy+o, h, w, x );
@@ -66,7 +72,17 @@ float* acosTable() {
   init=true; return a1;
 }
 
-
+// normalize gradient magnitude at each location (uses sse)
+/**
+ * Funcion gradMagNorm. Normaliza la magnitud del gradiente en cada píxel.
+ *
+ * @param M: Dirección de memoria donde está la magnitud del gradiente a normalizar
+ * @param S: Nueva dirección de memoria donde se guarda la magnitud del gradiente normalizada
+ * @param h: Altura correspondiente al cv::Mat de la magnitud del gradiente
+ * @param w: Anchura correspondiente al cv::Mat de la magnitud del gradiente
+ * @param norm: Valor por el que se quiere normalizar
+ *
+ */
 void GradMagExtractor::gradMagNorm( float *M, float *S, int h, int w, float norm ) {
   __m128 *_M, *_S, _norm; int i=0, n=h*w, n4=n/4;
   _S = (__m128*) S; _M = (__m128*) M; _norm = SET(norm);
@@ -77,6 +93,19 @@ void GradMagExtractor::gradMagNorm( float *M, float *S, int h, int w, float norm
 
 
 // compute gradient magnitude and orientation at each location (uses sse)
+/**
+ * Funcion gradMag. Se ha obtenido de p.dollar y alguna cosa modificada.
+ * Calcula la magnitud y orientación del gradiente en cada pixel. 
+ *
+ * @param I: Imagen de la cual se quieren calcular las características
+ * @param M: Dirección de memoria donde se guardara la magnitud del gradiente
+ * @param O: Direccion de memoria donde se guardara la orientación del gradiente
+ * @param h: Altura (píxeles) de la imagen
+ * @param w: Anchura (píxeles) de la imagen
+ * @param d: Número de canales de la imagen
+ * @param full: Si es verdadero calcula ángulos en [0,2*pi), sino en [0,pi)
+ *
+ */
 void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
   int x, y, y1, c, h4, s; float *Gx, *Gy, *M2; __m128 *_Gx, *_Gy, *_M2, _m;
   float *acost = acosTable(), acMult=10000.0f;
@@ -123,23 +152,21 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
       for( ; y<h; y++ ) O[y+x*h]+=(Gy[y]<0)*PI;
     }
   }
-  free(Gx); free(Gy); free(M2); //DELETE    
+  delete(Gx); delete(Gy); delete(M2);     
 }
 
-
-float* GradMagExtractor::allocW(int size , int sf, int misalign){
-  float *var;
-  var  = (float*) calloc(size+misalign,sf) + misalign;
-  return var;
- }
-
-
-void GradMagExtractor::gradM(float *I, float *M, float *O){
-  const int h=12, w=12  , misalign=1; int x, y, d=3; 
-  gradMag( I, M, O, h, w, d ,  false ); 
-}	
-
-std::vector<cv::Mat> GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *O){
+/**
+ * Funcion gradM. Tiene como entrada la imagen de la que se quieren obtener la magnitud y orientación
+ * del gradiente y la variable donde se guardarán los valores. Retorna el vector de cv::Mat con las
+ * características. La funcion extractFeatures llama a esta función.
+ *
+ * @param image: Imagen de la cual se quieren obtener las características.
+ * @param *M: Dirección de memoria donde se guarda la magnitud del gradiente.
+ * @param *O: Dirección de memoria donde se guarda la orientación del gradiente. 
+ *
+ * @return std::vector<cv::Mat>: Estructura que contiene las imagenes con los la magnitud y orientación.
+ */
+std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
   int h = image.size().height;
   int w = image.size().width;
   int nChannels = image.channels();
@@ -167,7 +194,7 @@ std::vector<cv::Mat> GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *
     std::vector<float*> OVal{new float[size](), new float[size](), new float[size]() };
 
     transpose(image, image);  //cambio que se hacia por cada canal
-    image = image/255;        //cambio que se hacia por cada canal
+    //image = image/255;        //cambio que se hacia por cada canal
     cv::Mat image_split[3];
     split(image,image_split); 
 
@@ -200,11 +227,12 @@ std::vector<cv::Mat> GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *
 
   if(m_normRad != 0){
     cv::Mat dummy_query = cv::Mat(w,h,  CV_32F, M);
-    cv::Mat M_to_img = convTri(dummy_query, m_normRad);
+    Utils utils;
+    cv::Mat M_to_img = utils.convTri(dummy_query, m_normRad);
     cv::Mat newM;
     M_to_img.convertTo(newM, CV_32F);    
     float *dataM = newM.ptr<float>();
-    gradMagNorm(M, dataM, w,h, 0.005);
+    gradMagNorm(M, dataM, w,h, m_normConst);
   }
 
   std::vector<cv::Mat> channelsGradMag(2);
@@ -218,7 +246,14 @@ std::vector<cv::Mat> GradMagExtractor::gradMAdv(cv::Mat image, float *M, float *
   return channelsGradMag;
 }
 
-
+/**
+ * Función extractFeatures. 
+ * Se le pasa una imagen y se encarga de calcular la magnitud del gradiente y la orientación del gradiente.
+ * La orientación del graciente no la utiliza como parámetro final, pero sirve para calcular el histograma.
+ *
+ * @param img: Contiene la imagen de la cual se quieren obtener las características
+ * @return std::vector<cv::Mat>: Vector con la magnitud y el gradiente en formato cv::Mat
+ */
 std::vector<cv::Mat> GradMagExtractor::extractFeatures(cv::Mat img){
   int dChan = img.channels();
   int width = img.size().width;
@@ -229,7 +264,7 @@ std::vector<cv::Mat> GradMagExtractor::extractFeatures(cv::Mat img){
   float *O = new float[size]();  
 
   std::vector<cv::Mat> channelsGradMag(2);
-  channelsGradMag = gradMAdv(img,M,O);
+  channelsGradMag = gradM(img,M,O);
 
   return channelsGradMag;
 }  
