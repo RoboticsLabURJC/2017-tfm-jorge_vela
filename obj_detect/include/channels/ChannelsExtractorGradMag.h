@@ -1,7 +1,7 @@
 
 /** ------------------------------------------------------------------------
  *
- *  @brief Channel feature extractors for LUV color space.
+ *  @brief Channel feature extractors for magnitude and orient gradients.
  *  @author Jorge Vela
  *  @author Jose M. Buenaposada (josemiguel.buenaposada@urjc.es)
  *  @date 2019/07/08
@@ -20,29 +20,16 @@ class GradMagExtractor
 
 private:
   int m_normRad;
-public:
-  GradMagExtractor
+  float m_normConst;
+
+    float* allocW
     (
-      int normRad = 0
-    ){
-      m_normRad = normRad;
-    };
-    
-  float* allocW
-    (
-  	  int size, 
-  	  int sf,
-  	  int misalign
+      int size, 
+      int sf,
+      int misalign
     );
 
-  void gradM
-    (
-    	float* I,
-    	float* M,
-    	float* O
-    );
-
-  std::vector<cv::Mat> gradMAdv
+  std::vector<cv::Mat> gradM
     (
       cv::Mat image,
       float* M,
@@ -58,6 +45,16 @@ public:
       float norm 
     );
 
+public:
+  GradMagExtractor
+    (
+      int normRad = 0,
+      float normConst = 0.005
+    ){
+      m_normRad = normRad;
+      m_normConst = normConst;
+    };
+    
   std::vector<cv::Mat> extractFeatures
     (
       cv::Mat img 

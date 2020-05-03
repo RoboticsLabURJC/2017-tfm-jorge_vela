@@ -1,7 +1,7 @@
 
 /** ------------------------------------------------------------------------
  *
- *  @brief Channel feature extractors for LUV color space.
+ *  @brief Channel feature extractors for histogram gradients
  *  @author Jorge Vela
  *  @author Jose M. Buenaposada (josemiguel.buenaposada@urjc.es)
  *  @date 2019/07/08
@@ -33,25 +33,6 @@ public:
       m_full = full;
     };
 
-  float* allocW
-    (
-  	  int size, 
-    	int sf,
-    	int misalign
-    );
-
-
-  std::vector<cv::Mat> gradH
-    (
-      cv::Mat image,
-      float* M,
-      float* O,
-      float* H,
-      int bin = 4,
-      int nOrients = 6,
-      int softBin = 0,
-      bool full = false
-    );
 
   std::vector<cv::Mat> extractFeatures
     (
@@ -65,7 +46,15 @@ private:
 	int m_softBin;
 	int m_full;
 
-protected:
+
+  std::vector<cv::Mat> gradH
+    (
+      cv::Mat image,
+      float* M,
+      float* O,
+      float* H
+    );
+
 	void gradHist
     (
 		  float *M, 
