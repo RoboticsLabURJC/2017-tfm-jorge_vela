@@ -23,6 +23,7 @@ using namespace std;
 class TestUtils: public testing::Test
 {
 public:
+  Utils utils;
   virtual void SetUp()
     {
     }
@@ -32,8 +33,37 @@ public:
     }
 };
 
+TEST_F(TestUtils, TestResampleGrayImage){
+  cv::Mat image = cv::imread("images/imgGrayScale.jpeg", cv::IMREAD_GRAYSCALE); 
+  cv::Mat image2 = cv::imread("images/index3.jpeg", cv::IMREAD_GRAYSCALE); 
 
-TEST_F(TestUtils, TestResample)
+  cv::Mat imageMatlab = cv::imread("images/mask_image_gray.jpeg", cv::IMREAD_GRAYSCALE); 
+
+  cv:Mat dst = utils.ImgResample(image2, 35,29);  
+
+  cv::Mat diff = imageMatlab - dst;
+
+  cv::Mat img1;
+  diff.convertTo(img1, CV_32F);    
+  float *diffImageVals = diff.ptr<float>();
+
+
+  int valTot = 0;
+  int diffTot = 0;
+  for(int i= 0; i < dst.size().height*dst.size().width; i++)
+  {
+      if(diffImageVals[i] > 15)
+      {
+        diffTot = diffTot + diffImageVals[i];
+        valTot = valTot + 1; 
+      }
+  }
+  //printf("DifTot --> %d\n", valTot);
+  ASSERT_TRUE(valTot < 40);
+}
+
+
+TEST_F(TestUtils, TestResampleColorImage)
 {
   cv::Mat imageMatlab = cv::imread("images/mask_image.jpg", cv::IMREAD_COLOR); 
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR); 
@@ -57,7 +87,9 @@ TEST_F(TestUtils, TestResample)
     w = image.size().width / 2 + 1;
   }
 
-  cv:Mat dst = ImgResample(image, w, h, 3);
+  cv:Mat dst = utils.ImgResample(image, w, h);
+
+  transpose(dst, dst);
 
   cv::Mat bgr_dst[3];
   split(dst,bgr_dst);
@@ -148,26 +180,97 @@ TEST_F(TestUtils, TestResample)
   ASSERT_TRUE(difPixels4 < 350);
 }
 
+TEST_F(TestUtils, TestResampleConv)
+{
+  cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_GRAYSCALE);
+  cv::Mat imgConv = utils.convTri(image, 5);
+
+  transpose(imgConv, imgConv);
+
+  cv::Mat img1;
+  imgConv.convertTo(img1, CV_32F);    
+  float *valuesImgConv = img1.ptr<float>();
+
+  FileStorage fs1;
+  fs1.open("yaml/convTri.yml", FileStorage::READ);
+
+  FileNode rows = fs1["J"]["rows"];
+  FileNode cols = fs1["J"]["cols"];
+  FileNode imgMatlab = fs1["J"]["data"];
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((int)valuesImgConv[i] - (int)imgMatlab[i]) < 1.1);
+  }
+}
+
 
 TEST_F(TestUtils, TestChannelsCompute)
 {
   cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
   std::vector<cv::Mat> pChnsCompute;
-  pChnsCompute = channelsCompute(image, 4);
+  pChnsCompute = utils.channelsCompute(image, 4);
+
+  cv::Mat testMag;
+  transpose(pChnsCompute[3], testMag);
+
+  cv::Mat imgMag;
+  testMag.convertTo(imgMag, CV_32F);    
+  float *valuesImgMag = imgMag.ptr<float>();
+
+  //printf("%f\n", valuesImgMag[1] );
+  FileStorage fs1;
+  fs1.open("yaml/TestMagChnsCompute.yml", FileStorage::READ);
+  FileNode rows = fs1["M"]["rows"];
+  FileNode cols = fs1["M"]["cols"];
+  FileNode imgMagMatlab = fs1["M"]["data"];
+
+  //for(int i=0;i<14*17 /*(int)rows*(int)cols*/;i++)
+  //{ 
+    //printf("%.4f %.4f \n", (float)valuesImgMag[i], (float)imgMagMatlab[i] );
+    //ASSERT_TRUE(abs((float)valuesImgMag[i] - (float)imgMagMatlab[i]) < 1.e-2f);
+  //}
+
 }
 
 
 TEST_F(TestUtils, TestGetScales)
 {
-
   int nPerOct = 8;
   int nOctUp = 1;
   int shrink = 4;
   int size[2] = {19,22};
   int minDS[2] = {16,16};
-  getScales(nPerOct, nOctUp, minDS, shrink, size);
+  std::vector<float> scales = utils.getScales(nPerOct, nOctUp, minDS, shrink, size);
+  std::vector<float> check = {2.1463, 1.8537, 1.6589, 1.4632, 1.2684, 1.0737, 0.8779};
+
+  for(int i = 0; i < scales.size(); i++){
+    ASSERT_TRUE(abs(scales[i]-check[i])<1.e-3f);
+  }
 }
 
+
+TEST_F(TestUtils, TestGetScalesChangeVals)
+{
+  int nPerOct = 7;
+  int nOctUp = 0;
+  int shrink = 4;
+  int size[2] = {30,30};
+  int minDS[2] = {16,16};
+  std::vector<float> scales = utils.getScales(nPerOct, nOctUp, minDS, shrink, size);
+  std::vector<float> check = {1.0667, 0.9333, 0.8000, 0.6667, 0.5333};
+
+  for(int i = 0; i < scales.size(); i++){
+    ASSERT_TRUE(abs(scales[i]-check[i])<1.e-3f);
+  }
+}
+
+
+TEST_F(TestUtils, chnsPyramids)
+{
+  cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  utils.chnsPyramids(image);
+}
 
 
 

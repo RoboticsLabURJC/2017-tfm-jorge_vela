@@ -1,6 +1,6 @@
 /** ------------------------------------------------------------------------
  *
- *  @brief Test of Channels Extractor for LUV color space
+ *  @brief Test of Channels Extractor for histogram gradients.
  *  @author Jose M. Buenaposada (josemiguel.buenaposada@urjc.es)
  *  @date 2019/07/08
  *
@@ -26,9 +26,11 @@ class TestChannelsExtractorGradHist: public testing::Test
 
   const int ROWS = 2;
   const int COLS = 4;
-  GradHistExtractor gradHistExtract;
-
   GradMagExtractor gradMagExtract;
+
+  GradHistExtractor gradHistExtract;
+  GradHistExtractor gradHistExtractBinSizeOrients{6,9,1,0};
+
   virtual void SetUp()
   {
   }
@@ -38,134 +40,91 @@ class TestChannelsExtractorGradHist: public testing::Test
   }
 };
 
-/*
-TEST_F(TestChannelsExtractorGradHist, TestMexImage)
-{
-	const int h=12, w=12  , misalign=1; int x, y, d; //192   const int h=12, w=12,
-	d = 3;
-	float *M, *O, *H;
-	int size = h*w*d;
-	int sizeData = sizeof(float);
-
-
-  	float I[h*w*3], *I0=I+misalign;
-  	for( x=0; x<h*w*3; x++ ) I0[x]=0;
-  	I0[0] = 1;
-
-
-	M = gradHistExtract.allocW(size, sizeData, misalign);
-	O = gradHistExtract.allocW(size, sizeData, misalign);
-
-	//Para calcular H, h2=h/4 w2=w/4, sizeTotal*6
-	int h2 = h/4;
-	int w2 = w/4;
-	int sizeH = h2*w2*d*6; //Valor obtenido de su ejemplo chnsTestCpp.cpp
-	H = gradHistExtract.allocW(sizeH, sizeData, misalign);
-
-	gradMagExtract.gradM(I0, M, O);
-	//float M1 =  M[0];
-	//float ExpectedValue = 1.4146;
-	//EXPECT_EQ(M[0], M[0]);
- 	gradHistExtract.gradH(M, O, H);
-	
- 	//channExtract.HOG(M, O, H);
-
- 	//printf("---------------- M: ----------------\n");
-	//for(y=0;y<h;y++){ for(x=0;x<w;x++) printf("%.4f ",M[x*h+y]); printf("\n");}
-	//printf("---------------- O: ----------------\n");
-	//for(y=0;y<h;y++){ for(x=0;x<w;x++) printf("%.4f ",O[x*h+y]); printf("\n");}
-	//printf("---------------- O: ----------------\n");
-	//for(y=0;y<h2;y++){ for(x=0;x<w2;x++) printf("%.4f ",H[x*h2+y]); printf("\n");}
-
-	//printf("%f \n", H[0]);
-
-	//EXPECT_TRUE(M1==ExpectedValue);* /
-}
-
-
-TEST_F(TestChannelsExtractorGradHist, TestRealImage){
-	cv::Mat image;
-	image = cv::imread("index3.jpeg", cv::IMREAD_GRAYSCALE); //IMREAD_COLOR);
-	float *M, *O, *H;
-
-    int misalign=1;
-	int h = image.size().height;
-	int w = image.size().width;
-    int nChannels = image.channels();
-
-	int size = h*w*nChannels;
-	int sizeData = sizeof(float);
-
-
-	//M = gradHistExtract.allocW(size, sizeData, misalign);
-	//O = gradHistExtract.allocW(size, sizeData, misalign);
-	M = new float[size](); // (size, sizeData, misalign)??
-	O = new float[size]();
-
-	int h2 = h/4;
-	int w2 = w/4;
-	int sizeH = h2*w2*nChannels*6; //Valor obtenido de su ejemplo chnsTestCpp.cpp
-	H = new float[sizeH]();
-
-
-	FileStorage fs;
-    fs.open("MRealImage.yaml", FileStorage::READ);
-    FileNode MMatrix = fs["M"]["data"];
-    int i = 0;
-
-    FileNode rows = fs["M"]["rows"];
-    FileNode cols = fs["M"]["cols"];
-
-
-  for(int y=0;y<(int)rows;y++)
-  { 
-	for(int x=0;x<(int)cols;x++)
-	  {
-        M[x*(int)cols+y] = (float)MMatrix[i];
-        i++;	
-    } 
-  }
-
-  fs.open("ORealImage.yaml", FileStorage::READ);
-
-  rows = fs["O"]["rows"];
-  cols = fs["O"]["cols"];
-  FileNode OMatrix = fs["O"]["data"];	
-
-  i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      O[x*(int)cols+y] = (float)OMatrix[i];
-      i++;	
-	} 
-  }
-  //printf("%.4f\n", H[0]);
-
-  gradHistExtract.gradHAdv(image, M, O, H);
-
-  //printf("%.4f\n", H[0]);
-}
-*/
-
 
 TEST_F(TestChannelsExtractorGradHist, TestColorImage){
   cv::Mat image;
   image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); 
 
-  int size = image.size().height*image.size().width*1;
-  float *M = new float[size](); // (size, sizeData, misalign)??
-  float *O = new float[size]();
+  std::vector<cv::Mat> gradMagExtractVector(2);
+  gradMagExtractVector = gradMagExtract.extractFeatures(image);
 
-  float *H= new float[size*6]();
+  std::vector<cv::Mat> gradHistExtractVector;
+  gradHistExtractVector = gradHistExtract.extractFeatures(image,gradMagExtractVector );
 
-  gradMagExtract.gradMAdv(image,M,O);
+  int height = gradHistExtractVector[0].size().height;
+  int width = gradHistExtractVector[0].size().width;
 
-  printf("%.4f %.4f\n", M[0], O[0] );
-  //gradHistExtract.gradHAdv(image, M, O, H);
-  //printf("%.4f\n", H[0]);
+  cv::Mat H1;
+  gradHistExtractVector[0].convertTo(H1, CV_32F);  
+  float *dirH1 = H1.ptr<float>();
+
+  cv::Mat H2;
+  gradHistExtractVector[1].convertTo(H2, CV_32F);  
+  float *dirH2 = H2.ptr<float>();
+
+  cv::FileStorage fs;
+  fs.open("yaml/TestHColorScale.yml", cv::FileStorage::READ);
+
+  cv::FileNode rows = fs["H"]["rows"];
+  cv::FileNode cols = fs["H"]["cols"];
+  cv::FileNode HMatrix = fs["H"]["data"];
+
+  int i = 0;
+  for(int y=0;y<(int)width;y++)
+  { 
+    for(int x=0;x<(int)height;x++)
+    {
+      ASSERT_TRUE(abs(dirH1[x*(int)width+y] - (float)HMatrix[i]) < 1.e-1f);
+      i++;  
+    } 
+  }
 }
+
+
+TEST_F(TestChannelsExtractorGradHist, TestColorImageBinSizeOrients){
+  cv::Mat image;
+  image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); 
+
+  std::vector<cv::Mat> gradMagExtractVector(2);
+  gradMagExtractVector = gradMagExtract.extractFeatures(image);
+
+  std::vector<cv::Mat> gradHistExtractVector;
+  gradHistExtractVector = gradHistExtractBinSizeOrients.extractFeatures(image,gradMagExtractVector);
+
+  int height = gradHistExtractVector[0].size().height;
+  int width = gradHistExtractVector[0].size().width;
+
+  cv::FileStorage fs;
+  fs.open("yaml/TestHColorBinSizeOrients.yml", cv::FileStorage::READ);
+
+  cv::FileNode rows = fs["H"]["rows"];
+  cv::FileNode cols = fs["H"]["cols"];
+  cv::FileNode HMatrix = fs["H"]["data"];
+
+  int i = 0;
+  for(int j=0; j < 3; j++){
+    printf("%d\n", j);
+    cv::Mat H1;
+    gradHistExtractVector[j].convertTo(H1, CV_32F);  
+    float *dirH1 = H1.ptr<float>();
+    for(int y=0;y<(int)width;y++)
+    { 
+      for(int x=0;x<(int)height;x++)
+      {
+        //printf("%.4f %.4f\n", dirH1[x*(int)width+y], (float)HMatrix[i]);
+        ASSERT_TRUE(abs(dirH1[x*(int)width+y] - (float)HMatrix[i]) < 1.e-1f);
+        i++;  
+      } 
+    }
+  }
+}
+
+
+
+
+
+
+
 
 
 
