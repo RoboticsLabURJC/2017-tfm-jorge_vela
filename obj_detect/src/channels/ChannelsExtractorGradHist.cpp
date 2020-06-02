@@ -10,22 +10,9 @@
 #include <iostream>
 #include <channels/ChannelsExtractorGradHist.h>
 #include <opencv/cv.hpp>
-
-#include "wrappers.hpp"
-#include <math.h>
-#include "string.h"
-#include "sse.hpp"
-#include <iostream>
-
 #include "sse.hpp"
 
 
-#include <math.h>
-#include "string.h"
-#include <iostream>
-
-using namespace cv;
-using namespace std;
 #define PI 3.14159265f
 
 
@@ -300,7 +287,6 @@ std::vector<cv::Mat> GradHistExtractor::extractFeatures(cv::Mat img, std::vector
 
   float *H = new float[size]();
 
-  
   std::vector<cv::Mat> channelsGradHist;
   channelsGradHist = gradH(img, dataM, dataO, H);
 

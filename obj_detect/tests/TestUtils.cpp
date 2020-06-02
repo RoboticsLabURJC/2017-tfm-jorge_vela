@@ -269,7 +269,8 @@ TEST_F(TestUtils, TestGetScalesChangeVals)
 TEST_F(TestUtils, chnsPyramids)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
-  utils.chnsPyramids(image);
+  std::vector<cv::Mat> pyramid = utils.chnsPyramids(image);
+  //printf("%d\n", pyramid[0].channels());
 }
 
 

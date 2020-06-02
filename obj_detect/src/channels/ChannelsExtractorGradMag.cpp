@@ -10,12 +10,8 @@
 #include <iostream>
 #include <channels/ChannelsExtractorGradMag.h>
 #include <channels/Utils.h>
-
 #include <opencv/cv.hpp>
-
 #include "sse.hpp"
-
-#include <channels/Utils.h>
 
 #define PI 3.14159265f
 
