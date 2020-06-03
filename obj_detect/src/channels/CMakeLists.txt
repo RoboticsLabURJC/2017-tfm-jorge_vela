@@ -14,6 +14,9 @@ FILE(
 
   ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Utils.h
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/badacostDetector.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/badacostDetector.h
   )
 
 # Set the sources for the main target
