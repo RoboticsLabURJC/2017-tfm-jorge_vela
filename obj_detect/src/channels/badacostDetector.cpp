@@ -24,38 +24,28 @@ bool BadacostDetector::load(std::string clfPath){
 
 
 	std::map<std::string, cv::Mat> clf;
-	std::vector<cv::Mat> clf2;
-	cv::Mat prueba;
-	std::vector<float> p;
 
-
-    printf("%d\n", clf2.size());
 
   	if(existClassifier == false){
   		loadValue = false;
   	}else{
-      for(int i = 8; i < 9; i++){
+      for(int i = 0; i < 14; i++){
       	int rows = (int)classifier[clf_aux[i]]["rows"];
       	int cols = (int)classifier[clf_aux[i]]["cols"];
         cv::FileNode num_classes_data = classifier[clf_aux[i]]["data"];
 
-
+        std::vector<float> p;
         num_classes_data >> p;
 
-        float *p2 = &p[0];
+        cv::Mat matrix= cv::Mat::zeros(rows, cols, CV_32F);
+        memcpy(matrix.data, p.data(), p.size()*sizeof(float));
 
-        printf("%s --> %.4f %d %d\n",clf_aux[i].c_str(), p2[0] , rows, cols);
-
-        cv::Mat mat = cv::Mat(rows,cols, CV_32F, p2);
-        //(float*)num_classes_data;
-        //if(num_classes_data.size() == 0){loadValue = false; }
-        clf.insert({clf_aux[i].c_str(), mat });
-      } 
+        clf.insert({clf_aux[i].c_str(), matrix });
+      }
   	}
 
 	std::cout << clf["Cprime"] << std::endl;
-	//std::cout << "M = " << std::endl << " "  << x << std::endl << std::endl;
-
+	std::cout << clf["Y"] << std::endl;
 
 	return loadValue;
 }
