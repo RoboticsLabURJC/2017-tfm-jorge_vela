@@ -233,7 +233,7 @@ TEST_F(TestUtils, TestChannelsCompute)
 
 }
 
-
+/*
 TEST_F(TestUtils, TestGetScales)
 {
   int nPerOct = 8;
@@ -248,7 +248,9 @@ TEST_F(TestUtils, TestGetScales)
     ASSERT_TRUE(abs(scales[i]-check[i])<1.e-3f);
   }
 }
+*/
 
+/*
 
 TEST_F(TestUtils, TestGetScalesChangeVals)
 {
@@ -264,18 +266,18 @@ TEST_F(TestUtils, TestGetScalesChangeVals)
     ASSERT_TRUE(abs(scales[i]-check[i])<1.e-3f);
   }
 }
-
-
+*/
+/*
 TEST_F(TestUtils, chnsPyramids)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   std::vector<cv::Mat> pyramid = utils.chnsPyramids(image);
   //printf("%d\n", pyramid[0].channels());
 }
+*/
 
-
-
-TEST_F(TestUtils, TestGetScalesChangeVals2)
+/*
+TEST_F(TestUtils, TestChannelsPyramids)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
@@ -298,7 +300,7 @@ TEST_F(TestUtils, TestGetScalesChangeVals2)
 
   //LLAMADA A CHNSPYRAMIDS CON LA IMAGEN, RECIBIENDO LA PIRAMIDE COMPLETA
   std::vector<cv::Mat> pyramid = utils.chnsPyramids(image, nOctUp, nPerOct, nApprox, shrink, minDS);
-
+  printf("%d\n",pyramid.size());
 
   //CARGAR EL FILTRO CREADO POR MATLAB DESDE UN YML
   FileStorage filter;
@@ -361,4 +363,4 @@ TEST_F(TestUtils, TestGetScalesChangeVals2)
       out_images.push_back(out_image);
     }
   }
-} 
+} */

@@ -1,181 +1,51 @@
-/** ------------------------------------------------------------------------
- *
- *  @brief Channel Utils.
- *  @author Jorge Vela
- *  @author Jose M. Buenaposada (josemiguel.buenaposada@urjc.es)
- *  @date 2020/17/02
- *
- *  ------------------------------------------------------------------------ */
 
 
+#include <channels/ChannelsPyramid.h> 
 #include <channels/Utils.h>
 #include <channels/ChannelsExtractorLUV.h>
 #include <channels/ChannelsExtractorGradMag.h>
 #include <channels/ChannelsExtractorGradHist.h>
 
+#include "gtest/gtest.h"
 #include <opencv/cv.hpp>
 #include <channels/Utils.h>
-#include <math.h>
 
-//using namespace cv;
+#include <iostream>
 
-/**
- * Función Imgresample. Encargada de redimensionar una imagen de entrada, al tamaño de ancho y alto 
- * que se le pase por parámetros. 
- *
- * @param src: Imagen que se quiere redimensionar
- * @param width: Ancho de la imagen de salida
- * @param height: Alto de la imagen de salida
- * @param norm: [1] Valor por el que se multiplican los píxeles de salida
- * @return cv::Mat: Imagen redimensionada
- * 
- */
-cv::Mat Utils::ImgResample(cv::Mat src, int width, int height, int norm){
-  cv::Mat dst(height, width, CV_32F, cv::Scalar(0, 0, 0));
-  resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_LINEAR);
+bool ChannelsPyramid::load(std::string opts){
+  bool loadValue = true;
+  cv::FileStorage pPyramid;
+  bool existOpts = pPyramid.open(opts, cv::FileStorage::READ);
+  if(existOpts){
+	  int nPerOct = pPyramid["nPerOct"]["data"][0];
+	  int nOctUp = pPyramid["nOctUp"]["data"][0];
+	  int nApprox = pPyramid["nApprox"]["data"][0];
+	  int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
+	  int shrink = pPyramid["pChns.shrink"]["data"];
 
-  return dst;
-}
+	  m_nOctUp = nOctUp;  
+	  m_nPerOct = nPerOct;
+	  m_nApprox = nApprox;
+	  m_shrink = shrink;
 
-/**
- * Funcion convTri. Convoluciona una imagen por un filtro de triangulo 2D. 
- *
- * @param input_image: Imagen de entrada la cual se quiere convolucionar.
- * @param kernel_size: Tamaño del kernel (radio) que se quiere para el filtro.
- *
- * @return cv::Mat: Imagen de retorno despues del filtro.
- */
-cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
-
-  cv::Mat output_image, help_image;
-
-  cv::Point anchor;
-  anchor = cv::Point( -1, -1 ); //tipo de salida = tipo elementos imagen entrada, mirar este valor, CV_32F
-
-  float valReduce = (kernel_size + 1)*(kernel_size + 1);
-  float arrayKernel[kernel_size*2];
-    
-  int i;
-  for(i = 1; i <= kernel_size + 1; i++)
-  {
-    arrayKernel[i-1] = (float)i / valReduce;
   }
+  return existOpts;
 
-  int downCount = 0;
-  for(int j = kernel_size; j > 0; j--)
-  {
-    arrayKernel[i-1] = (j - downCount) / valReduce;
-    downCount = downCount++; 
-    i = i+1;
-  }
-  double delta = 0;
 
-  cv::Mat kernel = cv::Mat((kernel_size*2)+1,1,  CV_32F, arrayKernel);
-  filter2D(input_image, help_image, -1 , kernel, anchor, delta, cv::BORDER_REFLECT );
-  kernel = cv::Mat(1,(kernel_size*2)+1,  CV_32F, arrayKernel);
-  filter2D(help_image, output_image, -1 , kernel, anchor, delta, cv::BORDER_REFLECT );
 
-  cv::Mat img3;
-  output_image.convertTo(img3, CV_32F);    
-  float *valueM = img3.ptr<float>();
-
-  /*printf("Convtri: \n");
-  for(int i = 0; i < 15; i++)
-    printf("%.4f ", valueM[i] );
-  printf("\n");
-  */
-  return output_image;
 }
 
 
-/**
- * Funcion channesCompute. Dada una imagen de entrada calcula las principales características
- * las cuales retorna como imagenes en un vector de cv::Mat. Los valores que retorna son:
- * (1) Canales de color LUV
- * (2) Magnitud del gradiente
- * (3) Canales de gradiente cuantificados.
- * 
- * @param src: Imagen de la cual se quieren calcular las características.
- * @param shrink: Cantidad para submuestrear los canales calculados
- * @return std::vector<cv::Mat>: Vector de cv::Mat con las imágenes correspondientes a las distintas
- *                               características.
- *
- */
-std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, int shrink){
-
-  productChnsCompute productCompute;
-
-  int smooth = 1;
-  ChannelsLUVExtractor channExtract{false, smooth};
-  GradMagExtractor gradMagExtract{5};
-  GradHistExtractor gradHistExtract{4, 6, 0,0};
-
-  int dChan = src.channels();
-  int h = src.size().height;
-  int w = src.size().width;
-
-  int crop_h = h % shrink;
-  int crop_w = w % shrink;
-
-  h = h - crop_h;
-  w = w - crop_w;
-  
-  cv::Rect cropImage = cv::Rect(0,0,w, h);
-  cv::Mat imageCropped = src(cropImage);
-
-  //printf("%d %d\n",h,w );
-  std::vector<cv::Mat> luvImage = channExtract.extractFeatures(imageCropped); //IMAGENES ESCALA DE GRISES??
-
-  cv::Mat luv_image;
-  merge(luvImage, luv_image);
-  luv_image = convTri(luv_image, smooth);
-
-
-  std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
-
-  //-------------------------------------------------------------
-  /*cv::Mat img3;
-  gMagOrient[0].convertTo(img3, CV_32F);    
-  float *valueM = img3.ptr<float>();
-
-  printf("M: \n");
-  for(int i = 0; i < 15; i++)
-    printf("%.4f ", valueM[i] );
-  printf("\n");*/
-
-  std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
-
-  std::vector<cv::Mat> chnsCompute;
-  for(int i = 0; i < luvImage.size(); i++){   //FALTA HACER RESAMPLE TAMAÑO/SHRINK PARA RETORNAR EL RESULTADO COMO ADDCHNS
-    cv::Mat resampleLuv = ImgResample(luvImage[i], w/shrink, h/shrink);
-    chnsCompute.push_back(resampleLuv);
-  }
-
-  cv::Mat resampleMag = ImgResample(gMagOrient[0], w/shrink, h/shrink);
-  chnsCompute.push_back(resampleMag);
-
-  for(int i = 0; i < gMagHist.size(); i++){
-    cv::Mat resampleHist = ImgResample(gMagHist[i], w/shrink, h/shrink);
-    chnsCompute.push_back(resampleHist);
-  }
-
-  return chnsCompute;
-}
-
-
-/*
-std::vector<cv::Mat> Utils::chnsPyramids(cv::Mat img, int nOctUp, int nPerOct, int nApprox, int shrink, std::vector<int> minDsA){
+std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img, int nOctUp, int nPerOct, int nApprox, int shrink){ 
+  Utils utils;
   //printf("channelsPyramids\n");
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
 
 
-  //int nOctUp=0;
-  //int nPerOct=8;
-  //int nApprox = 7;
   int sz[2] = {img.size().height, img.size().width};
   //int shrink = 4;
-  int minDs[2] = {minDsA[0], minDsA[1]};
+  int minDs[2] = {48,84}; //{minDsA[0], minDsA[1]};
 
   //int lambdas = {};
 
@@ -192,7 +62,7 @@ std::vector<cv::Mat> Utils::chnsPyramids(cv::Mat img, int nOctUp, int nPerOct, i
   //GET SCALES AT WHICH TO COMPUTE FEATURES---------------------------------
   std::vector<float> scales;
  
-  scales = getScales(nPerOct, nOctUp, minDs, shrink, sz);
+  scales = getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz);
 
   int nScales = scales.size();
   //printf("%d\n", nScales );
@@ -201,14 +71,14 @@ std::vector<cv::Mat> Utils::chnsPyramids(cv::Mat img, int nOctUp, int nPerOct, i
   if(1){ //PREGUNTAR ESTE IF EN MATLAB
     isR = 1;
   }else{
-    isR = 1+nOctUp*nPerOct;
+    isR = 1+m_nOctUp*m_nPerOct;
   }
  
   std::vector<int> isRarr;
   int iLoop = 0;
   while(iLoop<nScales){
     isRarr.push_back(1 + iLoop);
-    iLoop = iLoop + nApprox +1;
+    iLoop = iLoop + m_nApprox +1;
   }
 
   std::vector<int> isA;
@@ -251,13 +121,13 @@ std::vector<cv::Mat> Utils::chnsPyramids(cv::Mat img, int nOctUp, int nPerOct, i
     if(sz[0] == sz1[0] && sz[1] == sz1[1]){
       I1 = img;
     }else{
-      I1 = ImgResample(img, sz1[0] , sz1[1] );
+      I1 = utils.ImgResample(img, sz1[0] , sz1[1] );
     }
 
-    if(s==.5 && (nApprox>0 || nPerOct==1)){
+    if(s==.5 && (m_nApprox>0 || m_nPerOct==1)){
       img = I1;
     }
-    pChnsCompute = channelsCompute(I1,shrink);
+    pChnsCompute = utils.channelsCompute(I1,shrink);
     //printf("%d %d \n",isRarr[i]-1, pChnsCompute[0].size().height );
     strucData[isRarr[i] - 1] = pChnsCompute;
   } 
@@ -280,7 +150,7 @@ std::vector<cv::Mat> Utils::chnsPyramids(cv::Mat img, int nOctUp, int nPerOct, i
       cv::Mat dataResample = pChnsCompute[j];
       std::vector<cv::Mat> resampleVect;
       for(int k = 0; k < strucData[iR-1].size(); k++){
-        cv::Mat resample = ImgResample(strucData[iR-1][k], sz1[0] , sz1[1]); //RATIO
+        cv::Mat resample = utils.ImgResample(strucData[iR-1][k], sz1[0] , sz1[1]); //RATIO
         resampleVect.push_back(resample);
       }
       strucData[x] = resampleVect;
@@ -295,18 +165,19 @@ std::vector<cv::Mat> Utils::chnsPyramids(cv::Mat img, int nOctUp, int nPerOct, i
   }*/
   //FALTA EL OPTINALLY PAD
   //CONCATENA TODOS LOS CANALES
-/*
   std::vector<cv::Mat> channelsConcat;
   for(int i = 0; i < nScales; i++){
       cv::Mat concat;
       merge(strucData[i], concat);
-      concat = convTri(concat, 1);
+      concat = utils.convTri(concat, 1);
       channelsConcat.push_back(concat);
   }
 
   return channelsConcat;
-  //--------------------------------------s-----------------------------------
-}*/
+}
+
+
+
 
 
 /**
@@ -321,8 +192,7 @@ std::vector<cv::Mat> Utils::chnsPyramids(cv::Mat img, int nOctUp, int nPerOct, i
  *
  *
  */
-/*
-std::vector<float> Utils::getScales(  int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
+std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
   if(sz[0]==0 || sz[1]==0)
   {
     int scales[0];
@@ -405,7 +275,6 @@ std::vector<float> Utils::getScales(  int nPerOct, int nOctUp, int minDs[], int 
     printf("scale: %.4f\n", scales[i] );
   }*/
 
-  /*
   std::vector<float> kp;
   std::vector<float> scales2;
   for(int i = 0; i < scales.size()-1; i++){
@@ -432,8 +301,16 @@ std::vector<float> Utils::getScales(  int nPerOct, int nOctUp, int minDs[], int 
     printf("%.4f \n", scales2[i]);// scaleshw[i][0], scaleshw[i][1]);
     //printf("%.4f %.4f \n", scaleshw[i][0], scaleshw[i][1]);
   }*/
-  /*
+
   return scales2;
 }
-*/
+
+
+
+
+
+
+
+
+
 

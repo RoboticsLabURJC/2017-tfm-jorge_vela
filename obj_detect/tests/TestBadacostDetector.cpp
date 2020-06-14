@@ -34,6 +34,8 @@ TEST_F(TestBadacostDetector, loadClassifier){
 	bool loadVal = badacost.load(clfPath.c_str());
 	ASSERT_TRUE(loadVal);
 
+	cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+	badacost.detect(image);
 }
 
 
