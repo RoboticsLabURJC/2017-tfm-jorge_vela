@@ -33,7 +33,7 @@ public:
 
 	bool load(std::string opts);
 
-	std::vector<cv::Mat> getPyramid(cv::Mat img, int nOctUp, int nPerOct, int nApprox, int shrink);
+	std::vector<cv::Mat> getPyramid(cv::Mat img);
 
 };
 

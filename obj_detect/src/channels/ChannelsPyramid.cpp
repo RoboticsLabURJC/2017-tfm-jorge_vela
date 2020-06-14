@@ -36,7 +36,7 @@ bool ChannelsPyramid::load(std::string opts){
 }
 
 
-std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img, int nOctUp, int nPerOct, int nApprox, int shrink){ 
+std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){ 
   Utils utils;
   //printf("channelsPyramids\n");
   int smooth = 1;
@@ -113,8 +113,8 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img, int nOctUp, int nP
   std::vector<cv::Mat> pChnsCompute;
   for(int i=0; i< isRarr.size(); i++){
     float s=scales[isRarr[i]-1];
-    int sz_1 = round(sz[0]*s/shrink)*shrink;
-    int sz_2 = round(sz[1]*s/shrink)*shrink;
+    int sz_1 = round(sz[0]*s/m_shrink)*m_shrink;
+    int sz_2 = round(sz[1]*s/m_shrink)*m_shrink;
     int sz1[2] = {sz_1, sz_2};
     //printf("-->%d %d\n",sz1[0], sz1[1] );
     cv::Mat I1;
@@ -127,7 +127,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img, int nOctUp, int nP
     if(s==.5 && (m_nApprox>0 || m_nPerOct==1)){
       img = I1;
     }
-    pChnsCompute = utils.channelsCompute(I1,shrink);
+    pChnsCompute = utils.channelsCompute(I1,m_shrink);
     //printf("%d %d \n",isRarr[i]-1, pChnsCompute[0].size().height );
     strucData[isRarr[i] - 1] = pChnsCompute;
   } 
@@ -143,8 +143,8 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img, int nOctUp, int nP
   for(int i=0; i< isA.size(); i++){
     int x = isA[i] -1;
     int iR =  isN[x];
-    int sz_1 = round(sz[0]*scales[x]/shrink);
-    int sz_2 = round(sz[1]*scales[x]/shrink);
+    int sz_1 = round(sz[0]*scales[x]/m_shrink);
+    int sz_2 = round(sz[1]*scales[x]/m_shrink);
     int sz1[2] = {sz_1, sz_2};
     for(int j=0; j < pChnsCompute.size(); j++){
       cv::Mat dataResample = pChnsCompute[j];

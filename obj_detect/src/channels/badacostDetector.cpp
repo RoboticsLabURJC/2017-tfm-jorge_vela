@@ -9,6 +9,7 @@
 
 
 #include <channels/badacostDetector.h> 
+#include <channels/ChannelsPyramid.h>
 #include "gtest/gtest.h"
 #include <opencv/cv.hpp>
 #include <channels/Utils.h>
@@ -74,23 +75,14 @@ std::vector<float> BadacostDetector::detect(cv::Mat imgs){
 
 	//LLAMAR A CHNSPYRAMID CON LA IMAGEN PARA OBTENER TODAS LAS ESCALAS
 	//LLAMAR A CHNSPYRAMID CON LA IMAGEN PARA OBTENER TODAS LAS ESCALAS
-	Utils utils;
-    cv::FileStorage pPyramid;
-    pPyramid.open("yaml/pPyramid.yml", cv::FileStorage::READ);
-    int nPerOct = pPyramid["nPerOct"]["data"][0];
-    int nOctUp = pPyramid["nOctUp"]["data"][0];
-    int nApprox = pPyramid["nApprox"]["data"][0];
-    int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
-    int shrink = pPyramid["pChns.shrink"]["data"];
-
-    std::vector<int> minDS = {48, 84};
-	//std::vector<cv::Mat> pyramid = utils.chnsPyramids(imgs, nOctUp, nPerOct, nApprox, shrink, minDS);
+    ChannelsPyramid chnsPyramids;
+    chnsPyramids.load("yaml/pPyramid.yml");
+	std::vector<cv::Mat> pyramid = chnsPyramids.getPyramid(imgs);
 
 	//printf("%d\n", pyramid.size());
 
 	//HACER UN BUCLE UTILIZANDO getSingleScale PARA OBTENER LOS VALORES EN CADA ESCALA
-	int nScales = 24; //ESTE DATO SE OBTIENE DE CHNSPYRAMID
-	for(int i = 0; i < nScales; i++){
+	for(int i = 0; i < pyramid.size(); i++){
 		//LLAMAMOS A DETECTSINGLESCALE
 	}
 

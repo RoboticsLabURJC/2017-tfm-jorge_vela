@@ -45,7 +45,7 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
   bool loadOk = chnsPyramid.load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
 
-  std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image,1,10,9,4);
+  std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image);
 
   ASSERT_TRUE(pyramid.size()==28);
 
