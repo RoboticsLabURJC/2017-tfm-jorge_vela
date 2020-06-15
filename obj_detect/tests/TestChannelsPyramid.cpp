@@ -37,6 +37,21 @@ TEST_F(TestChannelsPyramid, TestGetScales)
   }
 }
 
+TEST_F(TestChannelsPyramid, TestGetScalesChangeVals)
+{
+  int nPerOct = 7;
+  int nOctUp = 0;
+  int shrink = 4;
+  int size[2] = {30,30};
+  int minDS[2] = {16,16};
+  std::vector<float> scales = chnsPyramid.getScales(nPerOct, nOctUp, minDS, shrink, size);
+  std::vector<float> check = {1.0667, 0.9333, 0.8000, 0.6667, 0.5333};
+
+  for(int i = 0; i < scales.size(); i++){
+    ASSERT_TRUE(abs(scales[i]-check[i])<1.e-3f);
+  }
+}
+
 
 TEST_F(TestChannelsPyramid, channelsPyramid){
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
@@ -49,6 +64,9 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
 
   ASSERT_TRUE(pyramid.size()==28);
 
+  chnsPyramid.badacostFilters(pyramid, "yaml/filterTest.yml");
+
+  /*
   //CARGAR EL FILTRO CREADO POR MATLAB DESDE UN YML
   cv::FileStorage filter;
   filter.open("yaml/filterTest.yml", cv::FileStorage::READ);
@@ -110,6 +128,6 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
       out_images.push_back(out_image);
     }
   }
-
+  */
 
 }

@@ -20,7 +20,6 @@ private:
   std::vector<int> m_minDs;
 
 
-
 protected:
 
 
@@ -34,6 +33,8 @@ public:
 	bool load(std::string opts);
 
 	std::vector<cv::Mat> getPyramid(cv::Mat img);
+  	void badacostFilters(std::vector<cv::Mat> pyramid, std::string filterName);
+
 
 };
 

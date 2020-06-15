@@ -47,7 +47,7 @@ public:
       int kernel_size
     );
 
-  std::vector<cv::Mat> chnsPyramids
+  /*std::vector<cv::Mat> chnsPyramids
     (
       cv::Mat img,
       int nOctUp =0,
@@ -55,7 +55,7 @@ public:
       int nApprox = 7,
       int shrink = 4,
       std::vector<int> minDsA= {16,16}
-    );
+    );*/
 
 
   std::vector<float> getScales

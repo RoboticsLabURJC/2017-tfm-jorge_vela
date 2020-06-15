@@ -73,8 +73,7 @@ std::vector<float> BadacostDetector::detect(cv::Mat imgs){
 	printf("%d %d \n",rows, cols );
 
 
-	//LLAMAR A CHNSPYRAMID CON LA IMAGEN PARA OBTENER TODAS LAS ESCALAS
-	//LLAMAR A CHNSPYRAMID CON LA IMAGEN PARA OBTENER TODAS LAS ESCALAS
+    //LLAMAR A CHNSPYRAMID CON LA IMAGEN PARA OBTENER TODAS LAS ESCALAS
     ChannelsPyramid chnsPyramids;
     chnsPyramids.load("yaml/pPyramid.yml");
 	std::vector<cv::Mat> pyramid = chnsPyramids.getPyramid(imgs);
