@@ -178,7 +178,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
 
 
 
-void ChannelsPyramid::badacostFilters(std::vector<cv::Mat> pyramid, std::string filterName){ //ChannelsPyramid::
+std::vector<cv::Mat> ChannelsPyramid::badacostFilters(std::vector<cv::Mat> pyramid, std::string filterName){ //ChannelsPyramid::
   //CARGAR EL FILTRO CREADO POR MATLAB DESDE UN YML
   cv::FileStorage filter;
   filter.open(filterName.c_str(), cv::FileStorage::READ);
@@ -215,9 +215,9 @@ void ChannelsPyramid::badacostFilters(std::vector<cv::Mat> pyramid, std::string 
   }
 
   //EJEMPLO PARA UNA ESCALA, QUE TIENE nChannels CANALES
-  int nChannels = pyramid[2].channels();
+  int nChannels = pyramid[0].channels();
   cv::Mat bgr_dst[nChannels];
-  split(pyramid[2],bgr_dst);
+  split(pyramid[0],bgr_dst);
 
   //SE REPITE UNA ESCALA PARA PASAR POR LOS FILTROS
   cv::Mat G;
@@ -239,6 +239,7 @@ void ChannelsPyramid::badacostFilters(std::vector<cv::Mat> pyramid, std::string 
       out_images.push_back(out_image);
     }
   }
+  return out_images;
 }
 
 

@@ -33,7 +33,7 @@ public:
 	bool load(std::string opts);
 
 	std::vector<cv::Mat> getPyramid(cv::Mat img);
-  	void badacostFilters(std::vector<cv::Mat> pyramid, std::string filterName);
+  	std::vector<cv::Mat> badacostFilters(std::vector<cv::Mat> pyramid, std::string filterName);
 
 
 };

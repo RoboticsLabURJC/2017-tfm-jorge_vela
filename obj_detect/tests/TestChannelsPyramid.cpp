@@ -65,6 +65,14 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
   ASSERT_TRUE(pyramid.size()==28);
 
   chnsPyramid.badacostFilters(pyramid, "yaml/filterTest.yml");
+}
+
+
+
+
+
+
+
 
   /*
   //CARGAR EL FILTRO CREADO POR MATLAB DESDE UN YML
@@ -128,6 +136,6 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
       out_images.push_back(out_image);
     }
   }
-  */
 
 }
+  */
