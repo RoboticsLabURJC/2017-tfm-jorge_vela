@@ -35,25 +35,25 @@ private:
 protected:
 
 public:
-	BadacostDetector(
+  BadacostDetector(
             int shrink = 2, 
             int modelHt = 2, 
             int modelWd = 2, 
             int stride = 2, 
             int cascThr = 2
-	){   
+  ){   
             m_srhink = shrink;
             m_modelHt = modelHt;
             m_modelWd = modelWd;
             m_stride = stride;
             m_cascThr = cascThr;
-	};
+  };
 
-      bool load(std::string clf);
+    bool load(std::string clf);
 
-      std::vector<float> detect(cv::Mat img);
+    std::vector<cv::Rect2i> detect(cv::Mat img);
 
-      std::vector<float> getSingleScale(cv::Mat img);
+    std::vector<float> getSingleScale(cv::Mat img);
 
 };
 

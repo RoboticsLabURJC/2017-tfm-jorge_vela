@@ -28,14 +28,18 @@ public:
     }
 };
 
-
 TEST_F(TestBadacostDetector, loadClassifier){
 	std::string clfPath = "yaml/clf.yml";
 	bool loadVal = badacost.load(clfPath.c_str());
 	ASSERT_TRUE(loadVal);
 
-	cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
-	badacost.detect(image);
+	cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+
+	std::vector<cv::Rect2i> detections = badacost.detect(image);
+
+  rectangle(image,detections[0],cv::Scalar(200,0,0),2);
+  cv::imshow("image", image);
+  cv::waitKey();
 }
 
 
