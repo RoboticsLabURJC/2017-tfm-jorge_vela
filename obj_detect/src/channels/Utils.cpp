@@ -32,7 +32,7 @@
  */
 cv::Mat Utils::ImgResample(cv::Mat src, int width, int height, int norm){
   cv::Mat dst(height, width, CV_32F, cv::Scalar(0, 0, 0));
-  resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_LINEAR);
+  resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_AREA); //DICE QUE EN ALGUNOS CASOS NO UTILIZA ANTIALIASING OFF, POR LO QUE SERÍA INTER_AREA, EL CASO NORMAL ES INTER_LINEAR
 
   return dst;
 }

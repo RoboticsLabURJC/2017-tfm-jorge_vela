@@ -12,6 +12,7 @@
 #include <opencv2/core/core.hpp>
 #include <iostream>
 #include <string>
+#include <chrono> 
 
 #undef VISUALIZE_RESULTS
 
@@ -207,7 +208,14 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNormConst)
   int sizeData = sizeof(float);
 
   std::vector<cv::Mat> gradMagExtractVector;
+
+  auto start = std::chrono::high_resolution_clock::now();
+  
   gradMagExtractVector = gradMagExtractNormConst.extractFeatures(image);
+
+  auto stop = std::chrono::high_resolution_clock::now(); 
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start); 
+  std::cout << "time ms: " << duration.count() << std::endl;
 
   cv::Mat newM, newO;
   gradMagExtractVector[0].convertTo(newM, CV_32F);    
@@ -215,6 +223,12 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNormConst)
 
   gradMagExtractVector[1].convertTo(newO, CV_32F);    
   float *O = newO.ptr<float>();
+
+
+  //cv::imshow("M",gradMagExtractVector[0]);
+  //cv::imshow("O",gradMagExtractVector[1]);
+  //cv::waitKey(0);
+
 
   cv::FileStorage fs;
   fs.open("yaml/TestMColorNormRadConst.yml", cv::FileStorage::READ);

@@ -233,9 +233,7 @@ std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O,
   int w = image.size().width;
   int nChannels = image.channels();
 
-  int size = h*w*nChannels;
   int sizeData = sizeof(float);
-  int misalign=1;
 
   gradHist(M,O,H,h,w,m_binSize,m_nOrients,m_softBin,m_full);
 
@@ -244,15 +242,16 @@ std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O,
 
   std::vector<cv::Mat> H2(m_nOrients);
 
-  for(int numArr = 0; numArr < m_nOrients; numArr++){
-    float* HT = new float[hConv*wConv*sizeData];
-    for(int i=0; i < hConv* wConv; i++){
-      HT[i] = H[i + (hConv*wConv*numArr)];
-    }
-    H2[numArr] = *HT;
-    cv::Mat gradH = cv::Mat(wConv,hConv, CV_32F, HT);
-    transpose(gradH, gradH);
-    H2[numArr] = gradH;
+  float *arr[m_nOrients];
+  int pos = hConv*wConv;
+  int i;
+
+  
+  for(i = 0; i < m_nOrients; i++){
+      arr[i] = &H[i*pos];
+      cv::Mat gradH = cv::Mat(wConv,hConv, CV_32F, arr[i]);
+      transpose(gradH, gradH);
+      H2[i] = gradH;  
   }
   return H2;
 }

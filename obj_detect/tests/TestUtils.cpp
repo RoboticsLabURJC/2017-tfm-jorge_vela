@@ -33,7 +33,7 @@ public:
     }
 };
 
-TEST_F(TestUtils, TestResampleGrayImage){
+/*TEST_F(TestUtils, TestResampleGrayImage){
   cv::Mat image = cv::imread("images/imgGrayScale.jpeg", cv::IMREAD_GRAYSCALE); 
   cv::Mat image2 = cv::imread("images/index3.jpeg", cv::IMREAD_GRAYSCALE); 
 
@@ -52,16 +52,15 @@ TEST_F(TestUtils, TestResampleGrayImage){
   int diffTot = 0;
   for(int i= 0; i < dst.size().height*dst.size().width; i++)
   {
-      if(diffImageVals[i] > 15)
+      if(diffImageVals[i] > 1)
       {
         diffTot = diffTot + diffImageVals[i];
         valTot = valTot + 1; 
       }
   }
-  //printf("DifTot --> %d\n", valTot);
-  //ASSERT_TRUE(valTot < 40);
+  ASSERT_TRUE(valTot < 40);
 }
-
+*/
 
 TEST_F(TestUtils, TestResampleColorImage)
 {
@@ -121,14 +120,14 @@ TEST_F(TestUtils, TestResampleColorImage)
   {
     for(int i = 0; i < (int)rows; i++)
     {
-      if(abs(data[i + j] -  (float)imReample3[i + j])> 10)
+      if(abs(data[i + j] -  (float)imReample3[i + j])> 1)
       {
         difPixels = difPixels + 1;
       }
     }
   }
 
-  ASSERT_TRUE(difPixels < 350);
+  ASSERT_TRUE(difPixels < 10);
 
   cv::Mat bgr_dst1_chng;
   bgr_dst[1].convertTo(bgr_dst1_chng, CV_32F);
@@ -139,14 +138,15 @@ TEST_F(TestUtils, TestResampleColorImage)
   {
     for(int i = 0; i < (int)rows; i++)  
     {
-      if(abs(data2[i + j] -  (float)imReample2[i + j])> 10)
+      if(abs(data2[i + j] -  (float)imReample2[i + j])> 1)
       {
         difPixels2 = difPixels2 + 1;
       }
     }
   }
 
-  ASSERT_TRUE(difPixels2 < 350);
+
+  ASSERT_TRUE(difPixels2 < 1);
 
   cv::Mat bgr_dst2_chng;
   bgr_dst[2].convertTo(bgr_dst2_chng, CV_32F);
@@ -157,13 +157,14 @@ TEST_F(TestUtils, TestResampleColorImage)
   {
     for(int i = 0; i < (int)rows; i++)
     {
-      if(abs(data3[i + j] -  (float)imReample1[i + j])> 10)
+      if(abs(data3[i + j] -  (float)imReample1[i + j])> 1)
       {
         difPixels3 = difPixels3 + 1;
       }
     }
   }
-  ASSERT_TRUE(difPixels3 < 350);
+
+  ASSERT_TRUE(difPixels3 < 1);
 
 
   int difPixels4 = 0;
@@ -171,13 +172,14 @@ TEST_F(TestUtils, TestResampleColorImage)
   {
     for(int i = 0; i < (int)rows; i++)
     {
-      if(abs(data3[i + j] -  (float)imReample1[i + j])> 10 or abs(data2[i + j] -  (float)imReample2[i + j])> 10 or abs(data[i + j] -  (float)imReample3[i + j])> 10) 
+      if(abs(data3[i + j] -  (float)imReample1[i + j])> 1 or abs(data2[i + j] -  (float)imReample2[i + j])> 1 or abs(data[i + j] -  (float)imReample3[i + j])> 1) 
       {
         difPixels4 = difPixels4 + 1;
       }
     }
   }
-  ASSERT_TRUE(difPixels4 < 350);
+
+  ASSERT_TRUE(difPixels4 < 1);
 }
 
 TEST_F(TestUtils, TestResampleConv)
@@ -225,10 +227,13 @@ TEST_F(TestUtils, TestChannelsCompute)
   FileNode cols = fs1["M"]["cols"];
   FileNode imgMagMatlab = fs1["M"]["data"];
 
-  //for(int i=0;i<14*17 /*(int)rows*(int)cols*/;i++)
-  //{ 
-    //printf("%.4f %.4f \n", (float)valuesImgMag[i], (float)imgMagMatlab[i] );
-    //ASSERT_TRUE(abs((float)valuesImgMag[i] - (float)imgMagMatlab[i]) < 1.e-2f);
-  //}
+  for(int i=0;i<14*17 /*(int)rows*(int)cols*/;i++)
+  { 
+    //printf("%.5f %.5f \n", (float)valuesImgMag[i], (float)imgMagMatlab[i] );
+    ASSERT_TRUE(abs((float)valuesImgMag[i] - (float)imgMagMatlab[i]) < 1.e-2f);
+  }
 
 }
+
+
+

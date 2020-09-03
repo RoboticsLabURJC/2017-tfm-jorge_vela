@@ -48,8 +48,16 @@ TEST_F(TestChannelsExtractorGradHist, TestColorImage){
   std::vector<cv::Mat> gradMagExtractVector(2);
   gradMagExtractVector = gradMagExtract.extractFeatures(image);
 
+
+  auto start = std::chrono::high_resolution_clock::now();
+
   std::vector<cv::Mat> gradHistExtractVector;
   gradHistExtractVector = gradHistExtract.extractFeatures(image,gradMagExtractVector );
+
+  auto stop = std::chrono::high_resolution_clock::now(); 
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start); 
+  //std::cout << "time ms: " << duration.count() << std::endl;
+
 
   int height = gradHistExtractVector[0].size().height;
   int width = gradHistExtractVector[0].size().width;
@@ -78,6 +86,7 @@ TEST_F(TestChannelsExtractorGradHist, TestColorImage){
       i++;  
     } 
   }
+
 }
 
 

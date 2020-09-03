@@ -180,7 +180,7 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
     dst = dst/255.0;
     float *data = dst.ptr<float>();
 
-    gradMag(data, M, O, h, w, nChannels,  false ); 
+    gradMag(data, M, O, h, w, nChannels,  false ); //ESTABA AL CONTRARIO ( w,h) ¿porque?
 
   }
   else if(nChannels == 3)
@@ -212,18 +212,20 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
 
 
     int tot = h*w;
+
     for(int i=0; i < tot; i++)
     {
-      float max = ( MVal[0][i] < MVal[1][i] ) ? MVal[1][i] : MVal[0][i];
-      M[i] = ( max < MVal[2][i] ) ? MVal[2][i] : max;
+      int max = ( MVal[0][i] < MVal[1][i] ) ? 1  : 0 ;
+      int max2 =  ( MVal[max][i] < MVal[2][i] ) ? 2 : max;
 
-      float maxO = ( MVal[0][i] < MVal[1][i] ) ? OVal[1][i] : OVal[0][i];
-      O[i] = ( max < MVal[2][i] ) ? OVal[2][i] : maxO;
+      M[i] = MVal[max2][i];
+      O[i] = OVal[max2][i];
     }
   }  
 
+
   if(m_normRad != 0){
-    cv::Mat dummy_query = cv::Mat(w,h,  CV_32F, M);
+    cv::Mat dummy_query = cv::Mat(w, h, CV_32F, M);
     Utils utils;
     cv::Mat M_to_img = utils.convTri(dummy_query, m_normRad);
     cv::Mat newM;

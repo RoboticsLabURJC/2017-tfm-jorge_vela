@@ -43,9 +43,9 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   ChannelsLUVExtractor channExtract{false, smooth};
 
 
-  int sz[2] = {img.size().height, img.size().width};
+  int sz[2] = {img.size().width, img.size().height}; //SE HA CAMBIADO ESTO PORQUE HABIA UN ERROR EN EL ORDEN
   //int shrink = 4;
-  int minDs[2] = {48,84}; //{minDsA[0], minDsA[1]};
+  int minDs[2] = {84,48}; //{minDsA[0], minDsA[1]}; //DEBIDO AL CAMBIO DE LA ANTERIOR LINEA SE MODIFICA ESTA
 
   //int lambdas = {};
 
