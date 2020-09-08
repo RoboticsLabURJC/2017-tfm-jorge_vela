@@ -38,7 +38,6 @@ bool ChannelsPyramid::load(std::string opts){
 
 std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){ 
   Utils utils;
-  //printf("channelsPyramids\n");
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
 
@@ -49,13 +48,23 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
 
   //int lambdas = {};
 
-  //printf("%d %d\n",sz[0], sz[1] );
   //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
+
+  cv::Mat luvImageChng;
+
+  luvImage[0].copyTo(luvImageChng);
+  luvImage[2].copyTo(luvImage[0]);
+  luvImageChng.copyTo(luvImage[2]);
+
+
+
   merge(luvImage, luv_image);
 
   //EN ESTAS LINEAS EL COMPRUEBA QUE SE CUMPLEN LOS REQUISITOS PARA LA CONVERSION
+  cv::Mat imageUse = luv_image;
+ 
 
   //-------------------------------------------------------------------------
 
@@ -65,7 +74,6 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   scales = getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz);
 
   int nScales = scales.size();
-  //printf("%d\n", nScales );
 
   int isR;
   if(1){ //PREGUNTAR ESTE IF EN MATLAB
@@ -80,6 +88,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
     isRarr.push_back(1 + iLoop);
     iLoop = iLoop + m_nApprox +1;
   }
+
 
   std::vector<int> isA;
   int valIsRArr = 0;
@@ -105,9 +114,6 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
       isN.push_back(isRarr[i]);
     }
   }
-
-
-  //printf("%d %d %d\n", isRarr[0], isRarr[1], isRarr[2]);
   std::vector<cv::Mat> strucData[nScales];
   //COMPUTE IMAGE PYRAMID----------------------------------------------------
   std::vector<cv::Mat> pChnsCompute;
@@ -119,27 +125,90 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
     //printf("-->%d %d\n",sz1[0], sz1[1] );
     cv::Mat I1;
     if(sz[0] == sz1[0] && sz[1] == sz1[1]){
-      I1 = img;
+      I1 = imageUse;
     }else{
-      I1 = utils.ImgResample(img, sz1[0] , sz1[1] );
+      I1 = utils.ImgResample(imageUse, sz1[0] , sz1[1] );
     }
 
     if(s==.5 && (m_nApprox>0 || m_nPerOct==1)){
-      img = I1;
+      imageUse = I1;
     }
     pChnsCompute = utils.channelsCompute(I1,m_shrink);
-    //printf("%d %d \n",isRarr[i]-1, pChnsCompute[0].size().height );
     strucData[isRarr[i] - 1] = pChnsCompute;
   } 
 
   cv::Mat data[pChnsCompute.size()][nScales];
-  //if lambdas not specified compute image specific lambdas.. SE OBVIA------
+
 
   //SUPONEMOS QUE NO SE DARÁ ESTE CASO---------------------------------------
+  // if lambdas not specified compute image specific lambdas
+  if( nScales>0 && m_nApprox>0){
+    std::vector<int> isA;
+    for(int i = m_nOctUp*m_nPerOct; i < nScales; i){
+      isA.push_back(i);
+      i = i+m_nApprox+1;
+    }
+
+    int nTypes = 3;  // Se utiliza por cada canal que se añade en chnsCompute, para nosotros 10
+    
+    /*std::vector<int> f0;
+    for(int i = 0; i < nTypes; i++){
+      f0.push_back(0);
+    }
+
+    std::vector<int> f1 = f0;*/
+
+
+    double f0[] = {0,0,0};
+    double f1[] = {0,0,0};
+    double lambdas[] = {0,0,0};
+    for(int i = 0; i < nTypes; i++){
+      int w = strucData[isA[0]][i].size().width;
+      int h = strucData[isA[0]][i].size().height;
+
+      double sum1; 
+      double sum2;
+      double sum3;
+      for(int j = 0; j < 3; j++){
+        double a1 = cv::sum(strucData[isA[0]][i])[0];
+        f0[0]+=a1;   
+        double a2 = cv::sum(strucData[isA[1]][i])[0];
+        f1[0]+=a2;    
+      }
+
+      f0[0] = f0[0]/(w*h*3);
+      f1[0] = f1[0]/(w*h*3);
+
+      f0[1] =  cv::sum(strucData[isA[0]][3])[0]/(w*h);
+      f1[1] =  cv::sum(strucData[isA[1]][3])[0]/(w*h);
+
+      for(int j = 4; j < strucData[isA[0]].size(); j++){
+        double a1 = cv::sum(strucData[isA[0]][i])[0];
+        f0[2]+=a1;  
+        double a2 = cv::sum(strucData[isA[0]][i])[0];
+        f1[2]+=a2;
+      }
+
+      f0[2]=f0[2]/(w*h*(strucData[isA[0]].size() - 4));
+      f1[2]=f1[2]/(w*h*(strucData[isA[0]].size() - 4)); 
+
+    }
+
+    for(int i=0; i< 3; i++){
+      printf("%d %d \n", scales[isA[0]], scales[isA[1]] );
+      printf("%f %f \n", f0[i], f1[i] );
+
+
+      lambdas[i] = -log2 (f0[i]/f1[i]) / log2(scales[isA[0]]/scales[isA[1]]);
+    }
+    printf("%f %f %f \n", lambdas[0], lambdas[1], lambdas[2]); //REVISAR LOS RESULTADOS,,,??????????????????????????????????????????????????
+    
+  }
 
 
   //std::vector<cv::Mat> data;
   //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
+  
   for(int i=0; i< isA.size(); i++){
     int x = isA[i] -1;
     int iR =  isN[x];
@@ -156,6 +225,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
       strucData[x] = resampleVect;
     }
   }
+  
 
   //smooth channels, optionally pad and concatenate channels
   /*for(int i = 0; i < nScales; i++){

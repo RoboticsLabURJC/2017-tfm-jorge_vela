@@ -33,7 +33,7 @@
 cv::Mat Utils::ImgResample(cv::Mat src, int width, int height, int norm){
   cv::Mat dst(height, width, CV_32F, cv::Scalar(0, 0, 0));
   resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_AREA); //DICE QUE EN ALGUNOS CASOS NO UTILIZA ANTIALIASING OFF, POR LO QUE SERÍA INTER_AREA, EL CASO NORMAL ES INTER_LINEAR
-
+  dst = norm*dst;
   return dst;
 }
 
@@ -125,7 +125,8 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, int shrink){
 
   //printf("%d %d\n",h,w );
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(imageCropped); //IMAGENES ESCALA DE GRISES??
-
+  /*split(imageCropped, luvImage);
+  cv::imshow("",luvImage[0]);*/
   cv::Mat luv_image;
   merge(luvImage, luv_image);
   luv_image = convTri(luv_image, smooth);
