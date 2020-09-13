@@ -211,8 +211,9 @@ TEST_F(TestUtils, TestChannelsCompute)
 {
   cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
   std::vector<cv::Mat> pChnsCompute;
-  pChnsCompute = utils.channelsCompute(image, 4);
+  pChnsCompute = utils.channelsCompute(image,"RGB", 4);
 
+  cv::waitKey(0);
   cv::Mat testMag;
   transpose(pChnsCompute[3], testMag);
 

@@ -37,6 +37,7 @@ public:
   std::vector<cv::Mat> channelsCompute
     (
       cv::Mat src,
+      std::string colorSpace,
       int shrink
     );
 

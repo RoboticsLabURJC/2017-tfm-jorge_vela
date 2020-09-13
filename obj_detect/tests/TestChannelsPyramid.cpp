@@ -64,78 +64,41 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
 
   ASSERT_TRUE(pyramid.size()==28);
 
-  chnsPyramid.badacostFilters(pyramid, "yaml/filterTest.yml");
+  //chnsPyramid.badacostFilters(pyramid, "yaml/filterTest.yml");
+}
+
+
+
+TEST_F(TestChannelsPyramid, badacostFilters){
+  cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+  std::string nameOpts = "yaml/pPyramid.yml";
+  bool loadOk = chnsPyramid.load(nameOpts.c_str());
+  std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image);
+
+
+
+  /*std::vector<cv::Mat> filtered = chnsPyramid.badacostFilters(pyramid[11], "yaml/filterTest.yml");
+
+
+  printf("%d %d \n", filtered[0].size().height, filtered[0].size().width);
+
+  for(int k = 0; k < 40; k++){
+    double minVal; 
+    double maxVal; 
+    cv::Point minLoc; 
+    cv::Point maxLoc;
+    minMaxLoc( filtered[k], &minVal, &maxVal, &minLoc, &maxLoc );
+    std::cout << "min val: " << minVal << " max val:" << maxVal << std::endl;
+  }*/
+  //cv::imshow("", filtered[0]);
+  //cv::waitKey(0);
+
+
+
 }
 
 
 
 
 
-
-
-
-  /*
-  //CARGAR EL FILTRO CREADO POR MATLAB DESDE UN YML
-  cv::FileStorage filter;
-  filter.open("yaml/filterTest.yml", cv::FileStorage::READ);
-
-  //OBTENER EL NOMBRE DE LOS DISTINTOS FILTROS PARA ESTE CASO
-  std::vector<std::string> namesFilters;
-  for(int i = 1; i < 5; i++){
-    for(int j = 1; j< 11; j++){
-      std::string name  = "filter_" + std::to_string(j) + "_" + std::to_string(i);
-      namesFilters.push_back(name);
-    }
-  }
-
-  //SE CARGAN LOS DISTINTOS FILTROS, CON LOS NOMBRES ANTERIORES DESDE EL YML
-  std::vector<cv::Mat> filters;
-  for(int k = 0; k < namesFilters.size(); k++){
-    cv::FileNode filterData = filter[namesFilters[k].c_str()]["data"];
-    cv::FileNode filterRows = filter[namesFilters[k].c_str()]["rows"];
-    cv::FileNode filterCols = filter[namesFilters[k].c_str()]["cols"];
-
-    float* filt = new float[25*sizeof(float)];
-
-    for(int i = 0; i < (int)filterRows; i++){
-      for(int j = 0; j < (int)filterCols; j++){
-        float x = (float)filterData[i*5+j];
-        filt[i*5+j] = x;
-      }
-    }
-
-    cv::Mat filterConver = cv::Mat(5,5, CV_32F, filt);
-    transpose(filterConver,filterConver);
-    float *O = filterConver.ptr<float>();
-
-    filters.push_back(filterConver);//(filt);
-  }
-
-  //EJEMPLO PARA UNA ESCALA, QUE TIENE 10 CANALES
-  cv::Mat bgr_dst[10];
-  split(pyramid[2],bgr_dst);
-
-  //SE REPITE UNA ESCALA PARA PASAR POR LOS FILTROS
-  cv::Mat G;
-  pyramid[0].copyTo(G);
-  std::vector<cv::Mat> C_repMat;
-  for(int i = 0; i < 10; i++){
-    pyramid[0].copyTo(G);
-    C_repMat.push_back(G);
-  }
-
-
-  //SE CONVOLUCIONA UNA IMAGEN CON LOS FILTROS Y SE OBTIENEN LAS IMAGENES DE SALIDA
-  std::vector<cv::Mat> out_images;
-  for(int j = 0; j < 4; j++){
-    cv::Mat splitted[10];
-    split(C_repMat[j],splitted);
-    for(int i = 0; i < 10; i++){
-      cv::Mat out_image; 
-      filter2D(splitted[i], out_image, -1 , filters[i+(10*j)], cv::Point( -1, -1 ), 0, cv::BORDER_REFLECT );
-      out_images.push_back(out_image);
-    }
-  }
-
-}
-  */
+ 

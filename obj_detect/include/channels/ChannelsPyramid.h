@@ -28,12 +28,12 @@ public:
 	ChannelsPyramid(
 	){
 	}
-    std::vector<float> getScales(  int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]);
+  std::vector<float> getScales(  int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]);
 
 	bool load(std::string opts);
 
 	std::vector<cv::Mat> getPyramid(cv::Mat img);
-  	std::vector<cv::Mat> badacostFilters(std::vector<cv::Mat> pyramid, std::string filterName);
+  std::vector<cv::Mat> badacostFilters(cv::Mat pyramid, std::string filterName); //std::vector<
 
 
 };
