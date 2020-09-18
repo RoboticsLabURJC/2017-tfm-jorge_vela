@@ -202,7 +202,7 @@ BadacostDetector::detect(cv::Mat imgs)
         cids[m++] = z*width*height + c*height + r;
       }
 
-    /*float t = 0;
+    float t = 0;
     for (int k = 0; k < 177; k++){ //k=1:177
         for (int v = 0; v < 313; v++){ //v=1:313
           for (int w = 0; w < 40; w++){ //w=1:40
@@ -211,7 +211,7 @@ BadacostDetector::detect(cv::Mat imgs)
                //printf("%d %d %d \n",k,v,w );
             }
         }
-    }*/
+    }
 
 /*  
   #ifdef USEOMP
@@ -219,9 +219,9 @@ BadacostDetector::detect(cv::Mat imgs)
   #pragma omp parallel for num_threads(nThreads)
   #endif
 */
-  for( int c=0; c< 1 /*width1*/; c++ )
+  for( int c=0; c< 2 /*width1*/; c++ )
   {
-    for( int r=0; r< 1/*height1*/ ; r++ ) 
+    for( int r=0; r< 2/*height1*/ ; r++ ) 
     { 
         printf("-------------------------------------- %d  \n", r);
 
@@ -262,9 +262,9 @@ BadacostDetector::detect(cv::Mat imgs)
           //   z - ftrChnIndex
           //   c - ftrChnCol
           //   r - ftrChnRow
-          int ftrChnIndex = ftrId / (width*height);
-          int ftrChnCol = (ftrId % (width*height)) / height;
-          int ftrChnRow =  (ftrId % (width*height)) % height;
+          //int ftrChnIndex = ftrId / (width*height);
+          //int ftrChnCol = (ftrId % (width*height)) / height;
+          //int ftrChnRow =  (ftrId % (width*height)) % height;
 
           // Obtain the feature value and threshold for the k-th tree node.
           //float ftr = filteredImagesResized[ftrChnIndex].at<float>(ftrChnRow, ftrChnCol);
