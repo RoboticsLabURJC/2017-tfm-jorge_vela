@@ -137,6 +137,7 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
   const float s=(float)bin, sInv=1/s, sInv2=1/s/s;
   float *H0, *H1, *M0, *M1; int x, y; int *O0, *O1; float xb, init;
 
+
   O0 = new int[h*sizeof(int)+16]();M0 = new float[h*sizeof(int)+16]();
   O1 = new int[h*sizeof(int)+16]();M1 = new float[h*sizeof(int)+16]();
 
@@ -167,6 +168,7 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
       #undef GH
 
     } else {
+      //------------------------------------------------------------------------------printf("1 --> x: %d w0: %d \n", x, w0);
       // interpolate using trilinear interpolation
       float ms[4], xyd, yb, xd, yd; __m128 _m, _m0, _m1;
       bool hasLf, hasRt; int xb0, yb0;
@@ -196,6 +198,7 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
         if(hasRt) { _m=SET(0,0,ms[3],ms[2]);
           GH(H0+O0[y]+hb,_m,_m0); GH(H0+O1[y]+hb,_m,_m1); }
       }
+
       // final rows, no bottom bin
       for( ; y<h0; y++ ) {
         yb0 = (int) yb; GHinit;
@@ -206,7 +209,9 @@ void GradHistExtractor::gradHist( float *M, float *O, float *H, int h, int w,
       #undef GH
     }
   }
-  delete(O0); delete(O1); delete(M0); delete(M1);
+
+
+  //delete(O0); delete(O1); delete(M0); delete(M1);
   // normalize boundary bins which only get 7/8 of weight of interior bins
   if( softBin%2!=0 ) for( int o=0; o<nOrients; o++ ) {
     x=0; for( y=0; y<hb; y++ ) H[o*nb+x*hb+y]*=8.f/7.f;
@@ -235,8 +240,12 @@ std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O,
 
   int sizeData = sizeof(float);
 
+  //printf("%d %d %d %d \n",m_binSize , m_nOrients, m_softBin, m_full);
+
+
   gradHist(M,O,H,h,w,m_binSize,m_nOrients,m_softBin,m_full);
 
+  //printf("errorrrrrrrrr\n");
   int hConv = h/m_binSize;
   int wConv = w/m_binSize;
 
@@ -249,7 +258,7 @@ std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O,
   
   for(i = 0; i < m_nOrients; i++){
       arr[i] = &H[i*pos];
-      cv::Mat gradH = cv::Mat(wConv,hConv, CV_32F, arr[i]);
+      cv::Mat gradH = cv::Mat(wConv,hConv, CV_32FC1, arr[i]);
       transpose(gradH, gradH);
       H2[i] = gradH;  
   }
@@ -268,12 +277,12 @@ std::vector<cv::Mat> GradHistExtractor::gradH(cv::Mat image, float *M, float *O,
 std::vector<cv::Mat> GradHistExtractor::extractFeatures(cv::Mat img, std::vector<cv::Mat> gradMag)
 {
   cv::Mat dstM;
-  gradMag[0].convertTo(dstM, CV_32F);
+  gradMag[0].convertTo(dstM, CV_32FC1);
   transpose(dstM, dstM);
   float *dataM = dstM.ptr<float>();
 
   cv::Mat dstO;
-  gradMag[1].convertTo(dstO, CV_32F);
+  gradMag[1].convertTo(dstO, CV_32FC1);
   transpose(dstO, dstO);
   float *dataO = dstO.ptr<float>();
 
@@ -287,7 +296,9 @@ std::vector<cv::Mat> GradHistExtractor::extractFeatures(cv::Mat img, std::vector
   float *H = new float[size]();
 
   std::vector<cv::Mat> channelsGradHist;
+  //printf("gradhist 293: llegaaaa\n");
   channelsGradHist = gradH(img, dataM, dataO, H);
+  //printf("gradhist 295: llegaaaa\n");
 
 
   return channelsGradHist;

@@ -139,7 +139,7 @@ std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
   cv::Mat img
   )
 {
-  assert(img.type() == CV_8UC3); // TODO: Make it an error check + throw exception
+  //assert(img.type() == CV_8UC3); // TODO: Make it an error check + throw exception
 
   std::vector<cv::Mat> channelsLUV(3);
   std::vector<cv::Mat> channelsLUV_normalized(3);

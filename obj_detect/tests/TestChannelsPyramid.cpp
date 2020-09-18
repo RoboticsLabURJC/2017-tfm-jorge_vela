@@ -63,7 +63,6 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
   std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image);
 
   ASSERT_TRUE(pyramid.size()==28);
-
   //chnsPyramid.badacostFilters(pyramid, "yaml/filterTest.yml");
 }
 

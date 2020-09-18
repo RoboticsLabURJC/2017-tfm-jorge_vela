@@ -70,13 +70,13 @@ cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
   }
   double delta = 0;
 
-  cv::Mat kernel = cv::Mat((kernel_size*2)+1,1,  CV_32F, arrayKernel);
-  filter2D(input_image, help_image, -1 , kernel, anchor, delta, cv::BORDER_REFLECT );
-  kernel = cv::Mat(1,(kernel_size*2)+1,  CV_32F, arrayKernel);
-  filter2D(help_image, output_image, -1 , kernel, anchor, delta, cv::BORDER_REFLECT );
+  cv::Mat kernel = cv::Mat((kernel_size*2)+1,1,  CV_32FC1, arrayKernel);
+  filter2D(input_image, help_image, CV_32FC1 , kernel, anchor, delta, cv::BORDER_REFLECT );
+  kernel = cv::Mat(1,(kernel_size*2)+1,  CV_32FC1, arrayKernel);
+  filter2D(help_image, output_image, CV_32FC1 , kernel, anchor, delta, cv::BORDER_REFLECT );
 
   cv::Mat img3;
-  output_image.convertTo(img3, CV_32F);    
+  output_image.convertTo(img3, CV_32FC1);    
   float *valueM = img3.ptr<float>();
 
   /*printf("Convtri: \n");
@@ -108,7 +108,7 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
   GradMagExtractor gradMagExtract{5};
-  GradHistExtractor gradHistExtract{4, 6, 0,0};
+  GradHistExtractor gradHistExtract{4, 6, 0,0}; //4,6,0,0
 
   int dChan = src.channels();
   int h = src.size().height;
@@ -136,6 +136,7 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
     luv_image = imageCropped;
     split(luv_image, luvImage);
   }
+
   luv_image = convTri(luv_image, smooth);
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
 
@@ -150,8 +151,10 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
   for(int i = 0; i < 15; i++)
     printf("%.4f ", valueM[i] );
   printf("\n");*/
+  //printf("----------------------------\n");
 
   std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
+  //printf("---------------------------- 2\n");
 
   std::vector<cv::Mat> chnsCompute;
   for(int i = 0; i < 3/*luvImage.size()*/; i++){   //FALTA HACER RESAMPLE TAMAÑO/SHRINK PARA RETORNAR EL RESULTADO COMO ADDCHNS

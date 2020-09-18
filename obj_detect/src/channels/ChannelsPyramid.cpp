@@ -126,15 +126,19 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
     //printf("-->%d %d\n",sz1[0], sz1[1] );
     cv::Mat I1;
     if(sz[0] == sz1[0] && sz[1] == sz1[1]){
-      I1 = img;
+      I1 = imageUse;
     }else{
-      I1 = utils.ImgResample(img, sz1[0] , sz1[1]);
+      I1 = utils.ImgResample(imageUse, sz1[0] , sz1[1]);
     }
 
     if(s==.5 && (m_nApprox>0 || m_nPerOct==1)){
-      img = I1;
+      imageUse = I1;
     }
-    std::string colorSpace = "RGB";
+    std::string colorSpace = "LUV";
+
+    //cv::imshow("", I1);
+    //cv::waitKey(0);
+
     pChnsCompute = utils.channelsCompute(I1, colorSpace.c_str(), m_shrink);
     strucData[i]/*[isRarr[i] - 1]*/ = pChnsCompute;
   } 
@@ -230,21 +234,29 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   
 
   //smooth channels, optionally pad and concatenate channels
-  for(int i = 0; i < nScales; i++){
+  /*for(int i = 0; i < nScales; i++){
     for(int j=0; j < pChnsCompute.size();j++){
       data[j][i] = utils.convTri(luv_image, smooth);
     }
-  }
+  }*/
+
   //FALTA EL OPTINALLY PAD
   //CONCATENA TODOS LOS CANALES
   std::vector<cv::Mat> channelsConcat;
   for(int i = 0; i < nScales; i++){
       cv::Mat concat;
       merge(strucData[i], concat);
+
       concat = utils.convTri(concat, 1);
+
+      //cv::Mat dst;
+      //cv::RNG rng(12345);
+      //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+      //copyMakeBorder( concat, concat, 2, 2, 3, 3, cv::BORDER_REPLICATE, 0 );
+
+
       channelsConcat.push_back(concat);
   }
-
   return channelsConcat;
 }
 
@@ -284,15 +296,6 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
     cv::Mat filterConver = cv::Mat(5,5, CV_32F, filt);
     transpose(filterConver,filterConver);
 
-
-
-    /*printf("%f %f %f %f %f\n", (float)filterConver.at<float>(0,0), (float)filterConver.at<float>(0,1), (float)filterConver.at<float>(0,2), (float)filterConver.at<float>(0,3), (float)filterConver.at<float>(0,4) );
-    printf("%f %f %f %f %f\n", (float)filterConver.at<float>(1,0), (float)filterConver.at<float>(1,1), (float)filterConver.at<float>(1,2), (float)filterConver.at<float>(1,3), (float)filterConver.at<float>(1,4) );
-    printf("%f %f %f %f %f\n", (float)filterConver.at<float>(2,0), (float)filterConver.at<float>(2,1), (float)filterConver.at<float>(2,2), (float)filterConver.at<float>(2,3), (float)filterConver.at<float>(2,4) );
-    printf("%f %f %f %f %f\n", (float)filterConver.at<float>(3,0), (float)filterConver.at<float>(3,1), (float)filterConver.at<float>(3,2), (float)filterConver.at<float>(3,3), (float)filterConver.at<float>(3,4) );
-    printf("%f %f %f %f %f\n \n \n", (float)filterConver.at<float>(4,0), (float)filterConver.at<float>(4,1), (float)filterConver.at<float>(4,2), (float)filterConver.at<float>(4,3), (float)filterConver.at<float>(4,4) );*/
-
-
     float *O = filterConver.ptr<float>();
 
     filters.push_back(filterConver);//(filt);
@@ -312,6 +315,9 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
     C_repMat.push_back(G);
   }
 
+
+
+  //printf("pix 0,0 %f %f %d \n", (float)pyramid.at<float>(0,0), (float)pyramid.at<float>(0,1) , pyramid.size().height);
   //SE CONVOLUCIONA UNA IMAGEN CON LOS FILTROS Y SE OBTIENEN LAS IMAGENES DE SALIDA
   std::vector<cv::Mat> out_images;
   for(int j = 0; j < 4; j++){
@@ -319,11 +325,21 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
     split(C_repMat[j],splitted);
     for(int i = 0; i < nChannels; i++){
       cv::Mat out_image; 
-      filter2D(splitted[i], out_image, -1 , filters[i+(nChannels*j)], cv::Point( -1, -1 ), 0, cv::BORDER_REFLECT );
+      //filter2D(splitted[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_REFLECT );
+
+      cv::Mat dst;
+      cv::RNG rng(12345);
+      cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+      copyMakeBorder( splitted[i], dst, 2, 2, 3, 3, cv::BORDER_REFLECT, 0 );
+      //printf("pix 0,0 %f %f %f %f %d \n", (float)dst.at<float>(2,3), (float)dst.at<float>(2,4), (float)dst.at<float>(2,2), (float)dst.at<float>(1,1), dst.size().height);
 
 
+
+      filter2D(dst, out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_CONSTANT );
       out_image = utils.ImgResample(out_image, round((float)out_image.size().width/2), round((float)out_image.size().height/2));
 
+      //if(i == 1)
+      //  printf("pix 0,0 %f %f %f \n", (float)out_image.at<float>(0,0), (float)out_image.at<float>(0,1) , (float)out_image.at<float>(1,0));
 
       out_images.push_back(out_image);
     }

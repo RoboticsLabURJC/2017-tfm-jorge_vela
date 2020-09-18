@@ -223,22 +223,21 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
     }
   }  
 
-
   if(m_normRad != 0){
-    cv::Mat dummy_query = cv::Mat(w, h, CV_32F, M);
+    cv::Mat dummy_query = cv::Mat(w, h, CV_32FC1, M);
     Utils utils;
     cv::Mat M_to_img = utils.convTri(dummy_query, m_normRad);
     cv::Mat newM;
-    M_to_img.convertTo(newM, CV_32F);    
+    M_to_img.convertTo(newM, CV_32FC1);    
     float *dataM = newM.ptr<float>();
     gradMagNorm(M, dataM, w,h, m_normConst);
   }
 
   std::vector<cv::Mat> channelsGradMag(2);
-  cv::Mat gradM = cv::Mat(w,h, CV_32F, M);
+  cv::Mat gradM = cv::Mat(w,h, CV_32FC1, M);
   transpose(gradM, gradM);
   channelsGradMag[0] = gradM;
-  cv::Mat gradO = cv::Mat(w,h, CV_32F, O);
+  cv::Mat gradO = cv::Mat(w,h, CV_32FC1, O);
   transpose(gradO, gradO);
   channelsGradMag[1] = gradO;
 
