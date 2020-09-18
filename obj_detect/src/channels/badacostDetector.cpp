@@ -262,9 +262,9 @@ BadacostDetector::detect(cv::Mat imgs)
           //   z - ftrChnIndex
           //   c - ftrChnCol
           //   r - ftrChnRow
-          //int ftrChnIndex = ftrId / (width*height);
-          //int ftrChnCol = (ftrId % (width*height)) / height;
-          //int ftrChnRow =  (ftrId % (width*height)) % height;
+          int ftrChnIndex = ftrId / (width*height);
+          int ftrChnCol = (ftrId % (width*height)) / height;
+          int ftrChnRow =  (ftrId % (width*height)) % height;
 
           // Obtain the feature value and threshold for the k-th tree node.
           //float ftr = filteredImagesResized[ftrChnIndex].at<float>(ftrChnRow, ftrChnCol);
