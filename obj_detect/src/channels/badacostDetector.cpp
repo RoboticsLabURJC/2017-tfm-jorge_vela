@@ -85,6 +85,7 @@ bool BadacostDetector::load(std::string clfPath)
     data >> p;
     memcpy(m_Cprime.data, p.data(), p.size()*sizeof(float));
 
+
     // Read Y data
     rows = static_cast<int>(classifier["Y"]["rows"]);
     cols = static_cast<int>(classifier["Y"]["cols"]);
@@ -93,14 +94,16 @@ bool BadacostDetector::load(std::string clfPath)
     data >> p;
     memcpy(m_Y.data, p.data(), p.size()*sizeof(float));
 
+    
     // Read wl_weights data
     rows = static_cast<int>(classifier["w1_weights"]["rows"]);
     cols = static_cast<int>(classifier["w1_weights"]["cols"]);
-    data = classifier["w1_weigths"]["data"];
+    data = classifier["w1_weights"]["data"];
     m_wl_weights = cv::Mat::zeros(cols, rows, CV_32F);
     data >> p;
     memcpy(m_wl_weights.data, p.data(), p.size()*sizeof(float));
-    
+   
+
     // Read aRatio data
     rows = static_cast<int>(classifier["aRatio"]["rows"]);
     cols = static_cast<int>(classifier["aRatio"]["cols"]);
@@ -157,7 +160,7 @@ BadacostDetector::detect(cv::Mat imgs)
   int modelHt = 54;  // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
   int modelWd = 96;  // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
   int stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  float cascThr = 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  float cascThr = 0;//-2.239887; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
 
 
   int height = filteredImagesResized[0].size().height;
@@ -202,16 +205,20 @@ BadacostDetector::detect(cv::Mat imgs)
         cids[m++] = z*width*height + c*height + r;
       }
 
-    float t = 0;
+    /*int t = 0;
     for (int k = 0; k < 177; k++){ //k=1:177
         for (int v = 0; v < 313; v++){ //v=1:313
           for (int w = 0; w < 40; w++){ //w=1:40
-              filteredImagesResized[w].at<float>(k,v) = t; 
-              t = t + 1.0;
+              if(t %2 == 0){
+              filteredImagesResized[w].at<float>(k,v) = -t ; 
+              }else{
+                filteredImagesResized[w].at<float>(k,v) = t ; 
+              }
+              t = t + 7.0;
                //printf("%d %d %d \n",k,v,w );
             }
         }
-    }
+    }*/
 
 /*  
   #ifdef USEOMP
@@ -224,6 +231,7 @@ BadacostDetector::detect(cv::Mat imgs)
     for( int r=0; r< 2/*height1*/ ; r++ ) 
     { 
         printf("-------------------------------------- %d  \n", r);
+
 
       //if(c == 0 && r == 0){
       //  printf("%f \n", filteredImagesResized[0].at<float>(0,0) );
@@ -280,14 +288,19 @@ BadacostDetector::detect(cv::Mat imgs)
           printf("%d %d \n",child_choosen , k);
           k0 = k;
         }
-        int h = static_cast<int>((int)m_classifier["hs"].at<float>(k, t));
-        printf("%d\n",h );
+        int h = static_cast<int>((int)m_classifier["hs"].at<float>(t,k));
         // Add to the margin vector the codified output class h as a vector 
         // multiplied by the weak learner weights     
         cv::Mat Y = m_Y(cv::Range(0,m_num_classes), cv::Range(h-1,h));
+
+
+        //for(int wk = 0; wk < Y.size().height; wk++)
+        //  printf("%f \n", (float)Y.at<float>(wk,0) );
+
+        //printf("--> %f \n",(float)m_wl_weights.at<float>(0,0) );
         cv::Mat update = m_wl_weights.at<float>(t,0) * Y;
         margin_vector += update;
-    
+
         // Get the costs vector.
         cv::Mat costs_vector = m_Cprime * margin_vector;
         
@@ -305,7 +318,7 @@ BadacostDetector::detect(cv::Mat imgs)
 
         // Get the trace for the current detection window
         trace = -(min_pos_cost - neg_cost);
-    
+
         if (trace <= cascThr) break;
       }
 
