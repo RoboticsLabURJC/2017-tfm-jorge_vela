@@ -291,7 +291,11 @@ std::vector<cv::Mat> GradHistExtractor::extractFeatures(cv::Mat img, std::vector
   int width = img.size().width;
   int height = img.size().height;
 
-  int size = width/4*height/4*dChan*6;
+  //int size = width/4*height/4*dChan*6;
+  int size = width/m_binSize*height/m_binSize*dChan*m_nOrients;
+
+
+
 
   float *H = new float[size]();
 

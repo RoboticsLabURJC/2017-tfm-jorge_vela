@@ -335,7 +335,7 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
 
 
 
-      filter2D(dst, out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_CONSTANT );
+      filter2D( dst, out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_CONSTANT );
       out_image = utils.ImgResample(out_image, round((float)out_image.size().width/2), round((float)out_image.size().height/2));
 
       //if(i == 1)
