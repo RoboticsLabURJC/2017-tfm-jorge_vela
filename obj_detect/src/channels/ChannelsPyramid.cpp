@@ -49,28 +49,33 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   //int lambdas = {};
 
   //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
+  //img.convertTo(img, CV_32FC1);
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
 
   cv::Mat luvImageChng;
+  printf("--> %f \n", luvImage[0].at<float>(152,140) );
+
 
   //luvImage[0].copyTo(luvImageChng);
   //luvImage[2].copyTo(luvImage[0]);
   //luvImageChng.copyTo(luvImage[2]);
 
-
   merge(luvImage, luv_image);
+
+
+
 
   //EN ESTAS LINEAS EL COMPRUEBA QUE SE CUMPLEN LOS REQUISITOS PARA LA CONVERSION
   cv::Mat imageUse = luv_image;
+
+  
 
   //-------------------------------------------------------------------------
 
   //GET SCALES AT WHICH TO COMPUTE FEATURES---------------------------------
   std::vector<float> scales;
- 
   scales = getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz);
-  //printf("ChnsPyramid 73 shrink --> %d \n", m_shrink );
 
   int nScales = scales.size();
 
@@ -136,8 +141,6 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
     }
     std::string colorSpace = "LUV";
 
-    //cv::imshow("", I1);
-    //cv::waitKey(0);
 
     pChnsCompute = utils.channelsCompute(I1, colorSpace.c_str(), m_shrink);
     strucData[i]/*[isRarr[i] - 1]*/ = pChnsCompute;
@@ -246,9 +249,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   for(int i = 0; i < nScales; i++){
       cv::Mat concat;
       merge(strucData[i], concat);
-
       concat = utils.convTri(concat, 1);
-
       //cv::Mat dst;
       //cv::RNG rng(12345);
       //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );

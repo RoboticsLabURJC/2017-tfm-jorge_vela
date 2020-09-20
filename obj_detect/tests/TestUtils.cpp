@@ -33,7 +33,7 @@ public:
     }
 };
 
-TEST_F(TestUtils, TestResampleGrayImage){
+/*TEST_F(TestUtils, TestResampleGrayImage){
   cv::Mat image = cv::imread("images/imgGrayScale.jpeg", cv::IMREAD_GRAYSCALE); 
   cv::Mat image2 = cv::imread("images/index3.jpeg", cv::IMREAD_GRAYSCALE); 
 
@@ -59,7 +59,7 @@ TEST_F(TestUtils, TestResampleGrayImage){
       }
   }
   ASSERT_TRUE(valTot < 10);
-}
+}*/
 
 
 TEST_F(TestUtils, TestResampleColorImage)
@@ -205,6 +205,7 @@ TEST_F(TestUtils, TestResampleConv)
     ASSERT_TRUE(abs((float)valuesImgConv[i] - (float)imgMatlab[i]) < 0.6);
   }
 }
+
 
 
 TEST_F(TestUtils, TestChannelsCompute)

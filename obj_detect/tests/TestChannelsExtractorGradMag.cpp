@@ -153,15 +153,17 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNorm)
   int size = image.cols*image.rows*3;
   int sizeData = sizeof(float);
 
+
   std::vector<cv::Mat> gradMagExtractVector;
+
   gradMagExtractVector = gradMagExtractNorm.extractFeatures(image);
 
   cv::Mat newM, newO;
   gradMagExtractVector[0].convertTo(newM, CV_32F);    
-  float *M = newM.ptr<float>();
+  float *M = gradMagExtractVector[0].ptr<float>();
 
   gradMagExtractVector[1].convertTo(newO, CV_32F);    
-  float *O = newO.ptr<float>();
+  float *O = gradMagExtractVector[1].ptr<float>();
 
     cv::FileStorage fs;
   fs.open("yaml/TestMColorNormRad.yml", cv::FileStorage::READ);

@@ -123,9 +123,9 @@ std::vector<cv::Mat> ChannelsLUVExtractor::smoothImage
 {
     std::vector<cv::Mat> channelsLUV_output(3);
     Utils utils;
-    channelsLUV_output[0] = utils.convTri(inputImg[0], 5);
-    channelsLUV_output[1] = utils.convTri(inputImg[1], 5);
-    channelsLUV_output[2] = utils.convTri(inputImg[2], 5);
+    channelsLUV_output[0] = utils.convTri(inputImg[0], m_smooth_kernel_size); //5
+    channelsLUV_output[1] = utils.convTri(inputImg[1], m_smooth_kernel_size); //5
+    channelsLUV_output[2] = utils.convTri(inputImg[2], m_smooth_kernel_size); //5
 
     //cv::GaussianBlur(inputImg[0], channelsLUV_output[0], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
     //cv::GaussianBlur(inputImg[1], channelsLUV_output[1], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
