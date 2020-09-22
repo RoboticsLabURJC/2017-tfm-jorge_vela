@@ -11,7 +11,7 @@
 #ifndef CHANNELS_EXTRACTOR_LUV
 #define CHANNELS_EXTRACTOR_LUV
 
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 class ChannelsLUVExtractor

@@ -25,6 +25,13 @@ file(
         ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
 
+#file(
+#        GLOB
+#        TEST_REGRESSION_SHARED_SRC
+#        ${TEST_SHARED_ENTRY_POINT}
+#        ${CMAKE_CURRENT_SOURCE_DIR}/TestBadacostDetector.cpp
+#)
+
 # All regression tests for the library
 add_executable(
         ${TESTS_REGRESSION_NAME}

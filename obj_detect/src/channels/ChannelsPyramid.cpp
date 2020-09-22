@@ -1,5 +1,3 @@
-
-
 #include <channels/ChannelsPyramid.h> 
 #include <channels/Utils.h>
 #include <channels/ChannelsExtractorLUV.h>
@@ -7,20 +5,20 @@
 #include <channels/ChannelsExtractorGradHist.h>
 
 #include "gtest/gtest.h"
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
 
 #include <iostream>
 
 bool ChannelsPyramid::load(std::string opts){
-  bool loadValue = true;
+//  bool loadValue = true;
   cv::FileStorage pPyramid;
   bool existOpts = pPyramid.open(opts, cv::FileStorage::READ);
   if(existOpts){
 	  int nPerOct = pPyramid["nPerOct"]["data"][0];
-	  int nOctUp = pPyramid["nOctUp"]["data"][0];
+      int nOctUp = 0; //pPyramid["nOctUp"]["data"][0];
 	  int nApprox = pPyramid["nApprox"]["data"][0];
-	  int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
+//	  int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
 	  int shrink = pPyramid["pChns.shrink"]["data"];
 
 	  m_nOctUp = nOctUp;  
@@ -30,11 +28,7 @@ bool ChannelsPyramid::load(std::string opts){
 
   }
   return existOpts;
-
-
-
 }
-
 
 std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){ 
   Utils utils;
@@ -51,7 +45,6 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
-
   cv::Mat luvImageChng;
 
   //luvImage[0].copyTo(luvImageChng);
@@ -101,15 +94,15 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
 
   std::vector<int> arrJ;
   arrJ.push_back(0); //[0] = 0;
-  for(int i = 0; i < isRarr.size() - 1; i++){
+  for(uint i = 0; i < isRarr.size() - 1; i++){
     arrJ.push_back((floor(isRarr[i] + isRarr[i+1]))/2);//[i+1] = (isRarr[i] + isRarr[i+1])/2;
   }
   arrJ.push_back(nScales); //[sizeisR+1]= nScales;
 
   std::vector<int> isN;
-  for(int i = 0; i <= isRarr.size(); i++){
+  for(uint i = 0; i <= isRarr.size(); i++){
     for(int j = arrJ[i]+1; j <= arrJ[i+1]; j++ ){
-      int val = i+j;
+      //int val = i+j;
       isN.push_back(isRarr[i]);
     }
   }
@@ -260,11 +253,16 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   return channelsConcat;
 }
 
-
-
-std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::string filterName){ //ChannelsPyramid::   std::vector<
-
+std::vector<cv::Mat> ChannelsPyramid::badacostFilters
+  (
+  cv::Mat pyramid,
+  //std::string filterName
+  std::vector<cv::Mat> filters
+  )
+{
   Utils utils;
+
+/*
   //CARGAR EL FILTRO CREADO POR MATLAB DESDE UN YML
   cv::FileStorage filter;
   filter.open(filterName.c_str(), cv::FileStorage::READ);
@@ -279,7 +277,7 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
   }
   //SE CARGAN LOS DISTINTOS FILTROS, CON LOS NOMBRES ANTERIORES DESDE EL YML
   std::vector<cv::Mat> filters;
-  for(int k = 0; k < namesFilters.size(); k++){
+  for(uint k = 0; k < namesFilters.size(); k++){
     cv::FileNode filterData = filter[namesFilters[k].c_str()]["data"];
     cv::FileNode filterRows = filter[namesFilters[k].c_str()]["rows"];
     cv::FileNode filterCols = filter[namesFilters[k].c_str()]["cols"];
@@ -296,10 +294,11 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
     cv::Mat filterConver = cv::Mat(5,5, CV_32F, filt);
     transpose(filterConver,filterConver);
 
-    float *O = filterConver.ptr<float>();
+    //float *O = filterConver.ptr<float>();
 
     filters.push_back(filterConver);//(filt);
   }
+ */
 
   //EJEMPLO PARA UNA ESCALA, QUE TIENE nChannels CANALES
   int nChannels = pyramid.channels();
@@ -315,8 +314,6 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
     C_repMat.push_back(G);
   }
 
-
-
   //printf("pix 0,0 %f %f %d \n", (float)pyramid.at<float>(0,0), (float)pyramid.at<float>(0,1) , pyramid.size().height);
   //SE CONVOLUCIONA UNA IMAGEN CON LOS FILTROS Y SE OBTIENEN LAS IMAGENES DE SALIDA
   std::vector<cv::Mat> out_images;
@@ -329,11 +326,9 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
 
       cv::Mat dst;
       cv::RNG rng(12345);
-      cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+      //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
       copyMakeBorder( splitted[i], dst, 2, 2, 3, 3, cv::BORDER_REFLECT, 0 );
       //printf("pix 0,0 %f %f %f %f %d \n", (float)dst.at<float>(2,3), (float)dst.at<float>(2,4), (float)dst.at<float>(2,2), (float)dst.at<float>(1,1), dst.size().height);
-
-
 
       filter2D( dst, out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_CONSTANT );
       out_image = utils.ImgResample(out_image, round((float)out_image.size().width/2), round((float)out_image.size().height/2));
@@ -351,8 +346,6 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
 }
 
 
-
-
 /**
  * Funcion getScales. En funcion de los parámetros de entrada retorna un vector con los distintos valores
  * por los que se tiene que escalar la imagen.
@@ -366,11 +359,12 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
  *
  */
 std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
-  if(sz[0]==0 || sz[1]==0)
+  /*if(sz[0]==0 || sz[1]==0)
   {
     int scales[0];
     int scaleshw[0];
   }
+  */
   
   float val1 = (float)sz[0]/(float)minDs[0];  
   float val2 = (float)sz[1]/(float)minDs[1];
@@ -432,7 +426,7 @@ std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int min
     std::vector<float> x = max(es0, es1);
     int pos = 0;
     float xMin = std::numeric_limits<float>::max(); 
-    for(int i=0; i < x.size(); i++){
+    for(uint i=0; i < x.size(); i++){
       float valMax = ( es0[i] <  es1[i] ) ?  es1[i] : es0[i];
       //printf("%.4f %.4f %.4f \n",valMax, es0[i], es1[i]);
       if( valMax <= xMin){
@@ -450,7 +444,7 @@ std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int min
 
   std::vector<float> kp;
   std::vector<float> scales2;
-  for(int i = 0; i < scales.size()-1; i++){
+  for(uint i = 0; i < scales.size()-1; i++){
     //printf("--> %.4f %.4f\n",scales[i],  scales[i+1] );
     int kpVal = (scales[i] != scales[i+1]);
     if(kpVal == 1){

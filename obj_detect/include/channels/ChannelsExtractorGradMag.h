@@ -12,7 +12,7 @@
 #ifndef CHANNELS_GRADMAG
 #define CHANNELS_GRADMAG
 
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 class GradMagExtractor

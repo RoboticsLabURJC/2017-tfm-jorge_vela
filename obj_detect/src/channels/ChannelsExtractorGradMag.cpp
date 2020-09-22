@@ -10,7 +10,7 @@
 #include <iostream>
 #include <channels/ChannelsExtractorGradMag.h>
 #include <channels/Utils.h>
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include "sse.hpp"
 #include <channels/badacostDetector.h> 
 

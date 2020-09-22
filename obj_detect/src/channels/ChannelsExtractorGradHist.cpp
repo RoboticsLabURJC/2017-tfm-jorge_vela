@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <channels/ChannelsExtractorGradHist.h>
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include "sse.hpp"
 
 

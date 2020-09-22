@@ -11,14 +11,12 @@
 #ifndef BADACOST_DETECTOR
 #define BADACOST_DETECTOR
 
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
-
-#include "gtest/gtest.h"
-#include <opencv/cv.hpp>
-
+//#include "gtest/gtest.h"
 #include <iostream>
+#include <channels/ChannelsPyramid.h>
 
 class BadacostDetector
 {
@@ -41,16 +39,17 @@ public:
     };
 
   // Loads the trained classfier from a yaml file.
-  bool load(std::string clf);
-  
+  bool load(std::string clfPath, std::string pyrPath, std::string filtersPath);
+
   // Detects objects at any scale in an image and return detections as rectangles
   std::vector<cv::Rect2i> detect(cv::Mat img);
   
 protected:
-  // Detects objects at a single scale in an image and return detections as rectangles
-  std::vector<cv::Rect2i> detectSingleScale(cv::Mat img);
+  std::vector<cv::Mat> loadFilters(std::string filtersPath);
 
-private:
+  // Detects objects at a single scale in an image and return detections as rectangles
+//  std::vector<cv::Rect2i> detectSingleScale(cv::Mat img);
+
   bool m_classifierIsLoaded;
     
   int m_srhink;
@@ -70,10 +69,16 @@ private:
   cv::Mat m_wl_weights;
   cv::Mat m_aRatio;
   
+
   // After load it contains the cv::Mat variables: 
   // "fids", "thrs", "child", "hs", "weights", "depth"
   std::map<std::string, cv::Mat> m_classifier;
 
+  // After load it contains the variables for build the pyramid of channel features
+  // "fids", "thrs", "child", "hs", "weights", "depth"
+  ChannelsPyramid m_chnsPyramid;
+
+  std::vector<cv::Mat> m_filters;
 };
 
 

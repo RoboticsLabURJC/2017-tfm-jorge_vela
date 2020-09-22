@@ -8,7 +8,7 @@
 
 #include <channels/ChannelsExtractorLUV.h>
 #include "gtest/gtest.h"
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 
 #undef VISUALIZE_RESULTS
 
@@ -373,12 +373,12 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImage)
   fs.open("yaml/smoothImage_L.yaml", cv::FileStorage::READ);
 
   cv::FileNode rows = fs["smoothL"]["rows"];
-  cv::FileNode cols = fs["smoothL"]["cols"];
+//  cv::FileNode cols = fs["smoothL"]["cols"];
   cv::FileNode smoothMatlab = fs["smoothL"]["data"];
 
   for(int i=0; i< (int)10; i++){
     for(int j=0; j<(int)2; j++){
-      ASSERT_TRUE(abs(channels[0].at<float>(j,i) - (float)smoothMatlab[i*(int)rows+j]) < 1.e-4f);
+      ASSERT_TRUE(abs(channels[0].at<float>(j,i) - static_cast<float>(smoothMatlab[i*static_cast<int>(rows)+j])) < 1.e-4f);
       //printf("%.4f %.4f\n", channels[0].at<float>(j,i), (float)smoothMatlab[i*(int)rows+j]);
     }
   }

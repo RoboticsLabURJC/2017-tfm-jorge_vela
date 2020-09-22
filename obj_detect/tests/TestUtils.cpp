@@ -11,7 +11,7 @@
 #include <channels/Utils.h>
 
 #include "gtest/gtest.h"
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <iostream>
 
@@ -39,7 +39,7 @@ TEST_F(TestUtils, TestResampleGrayImage){
 
   cv::Mat imageMatlab = cv::imread("images/mask_image_gray.jpeg", cv::IMREAD_GRAYSCALE); 
 
-  cv:Mat dst = utils.ImgResample(image2, 35,29);  
+  cv::Mat dst = utils.ImgResample(image2, 35,29);
 
   cv::Mat diff = imageMatlab - dst;
 
@@ -86,7 +86,7 @@ TEST_F(TestUtils, TestResampleColorImage)
     w = image.size().width / 2 + 1;
   }
 
-  cv:Mat dst = utils.ImgResample(image, w, h);
+  cv::Mat dst = utils.ImgResample(image, w, h);
 
   transpose(dst, dst);
 
@@ -224,8 +224,8 @@ TEST_F(TestUtils, TestChannelsCompute)
   //printf("%f\n", valuesImgMag[1] );
   FileStorage fs1;
   fs1.open("yaml/TestMagChnsCompute.yml", FileStorage::READ);
-  FileNode rows = fs1["M"]["rows"];
-  FileNode cols = fs1["M"]["cols"];
+  //FileNode rows = fs1["M"]["rows"];
+  //FileNode cols = fs1["M"]["cols"];
   FileNode imgMagMatlab = fs1["M"]["data"];
 
   for(int i=0;i<14*17 /*(int)rows*(int)cols*/;i++)

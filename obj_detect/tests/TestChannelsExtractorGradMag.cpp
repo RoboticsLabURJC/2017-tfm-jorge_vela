@@ -8,7 +8,7 @@
 
 #include <channels/ChannelsExtractorGradMag.h>
 #include "gtest/gtest.h"
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <iostream>
 #include <string>

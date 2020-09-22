@@ -1,7 +1,7 @@
 
 #include <channels/ChannelsPyramid.h> 
 #include "gtest/gtest.h"
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <iostream>
 
@@ -32,7 +32,7 @@ TEST_F(TestChannelsPyramid, TestGetScales)
   std::vector<float> scales = chnsPyramid.getScales(nPerOct, nOctUp, minDS, shrink, size);
   std::vector<float> check = {2.1463, 1.8537, 1.6589, 1.4632, 1.2684, 1.0737, 0.8779};
 
-  for(int i = 0; i < scales.size(); i++){
+  for(uint i = 0; i < scales.size(); i++){
     ASSERT_TRUE(abs(scales[i]-check[i])<1.e-3f);
   }
 }
@@ -47,7 +47,7 @@ TEST_F(TestChannelsPyramid, TestGetScalesChangeVals)
   std::vector<float> scales = chnsPyramid.getScales(nPerOct, nOctUp, minDS, shrink, size);
   std::vector<float> check = {1.0667, 0.9333, 0.8000, 0.6667, 0.5333};
 
-  for(int i = 0; i < scales.size(); i++){
+  for(uint i = 0; i < scales.size(); i++){
     ASSERT_TRUE(abs(scales[i]-check[i])<1.e-3f);
   }
 }
@@ -69,9 +69,14 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
 
 
 TEST_F(TestChannelsPyramid, badacostFilters){
-  cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+//  cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+  cv::Mat image = cv::imread("images/coches3.jpg", cv::IMREAD_COLOR);
   std::string nameOpts = "yaml/pPyramid.yml";
   bool loadOk = chnsPyramid.load(nameOpts.c_str());
+  if (!loadOk)
+  {
+      throw std::runtime_error("TestChannelsPyramid: pPyramid.yml not found");
+  }
   std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image);
 
 

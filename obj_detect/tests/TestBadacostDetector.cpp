@@ -10,7 +10,7 @@
 
 #include <channels/badacostDetector.h> 
 #include "gtest/gtest.h"
-#include <opencv/cv.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <iostream>
 
@@ -53,22 +53,30 @@ TEST_F(TestBadacostDetector, loadClassifier){
 
   printf("%d %d \n",out_image.size().width, out_image.size().height );*/
 
-	std::string clfPath = "yaml/clf.yml";
-	bool loadVal = badacost.load(clfPath.c_str());
+    std::string clfPath = "yaml/clf.yml";
+    std::string pyrPath = "yaml/pPyramid.yml";
+    std::string filtersPath = "yaml/filterTest.yml";
+
+    bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
 	ASSERT_TRUE(loadVal);
 
-	cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
-  
+//	cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+    cv::Mat image = cv::imread("images/coches8.jpg", cv::IMREAD_COLOR);
 
-  //std::vector<cv::Rect2i> detections = 
-	badacost.detect(image);
+//    cv::imshow("image", image);
+//    cv::waitKey();
 
-  //for(int i = 0; i < detections.size(); i++)
-  //  rectangle(image,detections[i],cv::Scalar(200,0,0),2);
-  //cv::imshow("image", image);
-  //cv::waitKey();
-  
-  
+  std::vector<cv::Rect2i> detections = badacost.detect(image);
+
+  for(uint i = 0; i < detections.size(); i++)
+  {
+    std::cout << "[ x=" << detections[i].x << ", y=";
+    std::cout << detections[i].y << ", w=" << detections[i].width << ", h=" << detections[i].height;
+    std::cout << " ] " << std::endl;
+    cv::rectangle(image, detections[i], cv::Scalar(200,0,0),2);
+  }
+  cv::imshow("image", image);
+  cv::waitKey();
 }
 
 

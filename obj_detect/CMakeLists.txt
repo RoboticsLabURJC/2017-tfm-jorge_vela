@@ -20,8 +20,7 @@ option(WITH_TESTS "Build tests senabled" ON)
 # ----------------- BUILD A LIBRARY -------------------------------------------
 
 # Create the object detection library
-add_library(${PROJECT_NAME}
-STATIC)
+add_library(${PROJECT_NAME} STATIC)
 
 # Library header files
 target_include_directories(
