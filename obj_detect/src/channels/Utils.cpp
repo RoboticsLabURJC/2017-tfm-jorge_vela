@@ -70,6 +70,12 @@ cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
   }
   double delta = 0;
 
+  //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+  //copyMakeBorder( input_image, input_image, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_CONSTANT, 0 );
+
+
+
+
   cv::Mat kernel = cv::Mat((kernel_size*2)+1,1,  CV_32FC1, arrayKernel); //
   filter2D(input_image, help_image, CV_32FC1 , kernel, anchor, delta, cv::BORDER_REFLECT );
   kernel = cv::Mat(1,(kernel_size*2)+1,  CV_32FC1, arrayKernel);
@@ -123,7 +129,6 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
   cv::Rect cropImage = cv::Rect(0,0,w, h);
   cv::Mat imageCropped = src(cropImage);
 
-  //printf("%d %d\n",h,w );
   cv::Mat luv_image;
   std::vector<cv::Mat> luvImage;
   if(colorSpace != "LUV"){
@@ -138,21 +143,8 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
   }
 
   luv_image = convTri(luv_image, smooth);
-
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
 
-
-
-  //-------------------------------------------------------------
-  /*cv::Mat img3;
-  gMagOrient[0].convertTo(img3, CV_32F);    
-  float *valueM = img3.ptr<float>();
-
-  printf("M: \n");
-  for(int i = 0; i < 15; i++)
-    printf("%.4f ", valueM[i] );
-  printf("\n");*/
-  //printf("----------------------------\n");
 
   std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
   //printf("---------------------------- 2\n");

@@ -17,6 +17,9 @@
 #include <iostream>
 #include <exception>
 
+typedef unsigned int uint32;
+
+
 bool BadacostDetector::load(std::string clfPath)
 {
   bool loadedOK = false;
@@ -137,22 +140,109 @@ BadacostDetector::detect(cv::Mat imgs)
   std::string nameOpts = "yaml/pPyramid.yml";
   bool loadOk = chnsPyramid.load(nameOpts.c_str());
   std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(imgs);  
-
   //std::vector<cv::Mat> filteredImages = chnsPyramid.badacostFilters(pyramid[0], "yaml/filterTest.yml");
-  for(int i = 0; i < pyramid.size(); i++){
-  std::vector<cv::Mat> filteredImagesResized= chnsPyramid.badacostFilters(pyramid[i], "yaml/filterTest.yml");
-  printf("--> %d %d \n", filteredImagesResized[i].size().height, filteredImagesResized[i].size().width );
 
+  int nChannels = pyramid[0].channels();
+  cv::Mat splitedPyramid[nChannels];
+  split(pyramid[0],splitedPyramid);
+
+
+  /*cv::FileStorage fs1;
+  fs1.open("yaml/0_LUV_1.yml", cv::FileStorage::READ);
+  cv::FileNode rows = fs1["data"]["rows"];
+  cv::FileNode cols = fs1["data"]["cols"];
+  cv::FileNode imageL = fs1["data"]["data"];
+
+  cv::Mat imageLUV = cv::Mat::zeros(cols, rows, CV_32F);
+  std::vector<float> p1;
+  imageL >> p1;
+  memcpy(imageLUV.data, p1.data(), p1.size()*sizeof(float));
+  transpose(imageLUV, imageLUV);
+
+
+
+  cv::Mat diffLuv = splitedPyramid[0] - imageLUV;
+  cv::imshow("c++", splitedPyramid[0]) ;
+  cv::imshow("matlab", imageLUV);
+  cv::imshow("diff", diffLuv);
+  cv::waitKey(0);  */
+  
+
+
+
+
+
+
+  printf("%d %d \n", pyramid[0].size().height, pyramid[0].size().width);
+
+
+  for(int i = 0; i < pyramid.size() ; i++){
+    std::vector<cv::Mat> filteredImagesResized= chnsPyramid.badacostFilters(pyramid[i], "yaml/filterTest.yml");
+
+    printf("--> %d %d \n", filteredImagesResized[i].size().height, filteredImagesResized[i].size().width );
+
+    /*for(int filt = 0; filt < 40; filt ++){
+      printf("%d \n",filt );
+      cv::FileStorage fs;
+
+      std::string num = std::to_string(filt+1);
+      printf("%s \n",num.c_str() );
+      std::string name = "yaml/"+ num +".yml";
+
+
+      fs.open(name, cv::FileStorage::READ);
+
+      cv::FileNode rows = fs["data"]["rows"];
+      cv::FileNode cols = fs["data"]["cols"];
+      cv::FileNode image = fs["data"]["data"];
+
+
+      cv::Mat image1 = cv::Mat::zeros(cols, rows, CV_32F);
+      std::vector<float> p;
+      image >> p;
+      memcpy(image1.data, p.data(), p.size()*sizeof(float));
+
+      transpose(image1, image1);
+
+      //image1.copyTo(filteredImagesResized[filt]);
+
+      cv::Mat diff = image1 - filteredImagesResized[filt];
+      cv::imshow("c++", filteredImagesResized[filt]);
+      cv::imshow("matlab", image1);
+      cv::imshow("diff", diff);
+      cv::waitKey(0);
+      //filteredImagesResized[filt]  = image1;
+    }*/
+
+    //cv::waitKey(0);
+    /*cv::Mat newResized;
+    filteredImagesResized[0].convertTo(newResized, CV_32F);    
+    float *M = newResized.ptr<float>();
+    printf("%d %d \n", (int)rows, (int)cols );
+    int k = 0;
+    for(int y=0;y<(int)rows;y++)
+    { 
+      printf("-----------------------\n");
+      for(int x=0;x<(int)cols;x++)
+      {
+        printf("row: %d col:  %d matlab: %f c++: %f \n",y,x,(float)image[k], M[y*(int)cols+x] );
+        //ASSERT_TRUE(abs(M[x*(int)cols+y] - (float)MMatrix[i]) < 1.e-3f);
+        k++;  
+      } 
+    }*/
+
+
+  //}
   //cv::imshow("", filteredImagesResized[0]);
   //cv::waitKey(0);
 
-  /*for(int i = 0; i < filteredImages.size(); i++)
-  {
-    cv::Mat imgResized = utils.ImgResample(filteredImages[i], 
-                                           filteredImages[i].size().width/2, 
-                                           filteredImages[i].size().height/2 );
-    filteredImagesResized.push_back(imgResized);
-  }*/
+  //for(int i = 0; i < filteredImages.size(); i++)
+  //{
+  //  cv::Mat imgResized = utils.ImgResample(filteredImages[i], 
+  //                                         filteredImages[i].size().width/2, 
+  //                                         filteredImages[i].size().height/2 );
+  //  filteredImagesResized.push_back(imgResized);
+  //}*/
 
   // COMIENZA EL SEGUNDO BUCLE
   int modelDsPad[2] = {54, 96}; // JM: Esto debería venir del fichero con el clasificador entrenado.
@@ -172,10 +262,9 @@ BadacostDetector::detect(cv::Mat imgs)
   int nTreeNodes = m_classifier["fids"].size().width;
   int nTrees = m_classifier["fids"].size().height;
   int height1 = ceil(float(height*shrink-modelHt+1)/stride);
-  int width1 = ceil(float((width*shrink)-modelWd+1)/stride);
+  int width1 = ceil(float(width*shrink-modelWd+1)/stride);
   int nFtrs = (modelHt/shrink)*(modelWd/shrink)*nChan;
     
-
   // JM: Esto debe de ser así siempre y por eso hacemos un assert:
   //assert((modelHt/shrink) == height);
   //assert((modelWd/shrink) == width);
@@ -192,21 +281,24 @@ BadacostDetector::detect(cv::Mat imgs)
   std::vector<int> rs(num_windows), cs(num_windows); 
   std::vector<float> hs1(num_windows), scores(num_windows);
 
-  int *cids =  new int[nFtrs];
-  int *zsA = new int[nFtrs];
-  int *csA = new int[nFtrs];
-  int *rsA = new int[nFtrs];
-  int m=0;
-  for( int z=0; z<nChan; z++ )
-    for( int c=0; c<modelWd/shrink; c++ )
+  uint32 *cids =  new uint32[nFtrs];
+  uint32 *zsA = new uint32[nFtrs];
+  uint32 *csA = new uint32[nFtrs];
+  uint32 *rsA = new uint32[nFtrs];
+  uint32 m=0;
+  for( int z=0; z<nChan; z++ ){
+    for( int c=0; c<modelWd/shrink; c++ ){
       for( int r=0; r<modelHt/shrink; r++ ){
         //if(z*width*height + c*height + r == 389760)
         //  printf("%d %d %d \n", z,c,r);
         zsA[m] = z; 
         csA[m] = c;
         rsA[m] = r;
-        cids[m++] = z*width*height + c*height + r;
+        cids[m] = z*width*height + c*height + r;
+        m = m + 1;
       }
+    }
+  }
 
     /*int t = 0;
     for (int k = 0; k < 177; k++){ //k=1:177
@@ -223,16 +315,15 @@ BadacostDetector::detect(cv::Mat imgs)
         }
     }*/
 
-/*  
-  #ifdef USEOMP
-  int nThreads = omp_get_max_threads();
-  #pragma omp parallel for num_threads(nThreads)
-  #endif
-*/
-  for( int c=0; c < width1; c++ )
+///*  
+//  #ifdef USEOMP
+//  int nThreads = omp_get_max_threads();
+//  #pragma omp parallel for num_threads(nThreads)
+//  #endif
+//*/
+  for( int c=0; c <1 /* width1*/; c++ )
   {
-    printf("%d %d \n", c, width1);
-    for( int r=0; r < height1 ; r++ ) 
+    for( int r=0; r <1 /* height1*/; r++ ) 
     { 
       //if(c == 0 && r == 0){
       //  printf("%f \n", filteredImagesResized[0].at<float>(0,0) );
@@ -252,18 +343,20 @@ BadacostDetector::detect(cv::Mat imgs)
         int k = 0; // Empezamos sobre el primer nodo del t-ésimo árbol.
         int k0 = k; 
         // La matriz "child" tiene los árboles almacenados por columnas.
-        while((int)m_classifier["child"].at<float>(t,k))
+        while(m_classifier["child"].at<float>(t,k))
         {
+
+          //printf("child : %d \n", (int)m_classifier["child"].at<float>(t,k));
           // Obtain the feature Id used in the split node.
           int ftrId = static_cast<int>(m_classifier["fids"].at<float>(t,k));
  
-
+          //printf("cids %d , fids %d \n",  cids[ftrId],   ftrId);
           int chanSearch = zsA[ftrId];
           int hSearch = csA[ftrId];
           int wSearch = rsA[ftrId];
 
-          //printf("%d %d %d \n",chanSearch, hSearch, wSearch );
-          float ftr2 = (float)filteredImagesResized[chanSearch].at<float>(wSearch+(r*stride/shrink), hSearch + (c*stride/shrink));      
+          //cids[ftrId] == chanSearch*width*height + hSearch*height + wSearch
+
           //printf("%f \n", ftr2);   
           // In the original code the m feature Id is redirected to this 
           // cids value: 
@@ -276,11 +369,13 @@ BadacostDetector::detect(cv::Mat imgs)
           int ftrChnCol = (ftrId % (width*height)) / height;
           int ftrChnRow =  (ftrId % (width*height)) % height;
 
+          float ftr2 = filteredImagesResized[chanSearch].at<float>(wSearch+(r*stride/shrink), hSearch + (c*stride/shrink));  //static_cast<float>(    
+
           // Obtain the feature value and threshold for the k-th tree node.
           //float ftr = filteredImagesResized[ftrChnIndex].at<float>(ftrChnRow, ftrChnCol);
           //printf("%f \n", ftr2 );
           float thrs = static_cast<float>(m_classifier["thrs"].at<float>(t, k));
-          //printf("thrs %f  , ftr %f  \n", thrs, ftr2);
+
 
           int child_choosen = (ftr2<thrs) ? 1 : 0;
 
@@ -288,12 +383,14 @@ BadacostDetector::detect(cv::Mat imgs)
           // left child is at k0-1 row index.
           //printf("child: %d, child_choosen: %d busquedaOffset %d \n", static_cast<int>(m_classifier["child"].at<float>(t,k0)), child_choosen, t*nTreeNodes);
 
-          k = static_cast<int>(m_classifier["child"].at<float>(t,k0)) - child_choosen;
+          k = static_cast<int>(m_classifier["child"].at<float>(t,k)) - child_choosen ;
+          printf("thrs %f  , ftr %f , k: %d  \n", thrs, ftr2, k);
           k0 = k;
           //printf("ftr:  %f k:  %d\n", ftr2, k); 
         }
         h = static_cast<int>((int)m_classifier["hs"].at<float>(t,k));
-        //printf("%d %d \n", h, t);
+        printf("----------------------%d \n", h);
+
         // Add to the margin vector the codified output class h as a vector 
         // multiplied by the weak learner weights     
         cv::Mat Y = m_Y(cv::Range(0,m_num_classes), cv::Range(h-1,h));

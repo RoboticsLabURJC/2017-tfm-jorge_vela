@@ -54,8 +54,6 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   cv::Mat luv_image;
 
   cv::Mat luvImageChng;
-  printf("--> %f \n", luvImage[0].at<float>(152,140) );
-
 
   //luvImage[0].copyTo(luvImageChng);
   //luvImage[2].copyTo(luvImage[0]);
@@ -140,7 +138,6 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
       imageUse = I1;
     }
     std::string colorSpace = "LUV";
-
 
     pChnsCompute = utils.channelsCompute(I1, colorSpace.c_str(), m_shrink);
     strucData[i]/*[isRarr[i] - 1]*/ = pChnsCompute;
@@ -250,6 +247,10 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
       cv::Mat concat;
       merge(strucData[i], concat);
       concat = utils.convTri(concat, 1);
+      cv::Mat dst;
+      cv::RNG rng(12345);
+      cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+      copyMakeBorder( concat, concat, 2, 2, 3, 3, cv::BORDER_REFLECT, 0 );
       //cv::Mat dst;
       //cv::RNG rng(12345);
       //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
@@ -290,14 +291,15 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
     for(int i = 0; i < (int)filterRows; i++){
       for(int j = 0; j < (int)filterCols; j++){
         float x = (float)filterData[i*5+j];
-        filt[i*5+j] = x;
+        filt[j*5+i] = x;
       }
     }
 
-    cv::Mat filterConver = cv::Mat(5,5, CV_32F, filt);
+
+    cv::Mat filterConver = cv::Mat(5,5, CV_32FC1, filt);
     transpose(filterConver,filterConver);
 
-    float *O = filterConver.ptr<float>();
+    //float *O = filterConver.ptr<float>();
 
     filters.push_back(filterConver);//(filt);
   }
@@ -326,17 +328,41 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
     split(C_repMat[j],splitted);
     for(int i = 0; i < nChannels; i++){
       cv::Mat out_image; 
-      //filter2D(splitted[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_REFLECT );
 
-      cv::Mat dst;
-      cv::RNG rng(12345);
-      cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
-      copyMakeBorder( splitted[i], dst, 2, 2, 3, 3, cv::BORDER_REFLECT, 0 );
-      //printf("pix 0,0 %f %f %f %f %d \n", (float)dst.at<float>(2,3), (float)dst.at<float>(2,4), (float)dst.at<float>(2,2), (float)dst.at<float>(1,1), dst.size().height);
+      /*cv::FileStorage fs1;
+      fs1.open("yaml/0_Filtered.yml", cv::FileStorage::READ);
+      cv::FileNode rows = fs1["data"]["rows"];
+      cv::FileNode cols = fs1["data"]["cols"];
+      cv::FileNode imageL = fs1["data"]["data"];
+
+      cv::Mat imageLUV = cv::Mat::zeros(cols, rows, CV_32F);
+      std::vector<float> p1;
+      imageL >> p1;
+      memcpy(imageLUV.data, p1.data(), p1.size()*sizeof(float));
+      transpose(imageLUV, imageLUV);
+
+      fs1.open("yaml/0_LUV_1.yml", cv::FileStorage::READ);
+      rows = fs1["data"]["rows"];
+      cols = fs1["data"]["cols"];
+      imageL = fs1["data"]["data"];
+
+      cv::Mat imageLUV2 = cv::Mat::zeros(cols, rows, CV_32F);
+      imageL >> p1;
+      memcpy(imageLUV2.data, p1.data(), p1.size()*sizeof(float));
+      transpose(imageLUV2, imageLUV2);*/
 
 
 
-      filter2D( dst, out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_CONSTANT );
+      filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( -1,-1), 0, cv::BORDER_CONSTANT ); //filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0), 0, cv::BORDER_CONSTANT ); + transpose
+
+
+
+      /*cv::imshow("filtered Matlab", imageLUV);    
+      cv::imshow("filtered C++", out_image);    
+      cv::Mat diff = imageLUV - out_image;
+      cv::imshow("Diff", diff);    
+      cv::waitKey(0);*/
+
       out_image = utils.ImgResample(out_image, round((float)out_image.size().width/2), round((float)out_image.size().height/2));
 
       //if(i == 1)
