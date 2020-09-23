@@ -297,7 +297,7 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
 
 
     cv::Mat filterConver = cv::Mat(5,5, CV_32FC1, filt);
-    transpose(filterConver,filterConver);
+    //transpose(filterConver,filterConver);
 
     //float *O = filterConver.ptr<float>();
 
@@ -323,14 +323,23 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
   //printf("pix 0,0 %f %f %d \n", (float)pyramid.at<float>(0,0), (float)pyramid.at<float>(0,1) , pyramid.size().height);
   //SE CONVOLUCIONA UNA IMAGEN CON LOS FILTROS Y SE OBTIENEN LAS IMAGENES DE SALIDA
   std::vector<cv::Mat> out_images;
+  int numeroFiltro = 0;
   for(int j = 0; j < 4; j++){
     cv::Mat splitted[nChannels];
     split(C_repMat[j],splitted);
+
+    printf("%d \n", nChannels );
     for(int i = 0; i < nChannels; i++){
       cv::Mat out_image; 
-
+      
       /*cv::FileStorage fs1;
-      fs1.open("yaml/0_Filtered.yml", cv::FileStorage::READ);
+
+      std::string num = std::to_string(numeroFiltro);
+      printf("%s \n",num.c_str() );
+      std::string name = "yaml/"+num+"_Filtered.yml";
+
+
+      fs1.open(name, cv::FileStorage::READ);
       cv::FileNode rows = fs1["data"]["rows"];
       cv::FileNode cols = fs1["data"]["cols"];
       cv::FileNode imageL = fs1["data"]["data"];
@@ -339,9 +348,12 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
       std::vector<float> p1;
       imageL >> p1;
       memcpy(imageLUV.data, p1.data(), p1.size()*sizeof(float));
-      transpose(imageLUV, imageLUV);
+      transpose(imageLUV, imageLUV);*/
 
-      fs1.open("yaml/0_LUV_1.yml", cv::FileStorage::READ);
+
+      /*std::string num2 = std::to_string(i+1);      
+      std::string name2 = "yaml/0_LUV_"+num2+".yml";
+      fs1.open(name2, cv::FileStorage::READ);
       rows = fs1["data"]["rows"];
       cols = fs1["data"]["cols"];
       imageL = fs1["data"]["data"];
@@ -350,16 +362,48 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters(cv::Mat pyramid, std::stri
       imageL >> p1;
       memcpy(imageLUV2.data, p1.data(), p1.size()*sizeof(float));
       transpose(imageLUV2, imageLUV2);*/
+      
+
+
+      /*for(int h = 0; h < filters[i+(nChannels*j)].size().height; h++){
+           for(int w = 0; w < filters[i+(nChannels*j)].size().width; w++){
+              printf("%f ", filters[i+(nChannels*j)].at<float>(w,h));
+           }
+           printf("\n");
+      }
+      printf("\n");*/
+
+      //cv::RNG rng(12345);
+      //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+      //copyMakeBorder( splitted[i], splitted[i], 2,2,2,2, cv::BORDER_REFLECT, 0 );
 
 
 
-      filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( -1,-1), 0, cv::BORDER_CONSTANT ); //filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0), 0, cv::BORDER_CONSTANT ); + transpose
+      filter2D( splitted[i], out_image, CV_32F , filters[i+(nChannels*j)], cv::Point( -1,-1), 0, cv::BORDER_DEFAULT); //filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0), 0, cv::BORDER_CONSTANT ); + transpose
+      numeroFiltro = numeroFiltro + 1;
 
 
+      //cv::Rect cropImage = cv::Rect(2,2,625,353); //(0,0, out_image.size().width - 4 , out_image.size().height-4);
+      //out_image = out_image(cropImage);
 
-      /*cv::imshow("filtered Matlab", imageLUV);    
+      //printf("--> %d %d \n", out_image.size().width, out_image.size().height);
+      //printf("--> %d %d \n", imageLUV.size().width, imageLUV.size().height);
+
+      
+      /*cv::Mat diff = imageLUV - out_image;
+
+
+      double minVal; 
+      double maxVal; 
+      cv::Point minLoc; 
+      cv::Point maxLoc;
+      
+      minMaxLoc( diff, &minVal, &maxVal, &minLoc, &maxLoc );
+      printf("%f %f \n", minVal, maxVal);
+
+      cv::imshow("orig", splitted[i]);
+      cv::imshow("filtered Matlab", imageLUV);    
       cv::imshow("filtered C++", out_image);    
-      cv::Mat diff = imageLUV - out_image;
       cv::imshow("Diff", diff);    
       cv::waitKey(0);*/
 

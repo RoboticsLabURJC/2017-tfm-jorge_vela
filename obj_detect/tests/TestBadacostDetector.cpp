@@ -38,20 +38,24 @@ TEST_F(TestBadacostDetector, loadClassifier){
 
   cv::RNG rng(12345);
   cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
-  //copyMakeBorder( A1, A1, 0,0,1,1, cv::BORDER_CONSTANT, 0 );
+  copyMakeBorder( A1, A1, 1,1,1,1, cv::BORDER_CONSTANT, 0 );
 
   cv::Mat out_image;
-  filter2D(A1, out_image,  CV_32FC1 , B1, cv::Point( 0.0, 0.0 ), 0, cv::BORDER_CONSTANT );
+  filter2D(A1, out_image,  CV_32FC1 , B1, cv::Point( 0,0 ), 0, cv::BORDER_CONSTANT );
 
-  for(int i = 0; i < out_image.size().height; i++){
-    for(int j = 0; j < out_image.size().width; j++){
-      printf("%f ", (float)out_image.at<float>(i,j));
+
+  cv::Rect cropImage = cv::Rect(1,1, out_image.size().height -2 , out_image.size().width-2);
+  cv::Mat imageCropped = out_image(cropImage);
+
+
+  for(int i = 0; i < imageCropped.size().height; i++){
+    for(int j = 0; j < imageCropped.size().width; j++){
+      printf("%f ", (float)imageCropped.at<float>(i,j));
     }
     printf("\n");
   }
   
-  printf("%d %d \n",out_image.size().width, out_image.size().height );
-  */
+  printf("%d %d \n",out_image.size().width, out_image.size().height );*/
 
 
 	std::string clfPath = "yaml/clf.yml";
