@@ -61,7 +61,7 @@ TEST_F(TestBadacostDetector, loadClassifier){
 	ASSERT_TRUE(loadVal);
 
 //	cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
-    cv::Mat image = cv::imread("images/coches8.jpg", cv::IMREAD_COLOR);
+    cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
 
 //    cv::imshow("image", image);
 //    cv::waitKey();

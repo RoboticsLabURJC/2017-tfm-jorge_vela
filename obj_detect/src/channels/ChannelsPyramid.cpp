@@ -18,7 +18,7 @@ bool ChannelsPyramid::load(std::string opts){
 	  int nPerOct = pPyramid["nPerOct"]["data"][0];
       int nOctUp = 0; //pPyramid["nOctUp"]["data"][0];
 	  int nApprox = pPyramid["nApprox"]["data"][0];
-//	  int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
+      //int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
 	  int shrink = pPyramid["pChns.shrink"]["data"];
 
 	  m_nOctUp = nOctUp;  
@@ -30,40 +30,55 @@ bool ChannelsPyramid::load(std::string opts){
   return existOpts;
 }
 
-std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){ 
+std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
+{
   Utils utils;
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
 
-
-  int sz[2] = {img.size().width, img.size().height}; //SE HA CAMBIADO ESTO PORQUE HABIA UN ERROR EN EL ORDEN
-  //int shrink = 4;
-  int minDs[2] = {84,48}; //{minDsA[0], minDsA[1]}; //DEBIDO AL CAMBIO DE LA ANTERIOR LINEA SE MODIFICA ESTA
+  cv::Size sz = img.size();
+  cv::Size minDs;
+  minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
+  minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
 
   //int lambdas = {};
 
   //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
+  //img.convertTo(img, CV_32FC1);
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
   cv::Mat luvImageChng;
+  //printf("--> %f \n", luvImage[0].at<float>(152,140) );
+
 
   //luvImage[0].copyTo(luvImageChng);
   //luvImage[2].copyTo(luvImage[0]);
   //luvImageChng.copyTo(luvImage[2]);
 
-
   merge(luvImage, luv_image);
+
 
   //EN ESTAS LINEAS EL COMPRUEBA QUE SE CUMPLEN LOS REQUISITOS PARA LA CONVERSION
   cv::Mat imageUse = luv_image;
 
+  
+
   //-------------------------------------------------------------------------
 
   //GET SCALES AT WHICH TO COMPUTE FEATURES---------------------------------
-  std::vector<float> scales;
- 
-  scales = getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz);
-  //printf("ChnsPyramid 73 shrink --> %d \n", m_shrink );
+
+  //std::vector<float> scales;
+  //scales = getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz);
+
+  std::vector<double> scales;
+  std::vector<cv::Size2d> scaleshw;
+  getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz, scales, scaleshw);
+
+  for (uint i=0; i < scales.size(); i++)
+  {
+    std::cout << scales[i] << ", ";
+  }
+  std::cout << std::endl;
 
   int nScales = scales.size();
 
@@ -112,16 +127,16 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   std::vector<cv::Mat> pChnsCompute;
   for(int i=0; i< nScales/*28*//*isRarr.size()*/; i++){ //isRarr.size()
     float s=scales[i]; //[isRarr[i]-1];
-    int sz_1 = round(sz[0]*s/m_shrink)*m_shrink;
-    int sz_2 = round(sz[1]*s/m_shrink)*m_shrink;
-    int sz1[2] = {sz_1, sz_2};
+    int sz_1 = round(sz.width*s/m_shrink)*m_shrink;
+    int sz_2 = round(sz.height*s/m_shrink)*m_shrink;
+    cv::Size sz1{sz_1, sz_2};
     //printf("ChnsPyramid 124 ; newSize; --->%d %d \n", sz1[0], sz1[1]);
     //printf("-->%d %d\n",sz1[0], sz1[1] );
     cv::Mat I1;
-    if(sz[0] == sz1[0] && sz[1] == sz1[1]){
+    if(sz.width == sz1.width && sz.height == sz1.height){
       I1 = imageUse;
     }else{
-      I1 = utils.ImgResample(imageUse, sz1[0] , sz1[1]);
+      I1 = utils.ImgResample(imageUse, sz1.width , sz1.height);
     }
 
     if(s==.5 && (m_nApprox>0 || m_nPerOct==1)){
@@ -129,81 +144,12 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
     }
     std::string colorSpace = "LUV";
 
-    //cv::imshow("", I1);
-    //cv::waitKey(0);
 
     pChnsCompute = utils.channelsCompute(I1, colorSpace.c_str(), m_shrink);
     strucData[i]/*[isRarr[i] - 1]*/ = pChnsCompute;
   } 
   cv::Mat data[pChnsCompute.size()][nScales];
 
-  /*cv::imshow("1", strucData[7][0]);
-  cv::imshow("2", strucData[7][1]);
-  cv::imshow("3", strucData[7][2]);
-  cv::imshow("4", strucData[7][3]);
-  cv::imshow("5", strucData[7][4]);
-  cv::imshow("6", strucData[7][5]);
-  cv::imshow("7", strucData[7][6]);
-  cv::imshow("8", strucData[7][7]);
-  cv::imshow("9", strucData[7][8]);
-  cv::imshow("10", strucData[7][9]);
-
-  cv::waitKey(0);*/
-
-
-  /*
-  //SUPONEMOS QUE NO SE DARÁ ESTE CASO---------------------------------------
-  // if lambdas not specified compute image specific lambdas
-  double lambdas[] = {0,0,0};
-  if( nScales>0 && m_nApprox>0){
-    std::vector<int> isA;
-    for(int i = m_nOctUp*m_nPerOct; i < nScales; i){
-      isA.push_back(i);
-      i = i+m_nApprox+1;
-    }
-
-    int nTypes = 3;  // Se utiliza por cada canal que se añade en chnsCompute, para nosotros 10
-
-    double f0[] = {0,0,0};
-    double f1[] = {0,0,0};
-    
-    //for(int i = 0; i < nTypes; i++){
-    int w = strucData[isA[0]][0].size().width;
-    int h = strucData[isA[0]][0].size().height;
-
-    int w1 = strucData[isA[1]][3].size().width;
-    int h1 = strucData[isA[1]][3].size().height;
-
-    double sum1; 
-    double sum2;
-    double sum3;
-    for(int j = 0; j < 3; j++){
-      double a1 = cv::sum(strucData[isA[0]][j])[0]/(w*h*3);
-      f0[0]+=a1;   
-      double a2 = cv::sum(strucData[isA[1]][j])[0]/(w1*h1*3);
-      f1[0]+=a2;    
-    }
-
-    f0[1] =  cv::sum(strucData[isA[0]][3])[0]/(w*h);
-    f1[1] =  cv::sum(strucData[isA[1]][3])[0]/(w1*h1);
-
-    for(int j = 4; j < strucData[isA[0]].size(); j++){
-      double a1 = cv::sum(strucData[isA[0]][j])[0];
-      f0[2]+=a1;  
-      double a2 = cv::sum(strucData[isA[1]][j])[0];
-      f1[2]+=a2;
-    }
-
-    f0[2]=f0[2]/(w*h*(strucData[isA[0]].size() - 4));
-    f1[2]=f1[2]/(w1*h1*(strucData[isA[1]].size() - 4)); 
-
-    //}
-    for(int i=0; i< 3; i++){
-      lambdas[i] = -log2 (f0[i]/f1[i]) / log2(scales[isA[0]]/scales[isA[1]]);
-    }
-    printf("%f %f %f \n", lambdas[0], lambdas[1], lambdas[2]); //REVISAR LOS RESULTADOS,,,??????????????????????????????????????????????????
-    
-  }*/
 
 
   //std::vector<cv::Mat> data;
@@ -239,14 +185,11 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img){
   for(int i = 0; i < nScales; i++){
       cv::Mat concat;
       merge(strucData[i], concat);
-
       concat = utils.convTri(concat, 1);
-
       //cv::Mat dst;
       //cv::RNG rng(12345);
       //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
-      //copyMakeBorder( concat, concat, 2, 2, 3, 3, cv::BORDER_REPLICATE, 0 );
-
+      copyMakeBorder( concat, concat, 2, 2, 3, 3, cv::BORDER_REPLICATE, 0 );
 
       channelsConcat.push_back(concat);
   }
@@ -299,6 +242,9 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters
     filters.push_back(filterConver);//(filt);
   }
  */
+  int num_filters_per_channel = 4; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
+  int num_channels = 10; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
+  int filter_size = 5; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
 
   //EJEMPLO PARA UNA ESCALA, QUE TIENE nChannels CANALES
   int nChannels = pyramid.channels();
@@ -317,21 +263,19 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters
   //printf("pix 0,0 %f %f %d \n", (float)pyramid.at<float>(0,0), (float)pyramid.at<float>(0,1) , pyramid.size().height);
   //SE CONVOLUCIONA UNA IMAGEN CON LOS FILTROS Y SE OBTIENEN LAS IMAGENES DE SALIDA
   std::vector<cv::Mat> out_images;
-  for(int j = 0; j < 4; j++){
+  for(int j = 0; j < num_filters_per_channel; j++){
     cv::Mat splitted[nChannels];
     split(C_repMat[j],splitted);
     for(int i = 0; i < nChannels; i++){
       cv::Mat out_image; 
-      //filter2D(splitted[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_REFLECT );
-
-      cv::Mat dst;
-      cv::RNG rng(12345);
+      //cv::Mat dst;
+      //cv::RNG rng(12345);
       //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
-      copyMakeBorder( splitted[i], dst, 2, 2, 3, 3, cv::BORDER_REFLECT, 0 );
+      //copyMakeBorder( splitted[i], dst, 2, 2, 3, 3, cv::BORDER_REFLECT, 0 );
       //printf("pix 0,0 %f %f %f %f %d \n", (float)dst.at<float>(2,3), (float)dst.at<float>(2,4), (float)dst.at<float>(2,2), (float)dst.at<float>(1,1), dst.size().height);
 
-      filter2D( dst, out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( 0,0 ), 0, cv::BORDER_CONSTANT );
-      out_image = utils.ImgResample(out_image, round((float)out_image.size().width/2), round((float)out_image.size().height/2));
+      filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
+      out_image = utils.ImgResample(out_image, round(out_image.size().width/2.0), round(out_image.size().height/2.0));
 
       //if(i == 1)
       //  printf("pix 0,0 %f %f %f \n", (float)out_image.at<float>(0,0), (float)out_image.at<float>(0,1) , (float)out_image.at<float>(1,0));
@@ -358,14 +302,82 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters
  *
  *
  */
-std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
-  /*if(sz[0]==0 || sz[1]==0)
+int
+ChannelsPyramid::getScales
+  (
+  int nPerOct,
+  int nOctUp,
+  const cv::Size& minDs,
+  int shrink,
+  const cv::Size& sz,
+  std::vector<double>& scales,
+  std::vector<cv::Size2d>& scaleshw
+  )
+{
+  // set each scale s such that max(abs(round(sz*s/shrink)*shrink-sz*s)) is
+  // minimized without changing the smaller dim of sz (tricky algebra)
+  scales = {};
+  scaleshw = {};
+
+  if (!sz.area())
   {
-    int scales[0];
-    int scaleshw[0];
+      return 0;
   }
-  */
-  
+
+  cv::Size2d ratio(double(sz.width) / double(minDs.width), double(sz.height) / double(minDs.height));
+  int nScales = std::floor(double(nPerOct) * (double(nOctUp) + log2(std::min(ratio.width, ratio.height))) + 1.0);
+
+  double d0 = sz.height, d1 = sz.width;
+  if (sz.height >= sz.width)
+  {
+      std::swap(d0, d1);
+  }
+
+  for (int i = 0; i < nScales; i++)
+  {
+    double s = std::pow(2.0, -double(i) / double(nPerOct) + double(nOctUp));
+    double s0 = (std::round(d0 * s / shrink) * shrink - 0.25 * shrink) / d0;
+    double s1 = (std::round(d0 * s / shrink) * shrink + 0.25 * shrink) / d0;
+    std::pair<double, double> best(0, std::numeric_limits<double>::max());
+    for (double j = 0.0; j < 1.0 - std::numeric_limits<double>::epsilon(); j += 0.01)
+    {
+      double ss = (j * (s1 - s0) + s0);
+      double es0 = d0 * ss;
+      es0 = std::abs(es0 - std::round(es0 / shrink) * shrink);
+      double es1 = d1 * ss;
+      es1 = std::abs(es1 - std::round(es1 / shrink) * shrink);
+      double es = std::max(es0, es1);
+      if (es < best.second)
+      {
+        best = { ss, es };
+      }
+    }
+    scales.push_back(best.first);
+  }
+
+  auto tmp = scales;
+  tmp.push_back(0);
+  scales.clear();
+  for (uint i = 1; i < tmp.size(); i++)
+  {
+    if (tmp[i] != tmp[i - 1])
+    {
+      double s = tmp[i - 1];
+      scales.push_back(s);
+
+      double x = std::round(double(sz.width) * s / shrink) * shrink / sz.width;
+      double y = std::round(double(sz.height) * s / shrink) * shrink / sz.height;
+      scaleshw.emplace_back(x, y);
+    }
+  }
+
+  return 0;
+}
+
+
+/*
+std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]){
+
   float val1 = (float)sz[0]/(float)minDs[0];  
   float val2 = (float)sz[1]/(float)minDs[1];
 
@@ -438,10 +450,6 @@ std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int min
     scales[i] = ss[pos];
   }
 
-  /*for(int i=0; i< scales.size(); i++){
-    printf("scale: %.4f\n", scales[i] );
-  }*/
-
   std::vector<float> kp;
   std::vector<float> scales2;
   for(uint i = 0; i < scales.size()-1; i++){
@@ -464,14 +472,10 @@ std::vector<float> ChannelsPyramid::getScales(  int nPerOct, int nOctUp, int min
     scaleshw[i][0] = h;
     scaleshw[i][1] = w;
   }
-  /*for(int i =0; i < sizeScaleshw; i++){
-    printf("%.4f \n", scales2[i]);// scaleshw[i][0], scaleshw[i][1]);
-    //printf("%.4f %.4f \n", scaleshw[i][0], scaleshw[i][1]);
-  }*/
 
   return scales2;
 }
-
+*/
 
 
 

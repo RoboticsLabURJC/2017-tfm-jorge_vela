@@ -32,6 +32,8 @@ class TestChannelsExtractorGradHist: public testing::Test
   GradHistExtractor gradHistExtract;
   GradHistExtractor gradHistExtractBinSizeOrients{6,9,1,0};
 
+
+
   virtual void SetUp()
   {
   }
@@ -40,7 +42,6 @@ class TestChannelsExtractorGradHist: public testing::Test
   {
   }
 };
-
 
 TEST_F(TestChannelsExtractorGradHist, TestColorImage){
   cv::Mat image;

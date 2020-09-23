@@ -198,6 +198,7 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
     cv::Mat dst;
     image_split[0].convertTo(dst, CV_32F);
     float *data = dst.ptr<float>();
+
     gradMag(data, MVal[0], OVal[0], h, w, 1,  false ); 
 
     cv::Mat dst2;
@@ -253,6 +254,12 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
  * @return std::vector<cv::Mat>: Vector con la magnitud y el gradiente en formato cv::Mat
  */
 std::vector<cv::Mat> GradMagExtractor::extractFeatures(cv::Mat img){
+
+  //printf("GradMag: -->8UC3 %d , 8UC1 %d , imageType %d \n",CV_8UC3, CV_8UC1 ,  img.type() );
+
+  //assert(img.type() == CV_8UC3 || img.type() == CV_8UC1);
+
+
   int dChan = img.channels();
   int width = img.size().width;
   int height = img.size().height;

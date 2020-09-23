@@ -18,19 +18,19 @@ set(
 )
 
 # Sources for regression tests builds
-file(
-        GLOB
-        TEST_REGRESSION_SHARED_SRC
-        ${TEST_SHARED_ENTRY_POINT}
-        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-)
-
 #file(
 #        GLOB
 #        TEST_REGRESSION_SHARED_SRC
 #        ${TEST_SHARED_ENTRY_POINT}
-#        ${CMAKE_CURRENT_SOURCE_DIR}/TestBadacostDetector.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 #)
+
+file(
+        GLOB
+        TEST_REGRESSION_SHARED_SRC
+        ${TEST_SHARED_ENTRY_POINT}
+        ${CMAKE_CURRENT_SOURCE_DIR}/TestBadacostDetector.cpp
+)
 
 # All regression tests for the library
 add_executable(

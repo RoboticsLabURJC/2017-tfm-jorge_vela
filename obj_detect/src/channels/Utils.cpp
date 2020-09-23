@@ -70,7 +70,7 @@ cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
   }
   double delta = 0;
 
-  cv::Mat kernel = cv::Mat((kernel_size*2)+1,1,  CV_32FC1, arrayKernel);
+  cv::Mat kernel = cv::Mat((kernel_size*2)+1,1,  CV_32FC1, arrayKernel); //
   filter2D(input_image, help_image, CV_32FC1 , kernel, anchor, delta, cv::BORDER_REFLECT );
   kernel = cv::Mat(1,(kernel_size*2)+1,  CV_32FC1, arrayKernel);
   filter2D(help_image, output_image, CV_32FC1 , kernel, anchor, delta, cv::BORDER_REFLECT );
@@ -108,7 +108,7 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
   GradMagExtractor gradMagExtract{5};
-  GradHistExtractor gradHistExtract{4, 6, 0,0}; //4,6,0,0
+  GradHistExtractor gradHistExtract{2,6,1,0}; //{4,6,1,1}; // <--- JM: Cuidado!! Estos parámetros dependerán del clasificador entrenado?
 
   int dChan = src.channels();
   int h = src.size().height;
@@ -138,6 +138,7 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
   }
 
   luv_image = convTri(luv_image, smooth);
+
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
 
 

@@ -80,10 +80,6 @@ bool BadacostDetector::load
     memcpy(m_RatioFixed.data, pRdFix.data(), pRdFix.size()*sizeof(float));
     m_aRatioFixedWidth = (int)m_RatioFixed.at<float>(0,0);
 
-    //m_treeDepth = classifier["treeDepth"]["data"];    
-    //m_num_classes = classifier["num_classes"]["data"];   
-    //m_aRatioFixedWidth = classifier["aRatioFixedWidth"]["data"];    
-    
 
     // Read Cprime data
     int rows = static_cast<int>(classifier["Cprime"]["rows"]);
@@ -102,7 +98,7 @@ bool BadacostDetector::load
     m_Y = cv::Mat::zeros(cols, rows, CV_32F);
     data >> p;
     memcpy(m_Y.data, p.data(), p.size()*sizeof(float));
-    cv::transpose(m_Y, m_Y); // <----- JM: Cuidado la he traspuesto.
+    //cv::transpose(m_Y, m_Y); // <----- JM: Cuidado la he traspuesto.
     
     // Read wl_weights data
     rows = static_cast<int>(classifier["w1_weights"]["rows"]);
@@ -125,22 +121,31 @@ bool BadacostDetector::load
   }
 
   cv::FileStorage pyramid;
-  //std::string pyrPath = "yaml/pPyramid.yml";
   file_exists = pyramid.open(pyrPath, cv::FileStorage::READ);
   bool loadedOKPyr = false;
   if (file_exists)
   {
-    // JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
+    std::cout << "Pyramids file exists!" << std::endl;
+
+    // TODO: JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
     // no existe no se hace nada, si existe se pasan los filtros.
     loadedOKPyr = m_chnsPyramid.load(pyrPath.c_str());
   }
 
   cv::FileStorage filters;
-  //std::string filtersPath = "yaml/filterTest.yml";
   file_exists = pyramid.open(filtersPath, cv::FileStorage::READ);
   if (file_exists)
   {
+    std::cout << "Filters exists!" << std::endl;
     m_filters = loadFilters(filtersPath);
+
+    /*
+    for (uint i=0; i < m_filters.size(); i++)
+    {
+      std::cout << m_filters[i] << std::endl;
+    }
+    */
+    std::cout << "--> m_filters.size() = " << m_filters.size() << std::endl;
   }
 
   m_classifierIsLoaded = loadedOK && loadedOKPyr;
@@ -156,16 +161,18 @@ BadacostDetector::loadFilters(std::string filtersPath)
 
   //OBTENER EL NOMBRE DE LOS DISTINTOS FILTROS PARA ESTE CASO
   std::vector<std::string> namesFilters;
-  for(int i = 1; i < 5; i++)
+  int num_filters_per_channel = 4; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
+  int num_channels = 10; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
+  int filter_size = 5; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
+  for(int i = 1; i <= num_filters_per_channel; i++)
   {
-    for(int j = 1; j< 11; j++)
+    for(int j = 1; j <= num_channels; j++)
     {
       std::string name  = "filter_" + std::to_string(j) + "_" + std::to_string(i);
       namesFilters.push_back(name);
     }
   }
 
-  //SE CARGAN LOS DISTINTOS FILTROS, CON LOS NOMBRES ANTERIORES DESDE EL YML
   std::vector<cv::Mat> filters;
   for(uint k = 0; k < namesFilters.size(); k++)
   {
@@ -173,46 +180,42 @@ BadacostDetector::loadFilters(std::string filtersPath)
     cv::FileNode filterRows = filter[namesFilters[k].c_str()]["rows"];
     cv::FileNode filterCols = filter[namesFilters[k].c_str()]["cols"];
 
-    float* filt = new float[25*sizeof(float)];
+    float* filt = new float[filter_size*filter_size*sizeof(float)];
 
+    // TODO: Remove the need of this copy. It is because
     for(int i = 0; i < (int)filterRows; i++)
     {
       for(int j = 0; j < (int)filterCols; j++)
       {
-        float x = (float)filterData[i*5+j];
-        filt[i*5+j] = x;
+        float x = (float)filterData[i*filter_size+j];
+        filt[i*filter_size+j] = x;
       }
     }
 
-    cv::Mat filterConver = cv::Mat(5,5, CV_32F, filt);
+    cv::Mat filterConver = cv::Mat(filter_size,filter_size, CV_32F, filt);
     transpose(filterConver,filterConver);
-
-    //float *O = filterConver.ptr<float>();
-
-    filters.push_back(filterConver);//(filt);
+    filters.push_back(filterConver); //(filt);
   }
 
   return filters;
 }
 
 std::vector<cv::Rect2i>
-BadacostDetector::detect(cv::Mat imgs)
+BadacostDetector::detect(cv::Mat img)
 {
   if (!m_classifierIsLoaded)
   {
     throw std::runtime_error("BadacostDetector::load() should be called befor BadacostDetector::detect()"); 
   }
 
+
   //CARGO LOS PARAMETROS, LLAMO A CHNSPYRAMID, SE PASA TODO POR EL FILTRO Y SE HACE RESIZE. 
   //EQUIVALENTE HASTA LINEA 80 acfDetectBadacost. Mismos resultados aparentemente.
   
-  std::vector<cv::Mat> pyramid = m_chnsPyramid.getPyramid(imgs);
-
+  std::vector<cv::Mat> pyramid = m_chnsPyramid.getPyramid(img);
   std::vector<cv::Mat> filteredImagesResized;
   if (!m_filters.empty())
   {
-    //std::vector<cv::Mat> filteredImages = chnsPyramid.badacostFilters(pyramid[0], "yaml/filterTest.yml");
-    //std::vector<cv::Mat> filteredImagesResized = chnsPyramid.badacostFilters(pyramid[0], "yaml/filterTest.yml");
     filteredImagesResized = m_chnsPyramid.badacostFilters(pyramid[0], m_filters);
   }
   else
@@ -220,7 +223,15 @@ BadacostDetector::detect(cv::Mat imgs)
     filteredImagesResized = pyramid;
   }
 
-  printf("--> %d %d \n", filteredImagesResized[0].size().height, filteredImagesResized[0].size().width );
+/*
+  for (int i=0; i < 10; i++)
+  {
+    cv::imshow("channel", filteredImagesResized[i*4]);
+    cv::waitKey();
+  }
+*/
+  printf("--> img's size = %d %d \n", img.size().height, img.size().width );
+  printf("--> channel's size = %d %d \n", filteredImagesResized[0].size().height, filteredImagesResized[0].size().width );
 
  // cv::imshow("", filteredImagesResized[4]);
  // cv::waitKey(0);
@@ -234,18 +245,19 @@ BadacostDetector::detect(cv::Mat imgs)
   }*/
 
   // COMIENZA EL SEGUNDO BUCLE
-  int modelDsPad[2] = {54, 96}; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  int modelDs[2] = {48, 84};    // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //int modelDsPad[2] = {54, 96}; // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //int modelDs[2] = {48, 84};    // JM: Esto debería venir del fichero con el clasificador entrenado.
 
   int shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
   int modelHt = 54;  // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
   int modelWd = 96;  // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  int stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  int stride = 2;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
   float cascThr = -2.239887; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
 
 
   int height = filteredImagesResized[0].size().height;
   int width = filteredImagesResized[0].size().width;
+
   int nChan = filteredImagesResized.size();
 
 
@@ -261,10 +273,9 @@ BadacostDetector::detect(cv::Mat imgs)
   int nTrees = m_classifier["fids"].size().height;
   std::cout << "nTrees = " << nTrees << std::endl;
   std::cout << "nTreeNodes = " << nTreeNodes << std::endl;
-  int height1 = ceil(float(height*shrink-modelHt+1)/stride);
+  int height1 = ceil(float((height*shrink)-modelHt+1)/stride);
   int width1 = ceil(float((width*shrink)-modelWd+1)/stride);
-  //int nFtrs = (modelHt/shrink)*(modelWd/shrink)*nChan;
-    
+
   int num_windows = width1*height1;
   if (num_windows < 0) 
   {
@@ -276,10 +287,11 @@ BadacostDetector::detect(cv::Mat imgs)
   // In any case it should works as is without OpenMP.
   std::vector<int> rs(num_windows, 0);
   std::vector<int> cs(num_windows, 0);
-  std::vector<float> hs1(num_windows, 1.0);
-  std::vector<float> scores(num_windows, -1500.0);
+  std::vector<float> hs1(num_windows, 1.0); // Initialized to background class ("not object")
+  std::vector<float> scores(num_windows, -1500.0); // Initialized to a very negative trace == score.
 
-  /*
+/*
+  int nFtrs = (modelHt/shrink)*(modelWd/shrink)*nChan;
   int *cids =  new int[nFtrs];
   int *zsA = new int[nFtrs];
   int *csA = new int[nFtrs];
@@ -312,19 +324,20 @@ BadacostDetector::detect(cv::Mat imgs)
         }
     }*/
 
-/*  
-  #ifdef USEOMP
-  int nThreads = omp_get_max_threads();
-  #pragma omp parallel for num_threads(nThreads)
-  #endif
-*/
   int modelWd_s = modelWd/shrink;
   int modelHt_s = modelHt/shrink;
   int modelWd_s_times_Ht_s = modelWd_s*modelHt_s;
 
+  /*
+    #ifdef USEOMP
+    int nThreads = omp_get_max_threads();
+    #pragma omp parallel for num_threads(nThreads)
+    #endif
+  */
   for( int c=0; c < width1; c++ )
   {
-    for( int r=0; r < height1 ; r++ )
+    //printf("%d %d \n", c, width1);
+    for( int r=0; r < height1 ; r++ ) 
     { 
       //if(c == 0 && r == 0){
       //  printf("%f \n", filteredImagesResized[0].at<float>(0,0) );
@@ -346,83 +359,71 @@ BadacostDetector::detect(cv::Mat imgs)
 
         // La matriz "child" tiene los índices de los hijos almacenados por filas.
         float child_node_index = static_cast<int>(m_classifier["child"].at<float>(t,k));
-        while( child_node_index ) // While k node is not a leave
+        while( child_node_index ) // While k node is not a leave it has children (child_node_index != 0).
         {
+          // std::cout << "t = " << t << ", k = " << k << ", child_node_index = " << child_node_index << std::endl;
+
           // Obtain the feature Id used in the split node.
           int ftrId = static_cast<int>(m_classifier["fids"].at<float>(t,k));
-/*
-          int chanSearch = zsA[ftrId];
-          int hSearch = csA[ftrId];
-          int wSearch = rsA[ftrId];
-          //printf("%d %d %d \n",chanSearch, hSearch, wSearch );
-          float ftr2 = (float)filteredImagesResized[chanSearch].at<float>(wSearch+(r*stride/shrink), hSearch + (c*stride/shrink));
-*/
 
-          //printf("%f \n", ftr2);   
-          // In the original code the m feature Id is redirected to this 
+          // In the original code the m feature Id is redirected to this
           // cids value: 
           //    cids[m++] = z*width*height + c*height + r;    
-          // Thus, we obtain the channel index z, column c and row for the feature:
+          // Thus, we obtain the channel index z, column c and row for the feature from the ftrId:
           //   z - ftrChnIndex
           //   c - ftrChnCol
           //   r - ftrChnRow
-          int ftrChnIndex = ftrId / (modelWd_s_times_Ht_s);
-          int ftrChnCol = (ftrId % (modelWd_s_times_Ht_s)) / (modelHt_s);
+          int ftrChnIndex = ftrId / (modelWd_s_times_Ht_s); // zsA[ftrId];
+          int ftrChnCol = (ftrId % (modelWd_s_times_Ht_s)) / (modelHt_s); // csA[ftrId];
           ftrChnCol =  round(ftrChnCol + posWidth);
-          int ftrChnRow = (ftrId % (modelWd_s_times_Ht_s)) % (modelHt_s);
+          int ftrChnRow = (ftrId % (modelWd_s_times_Ht_s)) % (modelHt_s); // rsA[ftrId]
           ftrChnRow =  round(ftrChnRow + posHeight);
-
 /*
           std::cout << "=========" << std::endl;
           std::cout << "ftrId = " << ftrId << ", ";
           std::cout << "ftrChnIdex = " << ftrChnIndex << ", ";
-          std::cout << "chanSearch = " << chanSearch << ", ";
+          std::cout << "zsA[ftrId] = " << zsA[ftrId] << ", ";
           std::cout << "ftrChnCol = " << ftrChnCol << ", ";
-          std::cout << "hSearch+(c*stride/shrink) = " <<  hSearch+(c*stride/shrink) << ", ";
+          std::cout << "csA[ftrId]+posWidth = " <<  csA[ftrId]+posWidth << ", ";
           std::cout << "ftrChnRow = " << ftrChnRow << ", ";
-          std::cout << "wSearch+(r*stride/shrink) = " <<  wSearch+(r*stride/shrink) << std::endl;
+          std::cout << "rsA[ftrId]+posHeight = " <<  rsA[ftrId]+posHeight << ", ";
 */
 
           // Obtain the feature value and threshold for the k-th tree node.
           float ftr = filteredImagesResized[ftrChnIndex].at<float>(ftrChnRow, ftrChnCol);
-          //printf("%f \n", ftr2 );
           float thrs = static_cast<float>(m_classifier["thrs"].at<float>(t, k));
-          //printf("thrs %f  , ftr %f  \n", thrs, ftr2);
+          //printf("thrs %f  , ftr %f  \n", thrs, ftr);
 
-//          int child_choosen = (ftr2<thrs) ? 1 : 0;
           int child_choosen = (ftr<thrs) ? 1 : 0;
 
           // it seams the the right child of k0 is at k0 row index while 
           // left child is at k0-1 row index.
           //printf("child: %d, child_choosen: %d busquedaOffset %d \n", static_cast<int>(m_classifier["child"].at<float>(t,k0)), child_choosen, t*nTreeNodes);
-
-          //k = static_cast<int>(m_classifier["child"].at<float>(t,k0)) - child_choosen;
           k = child_node_index  - child_choosen;
-          //k0 = k;
-
           child_node_index = static_cast<int>(m_classifier["child"].at<float>(t,k));
         }
-        h = static_cast<int>(m_classifier["hs"].at<float>(t,k));
 
-        // Add to the margin vector the codified output class h as a vector 
+        h = static_cast<int>(m_classifier["hs"].at<float>(t,k));
+        //std::cout << "h = " << h << std::endl;
+
+        // Add to the margin vector the codified output class h as a vector
         // multiplied by the weak learner weights     
-        //cv::Mat Y = m_Y(cv::Range(0,m_num_classes), cv::Range(h-1,h));
         cv::Mat Y = m_Y(cv::Range(0,m_num_classes), cv::Range(h-1,h));
 
         //std::cout << "m_Y.size()=" << m_Y.size() << std::endl;
         //std::cout << "Y=" << Y << std::endl;
         //printf("--> %d \n", h);
 
-        //for(int wk = 0; wk < Y.size().height; wk++)
-        //  printf("%f \n", (float)Y.at<float>(wk,0) );
-
         //printf("--> %f \n",(float)m_wl_weights.at<float>(0,0) );
-        cv::Mat update = m_wl_weights.at<float>(t,0) * Y;
+
+        cv::Mat update = m_wl_weights.at<float>(0,t) * Y; //en la anterior estaba como (t,0) y daba resultado erroneo
         margin_vector += update;
+        //std::cout << "margin_vector = " << margint_vector << std::endl;
 
         // Get the costs vector.
         cv::Mat costs_vector = m_Cprime * margin_vector;
         
+
         // Obtain the minimum cost for the positive classes (the object classes).
         // The negative class is the first and the rest are the positives
         double min_pos_cost;
@@ -433,16 +434,18 @@ BadacostDetector::detect(cv::Mat imgs)
         
         // Obtain the cost for the negative class (the background).
         // The negative class is the first and the rest are the positives
-        double neg_cost = costs_vector.at<float>(0,0);
-        
+        float neg_cost = costs_vector.at<float>(0,0);
+        //printf("%f %f \n", min_pos_cost, neg_cost);
         //printf("%f %f \n", min_pos_cost, neg_cost );
+
         // Get the trace for the current detection window
         trace = -(min_pos_cost - neg_cost);
+        //std::cout << "trace = " << trace << std::endl;
 
-        //printf("%f \n",trace );
         if (trace <= cascThr) break;
       }
 
+      //printf("----------->%f \n",trace );
       if (trace < 0)
       {
         h = 1; // If trace is negative we have a background window (class is 1)
@@ -486,7 +489,8 @@ BadacostDetector::detect(cv::Mat imgs)
         labels.push_back(hs1[i]);
     }
   }
-  printf("%d \n", detections.size());
+
+  std::cout <<  static_cast<uint>(detections.size()) << std::endl;
   return detections;
 }
 

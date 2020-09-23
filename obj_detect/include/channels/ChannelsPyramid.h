@@ -19,9 +19,20 @@ public:
 
   std::vector<cv::Mat> getPyramid(cv::Mat img);
   std::vector<cv::Mat> badacostFilters(cv::Mat pyramid, std::vector<cv::Mat> filters);
+//  std::vector<float> getScales(int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]);
+
+  int getScales(
+  int nPerOct,
+  int nOctUp,
+  const cv::Size& minDs,
+  int shrink,
+  const cv::Size& sz,
+  std::vector<double>& scales,
+  std::vector<cv::Size2d>& scaleshw
+  );
+
 
 private:
-  std::vector<float> getScales(int nPerOct, int nOctUp, int minDs[], int shrink, int sz[]);
 
   int m_nOctUp;
   int m_nPerOct;
