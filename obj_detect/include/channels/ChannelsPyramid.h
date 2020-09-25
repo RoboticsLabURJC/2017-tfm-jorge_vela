@@ -17,8 +17,14 @@ public:
   ChannelsPyramid() {}
   bool load(std::string opts);
 
-  std::vector<cv::Mat> getPyramid(cv::Mat img);
-  std::vector<cv::Mat> badacostFilters(cv::Mat pyramid, std::vector<cv::Mat> filters);
+  std::vector<std::vector<cv::Mat>> compute
+    (
+    cv::Mat img,
+    std::vector<cv::Mat> filters
+    );
+
+  // std::vector<cv::Mat> badacostFilters(cv::Mat pyramid, std::vector<cv::Mat> filters);
+
   int getScales
     (
     int nPerOct,
@@ -29,7 +35,6 @@ public:
     std::vector<double>& scales,
     std::vector<cv::Size2d>& scaleshw
     );
-
 
 private:
 

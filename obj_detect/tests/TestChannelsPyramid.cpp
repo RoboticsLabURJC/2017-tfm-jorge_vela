@@ -74,9 +74,9 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
   std::string nameOpts = "yaml/pPyramid.yml";
   bool loadOk = chnsPyramid.load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
-  std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image);
+  std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
+  std::vector<std::vector<cv::Mat>> pyramid = chnsPyramid.compute(image, filters);
   //ASSERT_TRUE(pyramid.size()==28);
-  //chnsPyramid.badacostFilters(pyramid, "yaml/filterTest.yml");
 }
 
 
@@ -90,9 +90,8 @@ TEST_F(TestChannelsPyramid, badacostFilters){
   {
       throw std::runtime_error("TestChannelsPyramid: pPyramid.yml not found");
   }
-  std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image);
-
-
+  std::vector<cv::Mat> filters; // empty filters to compute ACF pyramid
+  std::vector<std::vector<cv::Mat>> pyramid = chnsPyramid.compute(image, filters);
 
   /*std::vector<cv::Mat> filtered = chnsPyramid.badacostFilters(pyramid[11], "yaml/filterTest.yml");
 

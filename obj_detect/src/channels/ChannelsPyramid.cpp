@@ -3,7 +3,7 @@
 #include <channels/ChannelsExtractorLUV.h>
 #include <channels/ChannelsExtractorGradMag.h>
 #include <channels/ChannelsExtractorGradHist.h>
-#include <channels/ChannelsExtractorACF.h>
+#include <channels/ChannelsExtractorLDCF.h>
 
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
@@ -12,7 +12,9 @@
 
 #include <iostream>
 
-bool ChannelsPyramid::load(std::string opts){
+bool
+ChannelsPyramid::load(std::string opts)
+{
 //  bool loadValue = true;
   cv::FileStorage pPyramid;
   bool existOpts = pPyramid.open(opts, cv::FileStorage::READ);
@@ -31,7 +33,12 @@ bool ChannelsPyramid::load(std::string opts){
   return existOpts;
 }
 
-std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
+std::vector<std::vector<cv::Mat>>
+ChannelsPyramid::compute
+  (
+  cv::Mat img,
+  std::vector<cv::Mat> filters
+  )
 {
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
@@ -52,12 +59,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
   cv::Mat luv_image;
   cv::Mat luvImageChng;
 
-  //luvImage[0].copyTo(luvImageChng);
-  //luvImage[2].copyTo(luvImage[0]);
-  //luvImageChng.copyTo(luvImage[2]);
-
   merge(luvImage, luv_image);
-
 
   //EN ESTAS LINEAS EL COMPRUEBA QUE SE CUMPLEN LOS REQUISITOS PARA LA CONVERSION
   cv::Mat imageUse = luv_image;
@@ -104,9 +106,10 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
     }
   }
 
-  std::vector<cv::Mat> chnsPyramidData[nScales];
+  std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorACF acfExtractor(m_shrink, "LUV");
+//  ChannelsExtractorACF acfExtractor(m_shrink, "LUV");
+  ChannelsExtractorLDCF ldcfExtractor(filters, pad, m_shrink);
   //for (const auto& i : isR) // <-- JM: Para solo escalas reales
   for(int i=0; i< nScales; i++) // <-- JM: De momento lo hacemos para todas las escalas (y no solo para las que hay en isR).
   {
@@ -131,43 +134,13 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
       imageUse = I1;
     }
 
-    chnsPyramidData[i] = acfExtractor.extractFeatures(I1);
+    chnsPyramidData[i] = ldcfExtractor.extractFeatures(I1);
   }
 
-
- /*
-  //COMPUTE IMAGE PYRAMID----------------------------------------------------
-  std::vector<cv::Mat> pChnsCompute;
-  for(int i=0; i< nScales; i++){ //isRarr.size()
-    float s=scales[i]; //[isRarr[i]-1];
-    int sz_1 = round(sz.width*s/m_shrink)*m_shrink;
-    int sz_2 = round(sz.height*s/m_shrink)*m_shrink;
-    cv::Size sz1{sz_1, sz_2};
-    //printf("ChnsPyramid 124 ; newSize; --->%d %d \n", sz1[0], sz1[1]);
-    //printf("-->%d %d\n",sz1[0], sz1[1] );
-    cv::Mat I1;
-    if(sz.width == sz1.width && sz.height == sz1.height){
-      I1 = imageUse;
-    }else{
-      I1 = ImgResample(imageUse, sz1.width , sz1.height);
-    }
-
-    if(s==.5 && (m_nApprox>0 || m_nPerOct==1)){
-      imageUse = I1;
-    }
-    std::string colorSpace = "LUV";
-
-
-    pChnsCompute = channelsCompute(I1, colorSpace.c_str(), m_shrink);
-    strucData[i] = pChnsCompute;
-  } 
-  cv::Mat data[pChnsCompute.size()][nScales];
-*/
-
-
-  //std::vector<cv::Mat> data;
   //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
-  /*for(int i=0; i< isA.size(); i++){
+  /*
+  for(int i=0; i< isA.size(); i++)
+  {
     int x = isA[i] -1;
     int iR =  isN[x];
     int sz_1 = round(sz[0]*scales[x]/m_shrink);
@@ -182,16 +155,10 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
       }
       strucData[x] = resampleVect;
     }
-  }*/
-  
+  }
+  */
 
-  //smooth channels, optionally pad and concatenate channels
-  /*for(int i = 0; i < nScales; i++){
-    for(int j=0; j < pChnsCompute.size();j++){
-      data[j][i] = convTri(luv_image, smooth);
-    }
-  }*/
-
+  /*
   std::vector<cv::Mat> channelsConcat;
   int x = pad.width / m_shrink;
   int y = pad.height / m_shrink;
@@ -204,9 +171,12 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
       //copyMakeBorder( concat, concat, 2, 2, 3, 3, cv::BORDER_REPLICATE, 0 );
       channelsConcat.push_back(concat);
   }
-  return channelsConcat;
+  */
+
+  return chnsPyramidData;
 }
 
+/*
 std::vector<cv::Mat> ChannelsPyramid::badacostFilters
   (
   cv::Mat pyramid,
@@ -242,7 +212,7 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters
   //cv::waitKey(0);
   return out_images;
 }
-
+*/
 
 /**
  * Funcion getScales. En funcion de los parámetros de entrada retorna un vector con los distintos valores

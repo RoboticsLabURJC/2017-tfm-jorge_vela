@@ -15,6 +15,9 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorACF.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorACF.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLDCF.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLDCF.h
+
   ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Utils.h
 

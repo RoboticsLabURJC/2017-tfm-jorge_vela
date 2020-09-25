@@ -199,16 +199,18 @@ BadacostDetector::detect(cv::Mat img)
   //CARGO LOS PARAMETROS, LLAMO A CHNSPYRAMID, SE PASA TODO POR EL FILTRO Y SE HACE RESIZE. 
   //EQUIVALENTE HASTA LINEA 80 acfDetectBadacost. Mismos resultados aparentemente.
   
-  std::vector<cv::Mat> pyramid = m_chnsPyramid.getPyramid(img);
+  std::vector<std::vector<cv::Mat>> pyramid = m_chnsPyramid.compute(img, m_filters);
   std::vector<cv::Mat> filteredImagesResized;
-  if (!m_filters.empty())
-  {
-    filteredImagesResized = m_chnsPyramid.badacostFilters(pyramid[0], m_filters);
-  }
-  else
-  {
-    filteredImagesResized = pyramid;
-  }
+  filteredImagesResized = pyramid[0];
+
+//  if (!m_filters.empty())
+//  {
+//    filteredImagesResized = m_chnsPyramid.badacostFilters(pyramid[0], m_filters);
+//  }
+//  else
+//  {
+//    filteredImagesResized = pyramid;
+//  }
 
 #ifdef SHOW_CHANNELS
   for (int i=0; i < 40; i++)
