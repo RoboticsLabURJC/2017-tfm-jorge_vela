@@ -7,12 +7,10 @@
  *
  *  ------------------------------------------------------------------------ */
 
-
 #include <channels/Utils.h>
 #include <channels/ChannelsExtractorLUV.h>
 #include <channels/ChannelsExtractorGradMag.h>
 #include <channels/ChannelsExtractorGradHist.h>
-
 #include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
 #include <math.h>

@@ -2,13 +2,8 @@
 #define CHANNELS_PYRAMID
 
 #include <opencv2/opencv.hpp>
-
 #include <vector>
 #include <string>
-
-#include "gtest/gtest.h"
-#include <opencv2/opencv.hpp>
-
 #include <iostream>
 
 class ChannelsPyramid

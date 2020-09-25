@@ -10,7 +10,6 @@
 #ifndef IMAGE_UTILS
 #define IMAGE_UTILS
 
-
 #include <opencv2/opencv.hpp>
 #include <vector>
 

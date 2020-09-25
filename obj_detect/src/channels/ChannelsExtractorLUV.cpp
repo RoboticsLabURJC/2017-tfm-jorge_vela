@@ -10,10 +10,8 @@
 #include <iostream>
 #include <channels/ChannelsExtractorLUV.h>
 #include <channels/Utils.h>
-
 #include <opencv2/opencv.hpp>
 
-#include <channels/Utils.h>
 // ------------------- Adapted from Piotr Dollar Matlab Toolbox --------------------
 // Constants for rgb2luv conversion and lookup table for y-> l conversion
 cv::Mat ChannelsLUVExtractor::bgr2luvSetup

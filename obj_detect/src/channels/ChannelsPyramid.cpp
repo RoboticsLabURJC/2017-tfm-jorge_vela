@@ -1,15 +1,11 @@
+
 #include <channels/ChannelsPyramid.h> 
 #include <channels/Utils.h>
 #include <channels/ChannelsExtractorLUV.h>
-#include <channels/ChannelsExtractorGradMag.h>
-#include <channels/ChannelsExtractorGradHist.h>
 #include <channels/ChannelsExtractorLDCF.h>
-
-#include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
 #include <cmath>
-
 #include <iostream>
 
 bool
@@ -41,7 +37,7 @@ ChannelsPyramid::compute
   )
 {
   int smooth = 1;
-  ChannelsLUVExtractor channExtract{false, smooth};
+  ChannelsLUVExtractor channExtractLUV{false, smooth};
 
   cv::Size sz = img.size();
   cv::Size minDs;
@@ -55,7 +51,7 @@ ChannelsPyramid::compute
 
   //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
   //img.convertTo(img, CV_32FC1);
-  std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
+  std::vector<cv::Mat> luvImage = channExtractLUV.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
   cv::Mat luvImageChng;
 

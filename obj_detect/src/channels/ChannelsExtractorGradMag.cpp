@@ -12,7 +12,6 @@
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
 #include "sse.hpp"
-#include <detectors/badacostDetector.h>
 
 #define PI 3.14159265f
 
