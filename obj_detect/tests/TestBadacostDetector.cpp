@@ -8,7 +8,7 @@
  *  ------------------------------------------------------------------------ */
 
 
-#include <channels/badacostDetector.h> 
+#include <detectors/badacostDetector.h>
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
 
