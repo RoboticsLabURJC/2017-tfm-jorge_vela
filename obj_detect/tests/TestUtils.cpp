@@ -205,35 +205,3 @@ TEST_F(TestUtils, TestResampleConv)
   }
 }
 
-
-
-TEST_F(TestUtils, TestChannelsCompute)
-{
-  cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
-  std::vector<cv::Mat> pChnsCompute;
-  pChnsCompute = channelsCompute(image,"RGB", 4);
-
-  cv::waitKey(0);
-  cv::Mat testMag;
-  transpose(pChnsCompute[3], testMag);
-
-  cv::Mat imgMag;
-  testMag.convertTo(imgMag, CV_32F);    
-  float *valuesImgMag = imgMag.ptr<float>();
-
-  //printf("%f\n", valuesImgMag[1] );
-  FileStorage fs1;
-  fs1.open("yaml/TestMagChnsCompute.yml", FileStorage::READ);
-  //FileNode rows = fs1["M"]["rows"];
-  //FileNode cols = fs1["M"]["cols"];
-  FileNode imgMagMatlab = fs1["M"]["data"];
-
-  for(int i=0;i<14*17 /*(int)rows*(int)cols*/;i++)
-  { 
-    //printf("%.5f %.5f \n", (float)valuesImgMag[i], (float)imgMagMatlab[i] );
-    ASSERT_TRUE(abs((float)valuesImgMag[i] - (float)imgMagMatlab[i]) < 1.e-2f);
-  }
-}
-
-
-

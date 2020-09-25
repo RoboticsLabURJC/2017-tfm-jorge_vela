@@ -22,14 +22,6 @@ cv::Mat ImgResample
     int norm = 1
   );
 
-std::vector<cv::Mat> channelsCompute
-  (
-  cv::Mat src,
-  std::string colorSpace,
-  int shrink
-  );
-
-
 cv::Mat convTri
   (
   cv::Mat input_image,

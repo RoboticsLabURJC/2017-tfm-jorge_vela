@@ -3,6 +3,7 @@
 #include <channels/ChannelsExtractorLUV.h>
 #include <channels/ChannelsExtractorGradMag.h>
 #include <channels/ChannelsExtractorGradHist.h>
+#include <channels/ChannelsExtractorACF.h>
 
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
@@ -103,52 +104,9 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
     }
   }
 
-
-  /*
-  int isR;
-  if(1){ //PREGUNTAR ESTE IF EN MATLAB
-    isR = 1;
-  }else{
-    isR = 1+m_nOctUp*m_nPerOct;
-  }
- 
-  std::vector<int> isRarr;
-  int iLoop = 0;
-  while(iLoop<nScales){
-    isRarr.push_back(1 + iLoop);
-    iLoop = iLoop + m_nApprox +1;
-  }
-
-
-  std::vector<int> isA;
-  int valIsRArr = 0;
-  for(int i = 0; i < nScales; i++){
-    if(i+1 != isRarr[valIsRArr]){
-      isA.push_back(i+1);
-    }else{
-      valIsRArr = valIsRArr + 1;
-    }
-  }
-
-  std::vector<int> arrJ;
-  arrJ.push_back(0); //[0] = 0;
-  for(uint i = 0; i < isRarr.size() - 1; i++){
-    arrJ.push_back((floor(isRarr[i] + isRarr[i+1]))/2);//[i+1] = (isRarr[i] + isRarr[i+1])/2;
-  }
-  arrJ.push_back(nScales); //[sizeisR+1]= nScales;
-
-  std::vector<int> isN;
-  for(uint i = 0; i <= isRarr.size(); i++){
-    for(int j = arrJ[i]+1; j <= arrJ[i+1]; j++ ){
-      //int val = i+j;
-      isN.push_back(isRarr[i]);
-    }
-  }
-  std::vector<cv::Mat> strucData[nScales];
-  */
-
   std::vector<cv::Mat> chnsPyramidData[nScales];
   std::vector<cv::Mat> pChnsCompute;
+  ChannelsExtractorACF acfExtractor(m_shrink, "LUV");
   //for (const auto& i : isR) // <-- JM: Para solo escalas reales
   for(int i=0; i< nScales; i++) // <-- JM: De momento lo hacemos para todas las escalas (y no solo para las que hay en isR).
   {
@@ -173,8 +131,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
       imageUse = I1;
     }
 
-    std::string colorSpace = "LUV";
-    chnsPyramidData[i] = channelsCompute(I1, colorSpace, m_shrink);
+    chnsPyramidData[i] = acfExtractor.extractFeatures(I1);
   }
 
 
