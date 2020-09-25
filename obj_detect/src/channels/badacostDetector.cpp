@@ -293,7 +293,7 @@ BadacostDetector::detect(cv::Mat img)
         zsA[m] = z; 
         csA[m] = c;
         rsA[m] = r;
-        cids[m++] = z*width*height + c*height + r;
+        //cids[m++] = z*width*height + c*height + r;
       }
 */
 
@@ -360,8 +360,8 @@ BadacostDetector::detect(cv::Mat img)
           //   z - ftrChnIndex
           //   c - ftrChnCol
           //   r - ftrChnRow
-          int ftrChnIndex = ftrId / (modelWd_s_times_Ht_s); // zsA[ftrId];
-          int ftrChnCol = (ftrId % (modelWd_s_times_Ht_s)) / (modelHt_s); // csA[ftrId];
+          int ftrChnIndex = ftrId / (modelWd_s_times_Ht_s); // zsA[ftrId]
+          int ftrChnCol = (ftrId % (modelWd_s_times_Ht_s)) / (modelHt_s); // csA[ftrId]
           ftrChnCol =  round(ftrChnCol + posWidth);
           int ftrChnRow = (ftrId % (modelWd_s_times_Ht_s)) % (modelHt_s); // rsA[ftrId]
           ftrChnRow =  round(ftrChnRow + posHeight);
@@ -432,11 +432,13 @@ BadacostDetector::detect(cv::Mat img)
       {
         h = 1;
       }
-      // If trace is negative we have a background window (class is 1)
-      // Otherwise we have a positive (object) class)
       else //if (trace > 0)
       //if (h > 1)
       {
+        // WARNING: Change with respect to the Matlab's implementation ... there is a bug in the matlab implementation
+        //          as it returns the h (positive class) of the last executed tree and not the minimum cost one !!! :-(.
+        // If trace is negative we have a background window (class is 1)
+        // Otherwise we have a positive (object) class)
         double min_cost;
         double max_cost;
         int min_ind[2];
@@ -444,6 +446,7 @@ BadacostDetector::detect(cv::Mat img)
         cv::minMaxIdx(costs_vector.rowRange(1,m_num_classes),
                       &min_cost, &max_cost, min_ind, max_ind, cv::Mat());
         h = min_ind[0] + 2; // +1 because of 0 index, and +1 because of negative class is 1.
+        // End of corrected code w.r.t. Matlab's implementation.
 
         int index = c + (r * width1);
         cs[index] = c; 

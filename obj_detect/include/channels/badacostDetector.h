@@ -43,7 +43,7 @@ public:
 
   // Detects objects at any scale in an image and return detections as rectangles
   std::vector<cv::Rect2i> detect(cv::Mat img);
-  
+
 protected:
   std::vector<cv::Mat> loadFilters(std::string filtersPath);
 
