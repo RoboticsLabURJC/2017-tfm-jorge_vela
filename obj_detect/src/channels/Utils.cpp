@@ -30,7 +30,7 @@
  * @return cv::Mat: Imagen redimensionada
  * 
  */
-cv::Mat Utils::ImgResample(cv::Mat src, int width, int height, int norm){
+cv::Mat ImgResample(cv::Mat src, int width, int height, int norm){
   cv::Mat dst(height, width, CV_32F, cv::Scalar(0, 0, 0));
   resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_AREA); //DICE QUE EN ALGUNOS CASOS NO UTILIZA ANTIALIASING OFF, POR LO QUE SERÍA INTER_AREA, EL CASO NORMAL ES INTER_LINEAR
   //dst = norm*dst;
@@ -45,7 +45,7 @@ cv::Mat Utils::ImgResample(cv::Mat src, int width, int height, int norm){
  *
  * @return cv::Mat: Imagen de retorno despues del filtro.
  */
-cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
+cv::Mat convTri(cv::Mat input_image, int kernel_size){
 
   cv::Mat output_image, help_image;
 
@@ -77,9 +77,9 @@ cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
 
   cv::Mat img3;
   output_image.convertTo(img3, CV_32FC1);    
+/*
   float *valueM = img3.ptr<float>();
-
-  /*printf("Convtri: \n");
+  printf("Convtri: \n");
   for(int i = 0; i < 15; i++)
     printf("%.4f ", valueM[i] );
   printf("\n");
@@ -87,6 +87,13 @@ cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
   return output_image;
 }
 
+struct productChnsCompute
+  {
+    cv::Mat image;
+    float* M;
+    float* O;
+    float* H;
+} ;
 
 /**
  * Funcion channesCompute. Dada una imagen de entrada calcula las principales características
@@ -101,7 +108,7 @@ cv::Mat Utils::convTri(cv::Mat input_image, int kernel_size){
  *                               características.
  *
  */
-std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace, int shrink){
+std::vector<cv::Mat> channelsCompute(cv::Mat src, std::string colorSpace, int shrink){
 
   productChnsCompute productCompute;
 
@@ -141,11 +148,9 @@ std::vector<cv::Mat> Utils::channelsCompute(cv::Mat src, std::string colorSpace,
 
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
 
-
-
   //-------------------------------------------------------------
   /*cv::Mat img3;
-  gMagOrient[0].convertTo(img3, CV_32F);    
+  gMagOrient[0].convertTo(img3, CV_32F);
   float *valueM = img3.ptr<float>();
 
   printf("M: \n");

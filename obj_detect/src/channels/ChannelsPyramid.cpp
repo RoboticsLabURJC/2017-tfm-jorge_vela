@@ -32,7 +32,6 @@ bool ChannelsPyramid::load(std::string opts){
 
 std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
 {
-  Utils utils;
   int smooth = 1;
   ChannelsLUVExtractor channExtract{false, smooth};
 
@@ -168,7 +167,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
     }
     else
     {
-      I1 = utils.ImgResample(imageUse, sz1.width , sz1.height);
+      I1 = ImgResample(imageUse, sz1.width , sz1.height);
     }
 
     if ((s == 0.5) && (m_nApprox > 0 || m_nPerOct == 1))
@@ -177,7 +176,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
     }
 
     std::string colorSpace = "LUV";
-    chnsPyramidData[i] = utils.channelsCompute(I1, colorSpace, m_shrink);
+    chnsPyramidData[i] = channelsCompute(I1, colorSpace, m_shrink);
   }
 
 
@@ -195,7 +194,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
     if(sz.width == sz1.width && sz.height == sz1.height){
       I1 = imageUse;
     }else{
-      I1 = utils.ImgResample(imageUse, sz1.width , sz1.height);
+      I1 = ImgResample(imageUse, sz1.width , sz1.height);
     }
 
     if(s==.5 && (m_nApprox>0 || m_nPerOct==1)){
@@ -204,7 +203,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
     std::string colorSpace = "LUV";
 
 
-    pChnsCompute = utils.channelsCompute(I1, colorSpace.c_str(), m_shrink);
+    pChnsCompute = channelsCompute(I1, colorSpace.c_str(), m_shrink);
     strucData[i] = pChnsCompute;
   } 
   cv::Mat data[pChnsCompute.size()][nScales];
@@ -223,7 +222,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
       cv::Mat dataResample = pChnsCompute[j];
       std::vector<cv::Mat> resampleVect;
       for(int k = 0; k < strucData[iR-1].size(); k++){
-        cv::Mat resample = utils.ImgResample(strucData[iR-1][k], sz1[0] , sz1[1]); //RATIO
+        cv::Mat resample = ImgResample(strucData[iR-1][k], sz1[0] , sz1[1]); //RATIO
         resampleVect.push_back(resample);
       }
       strucData[x] = resampleVect;
@@ -234,7 +233,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
   //smooth channels, optionally pad and concatenate channels
   /*for(int i = 0; i < nScales; i++){
     for(int j=0; j < pChnsCompute.size();j++){
-      data[j][i] = utils.convTri(luv_image, smooth);
+      data[j][i] = convTri(luv_image, smooth);
     }
   }*/
 
@@ -245,7 +244,7 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
   {
       cv::Mat concat;
       merge(chnsPyramidData[i], concat);
-      concat = utils.convTri(concat, 1);
+      concat = convTri(concat, 1);
       copyMakeBorder( concat, concat, y, y, x, x, cv::BORDER_REPLICATE, 0 );
       channelsConcat.push_back(concat);
   }
@@ -259,8 +258,6 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters
   std::vector<cv::Mat> filters
   )
 {
-  Utils utils;
-
   int num_filters_per_channel = 4; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
   int num_channels = 10; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
   int filter_size = 5; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
@@ -286,7 +283,7 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters
       // Thus we have to flip the kernel and change the anchor point. We have already flipped the filters
       // when we loaded them!!
       filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
-      out_image = utils.ImgResample(out_image, round(out_image.size().width/2.0), round(out_image.size().height/2.0));
+      out_image = ImgResample(out_image, round(out_image.size().width/2.0), round(out_image.size().height/2.0));
       out_images.push_back(out_image);
     }
   }

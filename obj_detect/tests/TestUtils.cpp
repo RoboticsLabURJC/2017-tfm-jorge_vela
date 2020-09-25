@@ -23,7 +23,6 @@ using namespace std;
 class TestUtils: public testing::Test
 {
 public:
-  Utils utils;
   virtual void SetUp()
     {
     }
@@ -39,7 +38,7 @@ public:
 
   cv::Mat imageMatlab = cv::imread("images/mask_image_gray.jpeg", cv::IMREAD_GRAYSCALE); 
 
-  cv::Mat dst = utils.ImgResample(image2, 35,29);
+  cv::Mat dst = ImgResample(image2, 35,29);
 
   cv::Mat diff = imageMatlab - dst;
 
@@ -86,7 +85,7 @@ TEST_F(TestUtils, TestResampleColorImage)
     w = image.size().width / 2 + 1;
   }
 
-  cv::Mat dst = utils.ImgResample(image, w, h);
+  cv::Mat dst = ImgResample(image, w, h);
 
   transpose(dst, dst);
 
@@ -185,7 +184,7 @@ TEST_F(TestUtils, TestResampleColorImage)
 TEST_F(TestUtils, TestResampleConv)
 {
   cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_GRAYSCALE);
-  cv::Mat imgConv = utils.convTri(image, 5);
+  cv::Mat imgConv = convTri(image, 5);
 
   transpose(imgConv, imgConv);
 
@@ -212,7 +211,7 @@ TEST_F(TestUtils, TestChannelsCompute)
 {
   cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
   std::vector<cv::Mat> pChnsCompute;
-  pChnsCompute = utils.channelsCompute(image,"RGB", 4);
+  pChnsCompute = channelsCompute(image,"RGB", 4);
 
   cv::waitKey(0);
   cv::Mat testMag;
