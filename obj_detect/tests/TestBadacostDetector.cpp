@@ -41,9 +41,6 @@ TEST_F(TestBadacostDetector, loadClassifier){
     cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
 //    cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
 
-//    cv::imshow("image", image);
-//    cv::waitKey();
-
   std::vector<cv::Rect2i> detections = badacost.detect(image);
 
   for(uint i = 0; i < detections.size(); i++)

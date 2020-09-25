@@ -263,7 +263,6 @@ BadacostDetector::detect(cv::Mat img)
   std::cout << "height1 = " << height1 << std::endl;
   std::cout << "width1 = " << width1 << std::endl;
 
-
   int num_windows = width1*height1;
   if (num_windows < 0) 
   {
@@ -296,21 +295,6 @@ BadacostDetector::detect(cv::Mat img)
         //cids[m++] = z*width*height + c*height + r;
       }
 */
-
-    /*int t = 0;
-    for (int k = 0; k < 177; k++){ //k=1:177
-        for (int v = 0; v < 313; v++){ //v=1:313
-          for (int w = 0; w < 40; w++){ //w=1:40
-              if(t %2 == 0){
-              filteredImagesResized[w].at<float>(k,v) = -t ;
-              }else{
-                filteredImagesResized[w].at<float>(k,v) = t ;
-              }
-              t = t + 7.0;
-               //printf("%d %d %d \n",k,v,w );
-            }
-        }
-    }*/
 
   int modelWd_s = modelWd/shrink;
   int modelHt_s = modelHt/shrink;
@@ -350,6 +334,8 @@ BadacostDetector::detect(cv::Mat img)
         int ftrId;
         while( child_node_index ) // While k node is not a leave it has children (child_node_index != 0).
         {
+
+          //printf("child : %d \n", (int)m_classifier["child"].at<float>(t,k));
           // Obtain the feature Id used in the split node.
           ftrId = static_cast<int>(m_classifier["fids"].at<float>(t, k));
 

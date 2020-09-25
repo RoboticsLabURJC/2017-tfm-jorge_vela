@@ -233,7 +233,6 @@ TEST_F(TestUtils, TestChannelsCompute)
     //printf("%.5f %.5f \n", (float)valuesImgMag[i], (float)imgMagMatlab[i] );
     ASSERT_TRUE(abs((float)valuesImgMag[i] - (float)imgMagMatlab[i]) < 1.e-2f);
   }
-
 }
 
 

@@ -50,8 +50,6 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
   std::vector<cv::Mat> luvImage = channExtract.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
   cv::Mat luvImageChng;
-  //printf("--> %f \n", luvImage[0].at<float>(152,140) );
-
 
   //luvImage[0].copyTo(luvImageChng);
   //luvImage[2].copyTo(luvImage[0]);
@@ -245,7 +243,8 @@ std::vector<cv::Mat> ChannelsPyramid::getPyramid(cv::Mat img)
       cv::Mat concat;
       merge(chnsPyramidData[i], concat);
       concat = convTri(concat, 1);
-      copyMakeBorder( concat, concat, y, y, x, x, cv::BORDER_REPLICATE, 0 );
+      copyMakeBorder( concat, concat, y, y, x, x, cv::BORDER_REFLECT, 0 );
+      //copyMakeBorder( concat, concat, 2, 2, 3, 3, cv::BORDER_REPLICATE, 0 );
       channelsConcat.push_back(concat);
   }
   return channelsConcat;
@@ -270,14 +269,8 @@ std::vector<cv::Mat> ChannelsPyramid::badacostFilters
   //SE CONVOLUCIONA UNA IMAGEN CON LOS FILTROS Y SE OBTIENEN LAS IMAGENES DE SALIDA
   std::vector<cv::Mat> out_images;
   for(int j = 0; j < num_filters_per_channel; j++){
-    //cv::Mat splitted[nChannels];
-    //plit(C_repMat[j],splitted);
     for(int i = 0; i < nChannels; i++){
       cv::Mat out_image; 
-//      std::cout << "i=" << i;
-//      std::cout << ", j=" << j;
-//      std::cout << ", i+(nChannels*j)=" << i+(nChannels*j) << std::endl;
-//      std::cout << "filters[i+(nChannels*j)=" << filters[i+(nChannels*j)] << std::endl;
 
       // NOTE: filter2D is not making real convolucion as conv2 in matlab (it implements correlation).
       // Thus we have to flip the kernel and change the anchor point. We have already flipped the filters

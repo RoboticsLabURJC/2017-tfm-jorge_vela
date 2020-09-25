@@ -74,9 +74,7 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
   std::string nameOpts = "yaml/pPyramid.yml";
   bool loadOk = chnsPyramid.load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
-
   std::vector<cv::Mat> pyramid = chnsPyramid.getPyramid(image);
-
   //ASSERT_TRUE(pyramid.size()==28);
   //chnsPyramid.badacostFilters(pyramid, "yaml/filterTest.yml");
 }
