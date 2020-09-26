@@ -30,12 +30,14 @@ public:
     }
 };
 
-
 TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
 {
   cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorACF acfExtractor(4, "RGB");
+  cv::Size padding;
+  padding.width = 6;
+  padding.height = 4;
+  ChannelsExtractorACF acfExtractor(padding, 4, "RGB");
   pChnsCompute = acfExtractor.extractFeatures(image);
 
   cv::Mat testMag;

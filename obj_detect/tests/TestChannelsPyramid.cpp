@@ -81,37 +81,37 @@ TEST_F(TestChannelsPyramid, channelsPyramid){
 
 
 
-TEST_F(TestChannelsPyramid, badacostFilters){
-//  cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
-  cv::Mat image = cv::imread("images/coches3.jpg", cv::IMREAD_COLOR);
-  std::string nameOpts = "yaml/pPyramid.yml";
-  bool loadOk = chnsPyramid.load(nameOpts.c_str());
-  if (!loadOk)
-  {
-      throw std::runtime_error("TestChannelsPyramid: pPyramid.yml not found");
-  }
-  std::vector<cv::Mat> filters; // empty filters to compute ACF pyramid
-  std::vector<std::vector<cv::Mat>> pyramid = chnsPyramid.compute(image, filters);
+//TEST_F(TestChannelsPyramid, badacostFilters){
+////  cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+//  cv::Mat image = cv::imread("images/coches3.jpg", cv::IMREAD_COLOR);
+//  std::string nameOpts = "yaml/pPyramid.yml";
+//  bool loadOk = chnsPyramid.load(nameOpts.c_str());
+//  if (!loadOk)
+//  {
+//      throw std::runtime_error("TestChannelsPyramid: pPyramid.yml not found");
+//  }
+//  std::vector<cv::Mat> filters; // empty filters to compute ACF pyramid
+//  std::vector<std::vector<cv::Mat>> pyramid = chnsPyramid.compute(image, filters);
 
-  /*std::vector<cv::Mat> filtered = chnsPyramid.badacostFilters(pyramid[11], "yaml/filterTest.yml");
-
-
-  printf("%d %d \n", filtered[0].size().height, filtered[0].size().width);
-
-  for(int k = 0; k < 40; k++){
-    double minVal; 
-    double maxVal; 
-    cv::Point minLoc; 
-    cv::Point maxLoc;
-    minMaxLoc( filtered[k], &minVal, &maxVal, &minLoc, &maxLoc );
-    std::cout << "min val: " << minVal << " max val:" << maxVal << std::endl;
-  }*/
-  //cv::imshow("", filtered[0]);
-  //cv::waitKey(0);
+//  /*std::vector<cv::Mat> filtered = chnsPyramid.badacostFilters(pyramid[11], "yaml/filterTest.yml");
 
 
+//  printf("%d %d \n", filtered[0].size().height, filtered[0].size().width);
 
-}
+//  for(int k = 0; k < 40; k++){
+//    double minVal;
+//    double maxVal;
+//    cv::Point minLoc;
+//    cv::Point maxLoc;
+//    minMaxLoc( filtered[k], &minVal, &maxVal, &minLoc, &maxLoc );
+//    std::cout << "min val: " << minVal << " max val:" << maxVal << std::endl;
+//  }*/
+//  //cv::imshow("", filtered[0]);
+//  //cv::waitKey(0);
+
+
+
+//}
 
 
 

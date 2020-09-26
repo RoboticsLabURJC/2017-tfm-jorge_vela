@@ -72,6 +72,19 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
     chnsCompute.push_back(resampleHist);
   }
 
-  return chnsCompute;
+  // Preprocessing of the ACF channels
+  std::vector<cv::Mat> preprocessedChannels;
+  int x = round(m_padding.width / m_shrink);
+  int y = round(m_padding.height / m_shrink);
+
+  for (cv::Mat c: chnsCompute)
+  {
+    cv::Mat c_padded;
+    c_padded = convTri(c, 1);
+    copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
+    preprocessedChannels.push_back(c_padded);
+  }
+
+  return preprocessedChannels;
 }
 

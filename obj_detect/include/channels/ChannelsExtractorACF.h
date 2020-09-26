@@ -31,10 +31,12 @@ public:
     */
   ChannelsExtractorACF
     (
+      cv::Size padding,
       int shrink,
       std::string color_space = "LUV"
     ) 
     {
+      m_padding = padding;
       m_shrink = shrink;
       m_color_space = color_space;
     };
@@ -56,6 +58,8 @@ public:
 private:
   int m_shrink;
   std::string m_color_space;
+  cv::Size m_padding;
+
 
 };
 
