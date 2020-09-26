@@ -10,7 +10,7 @@
 %
 function matlab2opencv( variable, fileName, flag)
 
-[rows cols] = size(variable);
+[rows, cols] = size(variable);
 
 % Beware of Matlab's linear indexing
 variable = variable';
