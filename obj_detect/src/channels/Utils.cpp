@@ -28,7 +28,8 @@
  * @return cv::Mat: Imagen redimensionada
  * 
  */
-cv::Mat ImgResample(cv::Mat src, int width, int height, int norm){
+cv::Mat ImgResample(cv::Mat src, int width, int height, int norm)
+{
   cv::Mat dst(height, width, CV_32F, cv::Scalar(0, 0, 0));
   resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_AREA); //DICE QUE EN ALGUNOS CASOS NO UTILIZA ANTIALIASING OFF, POR LO QUE SERÍA INTER_AREA, EL CASO NORMAL ES INTER_LINEAR
   //dst = norm*dst;
@@ -43,51 +44,31 @@ cv::Mat ImgResample(cv::Mat src, int width, int height, int norm){
  *
  * @return cv::Mat: Imagen de retorno despues del filtro.
  */
-cv::Mat convTri(cv::Mat input_image, int kernel_size){
-
-  cv::Mat output_image, help_image;
-
-  cv::Point anchor;
-  anchor = cv::Point( -1, -1 ); //tipo de salida = tipo elementos imagen entrada, mirar este valor, CV_32F
-
+cv::Mat convTri(cv::Mat input_image, int kernel_size)
+{
   float valReduce = (kernel_size + 1)*(kernel_size + 1);
-  float arrayKernel[kernel_size*2];
+  cv::Mat kernel = cv::Mat::zeros(1, kernel_size*2+1, CV_32FC1);
     
-  int i;
-  for(i = 1; i <= kernel_size + 1; i++)
+  for(int i = 1; i <= kernel_size + 1; i++)
   {
-    arrayKernel[i-1] = (float)i / valReduce;
+    kernel.at<float>(0, i-1) = static_cast<float>(i);
   }
 
-  int downCount = 0;
-  for(int j = kernel_size; j > 0; j--)
+  for(int j = kernel_size + 1; j < kernel.size().width ; j++)
   {
-    arrayKernel[i-1] = (j - downCount) / valReduce;
-    downCount = downCount++; 
-    i = i+1;
+    kernel.at<float>(0, j) = kernel.at<float>(0, j-1)-1;
   }
-  double delta = 0;
 
-  //cv::Scalar value = cv::Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
-  //copyMakeBorder( input_image, input_image, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_CONSTANT, 0 );
+  //std::cout << "kernel=" << kernel << std::endl;
+  kernel /= valReduce;
 
+  cv::Mat output_image;
+  cv::Mat help_image;
+  filter2D(input_image, help_image, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  cv::Mat kernel_t;
+  transpose(kernel, kernel_t);
+  filter2D(help_image, output_image, CV_32FC1 , kernel_t, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
 
-
-
-  cv::Mat kernel = cv::Mat((kernel_size*2)+1,1,  CV_32FC1, arrayKernel); //
-  filter2D(input_image, help_image, CV_32FC1 , kernel, anchor, delta, cv::BORDER_REFLECT );
-  kernel = cv::Mat(1,(kernel_size*2)+1,  CV_32FC1, arrayKernel);
-  filter2D(help_image, output_image, CV_32FC1 , kernel, anchor, delta, cv::BORDER_REFLECT );
-
-  cv::Mat img3;
-  output_image.convertTo(img3, CV_32FC1);    
-/*
-  float *valueM = img3.ptr<float>();
-  printf("Convtri: \n");
-  for(int i = 0; i < 15; i++)
-    printf("%.4f ", valueM[i] );
-  printf("\n");
-  */
   return output_image;
 }
 

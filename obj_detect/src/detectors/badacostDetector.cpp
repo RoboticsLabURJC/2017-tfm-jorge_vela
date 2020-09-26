@@ -200,7 +200,7 @@ BadacostDetector::detect(cv::Mat img)
   
   std::vector<std::vector<cv::Mat>> pyramid = m_chnsPyramid.compute(img, m_filters);
   std::vector<cv::Mat> filteredImagesResized;
-  filteredImagesResized = pyramid[0];
+  filteredImagesResized = pyramid[1];
 
 //  if (!m_filters.empty())
 //  {
@@ -426,13 +426,13 @@ BadacostDetector::detect(cv::Mat img)
         //          as it returns the h (positive class) of the last executed tree and not the minimum cost one !!! :-(.
         // If trace is negative we have a background window (class is 1)
         // Otherwise we have a positive (object) class)
-        double min_cost;
-        double max_cost;
-        int min_ind[2];
-        int max_ind[2];
-        cv::minMaxIdx(costs_vector.rowRange(1,m_num_classes),
-                      &min_cost, &max_cost, min_ind, max_ind, cv::Mat());
-        h = min_ind[0] + 2; // +1 because of 0 index, and +1 because of negative class is 1.
+//        double min_cost;
+//        double max_cost;
+//        int min_ind[2];
+//        int max_ind[2];
+//        cv::minMaxIdx(costs_vector.rowRange(1,m_num_classes),
+//                      &min_cost, &max_cost, min_ind, max_ind, cv::Mat());
+//        h = min_ind[0] + 2; // +1 because of 0 index, and +1 because of negative class is 1.
         // End of corrected code w.r.t. Matlab's implementation.
 
         int index = c + (r * width1);

@@ -45,8 +45,8 @@ std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
 
   // Preprocessing of the ACF channels
   std::vector<cv::Mat> preprocessedChannels;
-  int x = m_padding.width / m_shrink;
-  int y = m_padding.height / m_shrink;
+  int x = round(m_padding.width / m_shrink);
+  int y = round(m_padding.height / m_shrink);
 
   for (cv::Mat c: acf_channels)
   {

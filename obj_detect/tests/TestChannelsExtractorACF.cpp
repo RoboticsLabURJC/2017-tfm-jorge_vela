@@ -38,7 +38,6 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
   ChannelsExtractorACF acfExtractor(4, "RGB");
   pChnsCompute = acfExtractor.extractFeatures(image);
 
-  cv::waitKey(0);
   cv::Mat testMag;
   transpose(pChnsCompute[3], testMag);
 
