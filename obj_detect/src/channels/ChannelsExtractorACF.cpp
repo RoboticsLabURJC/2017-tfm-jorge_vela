@@ -14,14 +14,13 @@
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
 
-
 std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   (
   cv::Mat img
   )
 {
   int smooth = 1;
-  ChannelsLUVExtractor channExtract{false, smooth};
+  ChannelsLUVExtractor luvExtractor{false, smooth};
   GradMagExtractor gradMagExtract{5};
   GradHistExtractor gradHistExtract{2,6,1,0}; //{4,6,1,1}; // <--- JM: Cuidado!! Estos parámetros dependerán del clasificador entrenado?
 
@@ -35,17 +34,14 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   h = h - crop_h;
   w = w - crop_w;
 
-  cv::Rect cropImage = cv::Rect(0,0,w, h);
+  cv::Rect cropImage = cv::Rect(0, 0, w, h);
   cv::Mat imageCropped = img(cropImage);
 
   cv::Mat luv_image;
   std::vector<cv::Mat> luvImage;
   if (m_color_space != "LUV")
   {
-    luvImage = channExtract.extractFeatures(imageCropped); //IMAGENES ESCALA DE GRISES??
-    /*split(imageCropped, luvImage);
-    cv::imshow("",luvImage[0]);*/
-    cv::Mat luvImageChng;
+    luvImage = luvExtractor.extractFeatures(imageCropped);
     merge(luvImage, luv_image);
   }
   else
@@ -53,22 +49,24 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
     luv_image = imageCropped;
     split(luv_image, luvImage);
   }
-
   luv_image = convTri(luv_image, smooth);
+
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
   std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
 
   std::vector<cv::Mat> chnsCompute;
-  for (uint i = 0; i < luvImage.size(); i++){   //FALTA HACER RESAMPLE TAMAÑO/SHRINK PARA RETORNAR EL RESULTADO COMO ADDCHNS
-    cv::Mat resampleLuv = ImgResample(luvImage[i], w/m_shrink, h/m_shrink);
+  for (cv::Mat luv_i: luvImage)
+  {
+    cv::Mat resampleLuv = ImgResample(luv_i, w/m_shrink, h/m_shrink);
     chnsCompute.push_back(resampleLuv);
   }
 
   cv::Mat resampleMag = ImgResample(gMagOrient[0], w/m_shrink, h/m_shrink);
   chnsCompute.push_back(resampleMag);
 
-  for(uint i = 0; i < gMagHist.size(); i++){
-    cv::Mat resampleHist = ImgResample(gMagHist[i], w/m_shrink, h/m_shrink);
+  for(cv::Mat mh_c: gMagHist)
+  {
+    cv::Mat resampleHist = ImgResample(mh_c, w/m_shrink, h/m_shrink);
     chnsCompute.push_back(resampleHist);
   }
 
