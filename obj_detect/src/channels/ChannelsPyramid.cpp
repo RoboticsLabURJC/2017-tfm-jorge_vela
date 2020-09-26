@@ -57,7 +57,6 @@ ChannelsPyramid::compute
   std::vector<cv::Mat> luvImage = channExtractLUV.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
   cv::Mat luv_image;
   cv::Mat luvImageChng;
-
   merge(luvImage, luv_image);
 
   //EN ESTAS LINEAS EL COMPRUEBA QUE SE CUMPLEN LOS REQUISITOS PARA LA CONVERSION

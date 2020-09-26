@@ -7,18 +7,13 @@
  *
  *  ------------------------------------------------------------------------ */
 
-
 #include <channels/Utils.h>
-
-#include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
-
 #include <iostream>
-
+#include "gtest/gtest.h"
 
 using namespace cv;
 using namespace std;
-
 
 class TestUtils: public testing::Test
 {
@@ -86,14 +81,13 @@ TEST_F(TestUtils, TestResampleColorImage)
   }
 
   cv::Mat dst = ImgResample(image, w, h);
-
-  transpose(dst, dst);
+  transpose(dst, dst); // JM: Si esto es necesario es porque está guardado mal en el YAML.
 
   cv::Mat bgr_dst[3];
-  split(dst,bgr_dst);
+  split(dst, bgr_dst);
 
   cv::Mat bgr_resample[3];
-  split(imageMatlab,bgr_resample);
+  split(imageMatlab, bgr_resample);
   
   FileStorage fs1;
   FileStorage fs2;

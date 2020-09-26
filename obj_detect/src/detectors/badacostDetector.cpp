@@ -43,7 +43,7 @@ bool BadacostDetector::load
    
     // Remove any existing variables from the classifier map.
     m_classifier.clear();
-      
+    std::vector<float> p;
     for(int i = 0; i < 14; i++)
     {
       int rows = static_cast<int>(classifier[clf_variable_labels[i]]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
@@ -51,7 +51,7 @@ bool BadacostDetector::load
       cv::FileNode data = classifier[clf_variable_labels[i]]["data"];
       
       cv::Mat matrix= cv::Mat::zeros(rows, cols, CV_32F);
-      std::vector<float> p;
+      p.clear();
       data >> p;
       memcpy(matrix.data, p.data(), p.size()*sizeof(float));
 
@@ -59,27 +59,21 @@ bool BadacostDetector::load
     }
     
     cv::FileNode dataNumClases = classifier["num_classes"]["data"];
-    cv::Mat m_num_clss = cv::Mat::zeros(1, 1, CV_32F);
-    std::vector<float> pNumClasses;
-    dataNumClases >> pNumClasses;
-    memcpy(m_num_clss.data, pNumClasses.data(), pNumClasses.size()*sizeof(float));
-    m_num_classes = (int)m_num_clss.at<float>(0,0);
-
+    p.clear();
+    dataNumClases >> p;
+    m_num_classes = static_cast<int>(p[0]);
 
     cv::FileNode dataTreeDepth= classifier["treeDepth"]["data"];
     cv::Mat m_tr_dpth = cv::Mat::zeros(1, 1, CV_32F);
-    std::vector<float> pTrDpt;
-    dataTreeDepth >> pTrDpt;
-    memcpy(m_tr_dpth.data, pTrDpt.data(), pTrDpt.size()*sizeof(float));
-    m_treeDepth = (int)m_tr_dpth.at<float>(0,0);
-
+    p.clear();
+    dataTreeDepth >> p;
+    m_treeDepth = static_cast<int>(p[0]);
 
     cv::FileNode dataRatioFixed= classifier["aRatioFixedWidth"]["data"];
     cv::Mat m_RatioFixed = cv::Mat::zeros(1, 1, CV_32F);
-    std::vector<float> pRdFix;
-    dataRatioFixed >> pRdFix;
-    memcpy(m_RatioFixed.data, pRdFix.data(), pRdFix.size()*sizeof(float));
-    m_aRatioFixedWidth = (int)m_RatioFixed.at<float>(0,0);
+    p.clear();
+    dataRatioFixed >> p;
+    m_aRatioFixedWidth = static_cast<int>(p[0]);
 
 
     // Read Cprime data
@@ -87,7 +81,7 @@ bool BadacostDetector::load
     int cols = static_cast<int>(classifier["Cprime"]["rows"]);
     cv::FileNode data = classifier["Cprime"]["data"];
     m_Cprime = cv::Mat::zeros(rows, cols, CV_32F);
-    std::vector<float> p;
+    p.clear();
     data >> p;
     memcpy(m_Cprime.data, p.data(), p.size()*sizeof(float));
     transpose(m_Cprime, m_Cprime); // <-- We have transposed it!!
@@ -97,6 +91,7 @@ bool BadacostDetector::load
     cols = static_cast<int>(classifier["Y"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
     data = classifier["Y"]["data"];
     m_Y = cv::Mat::zeros(rows, cols, CV_32F);
+    p.clear();
     data >> p;
     memcpy(m_Y.data, p.data(), p.size()*sizeof(float));
     
@@ -105,6 +100,7 @@ bool BadacostDetector::load
     cols = static_cast<int>(classifier["w1_weights"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
     data = classifier["w1_weights"]["data"];
     m_wl_weights = cv::Mat::zeros(rows, cols, CV_32F);
+    p.clear();
     data >> p;
     memcpy(m_wl_weights.data, p.data(), p.size()*sizeof(float));
    
@@ -114,6 +110,7 @@ bool BadacostDetector::load
     cols = static_cast<int>(classifier["aRatio"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
     data = classifier["aRatio"]["data"];
     m_aRatio = cv::Mat::zeros(rows, cols, CV_32F);
+    p.clear();
     data >> p;
     memcpy(m_aRatio.data, p.data(), p.size()*sizeof(float));
 
@@ -166,14 +163,15 @@ BadacostDetector::loadFilters(std::string filtersPath)
   }
 
   std::vector<cv::Mat> filters;
+  std::vector<float> p;
   for(uint k = 0; k < namesFilters.size(); k++)
   {
     cv::FileNode filterData = filter[namesFilters[k]]["data"];
     cv::FileNode filterRows = filter[namesFilters[k]]["cols"]; // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
     cv::FileNode filterCols = filter[namesFilters[k]]["rows"]; // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
 
-    std::vector<float> p;
     cv::Mat filterConver = cv::Mat::zeros(filterRows, filterCols, CV_32F);
+    p.clear();
     filterData >> p;
     memcpy(filterConver.data, p.data(), p.size()*sizeof(float));
     transpose(filterConver,filterConver);
