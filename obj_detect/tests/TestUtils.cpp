@@ -175,27 +175,88 @@ TEST_F(TestUtils, TestResampleColorImage)
   ASSERT_TRUE(difPixels4 < 1);
 }
 
-TEST_F(TestUtils, TestResampleConv)
-{
-  cv::Mat image = cv::imread("images/index3.jpeg", cv::IMREAD_GRAYSCALE);
-  cv::Mat imgConv = convTri(image, 5);
 
-  transpose(imgConv, imgConv);
+TEST_F(TestUtils, TestResampleConv){
+  float I[100]={1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4,4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,6 ,6,6, 6, 6, 6, 6, 6, 6, 6,
+  7, 7, 7, 7, 7, 7, 7, 7, 7 ,7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 ,10, 10, 10, 10, 10, 10, 10, 10, 10, 10 };
 
+  cv::Mat dummy_query = cv::Mat(10,10, CV_32F, I);
+  cv::Mat dst;
+  cv::Mat output_image = convTri(dummy_query, 3);
+  transpose(output_image, output_image);
   cv::Mat img1;
-  imgConv.convertTo(img1, CV_32F);    
+  output_image.convertTo(img1, CV_32F);    
   float *valuesImgConv = img1.ptr<float>();
 
-  FileStorage fs1;
-  fs1.open("yaml/convTri.yml", FileStorage::READ);
 
-  FileNode rows = fs1["J"]["rows"];
-  FileNode cols = fs1["J"]["cols"];
-  FileNode imgMatlab = fs1["J"]["data"];
+  FileStorage fs1;
+  fs1.open("yaml/TestConv2.yml", FileStorage::READ);
+
+  FileNode rows = fs1["convTri"]["rows"];
+  FileNode cols = fs1["convTri"]["cols"];
+  FileNode imgMatlab = fs1["convTri"]["data"];
 
   for(int i=0;i<(int)rows*(int)cols;i++)
   { 
-    ASSERT_TRUE(abs((float)valuesImgConv[i] - (float)imgMatlab[i]) < 0.6);
+    ASSERT_TRUE(abs((float)valuesImgConv[i] - (float)imgMatlab[i]) < 0.01);
   }
+
 }
 
+TEST_F(TestUtils, TestResampleConv2)
+{
+  float I[25] = {1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5};
+  cv::Mat dummy_query = cv::Mat(5,5, CV_32F, I);
+  cv::Mat dst;
+
+  cv::Mat output_image = convTri(dummy_query, 5);
+  transpose(output_image, output_image);
+  cv::Mat img1;
+  output_image.convertTo(img1, CV_32F);    
+  float *valuesImgConv = img1.ptr<float>();
+
+
+
+  FileStorage fs1;
+  fs1.open("yaml/TestConv1.yml", FileStorage::READ);
+
+  FileNode rows = fs1["convTri"]["rows"];
+  FileNode cols = fs1["convTri"]["cols"];
+  FileNode imgMatlab = fs1["convTri"]["data"];
+
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgConv[i] - (float)imgMatlab[i]) < 0.01);
+  }
+
+
+}
+
+
+TEST_F(TestUtils, TestResampleConvReal)
+{
+  cv::Mat image = cv::imread("images/imgGrayScale.jpeg", cv::IMREAD_GRAYSCALE);
+
+  cv::Mat output_image = convTri(image, 5);
+
+  transpose(output_image, output_image);
+  cv::Mat img1;
+  output_image.convertTo(img1, CV_32F);    
+  float *valuesImgConv = img1.ptr<float>();
+
+
+  FileStorage fs1;
+  fs1.open("yaml/TestConvReal.yml", FileStorage::READ);
+
+  FileNode rows = fs1["convTri"]["rows"];
+  FileNode cols = fs1["convTri"]["cols"];
+  FileNode imgMatlab = fs1["convTri"]["data"];
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgConv[i] - (float)imgMatlab[i]) < 0.01);
+  }
+
+
+}

@@ -46,6 +46,12 @@ cv::Mat ImgResample(cv::Mat src, int width, int height, int norm)
  */
 cv::Mat convTri(cv::Mat input_image, int kernel_size)
 {
+  cv::Mat dst;
+  cv::copyMakeBorder(input_image, dst, kernel_size,kernel_size,kernel_size,kernel_size, cv::BORDER_REFLECT, 0);
+
+  //FUNCION CONVTRI
+  int widthSize = input_image.size().width;
+  int heightSize = input_image.size().height;
   float valReduce = (kernel_size + 1)*(kernel_size + 1);
   cv::Mat kernel = cv::Mat::zeros(1, kernel_size*2+1, CV_32FC1);
     
@@ -59,16 +65,24 @@ cv::Mat convTri(cv::Mat input_image, int kernel_size)
     kernel.at<float>(0, j) = kernel.at<float>(0, j-1)-1;
   }
 
-  //std::cout << "kernel=" << kernel << std::endl;
   kernel /= valReduce;
 
   cv::Mat output_image;
   cv::Mat help_image;
-  filter2D(input_image, help_image, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  filter2D(dst, help_image, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+
+  int widthHelp = help_image.size().width;
+  int heightHelp = help_image.size().height;
+  int widthCrop = widthSize - kernel_size;
+  cv::Rect myRoi(kernel_size, 0, widthSize, heightHelp);
+  help_image = help_image(myRoi);
+
   cv::Mat kernel_t;
   transpose(kernel, kernel_t);
   filter2D(help_image, output_image, CV_32FC1 , kernel_t, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
-
+  cv::Rect myRoi2(0, kernel_size, widthSize, heightSize);
+  output_image = output_image(myRoi2);
   return output_image;
-}
 
+
+}
