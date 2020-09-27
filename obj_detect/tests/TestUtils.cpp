@@ -55,6 +55,79 @@ public:
   ASSERT_TRUE(valTot < 10);
 }*/
 
+TEST_F(TestUtils, TestResample1){
+  float I[9] = {1 ,1 ,1,2,2,2,3,3,3};
+  cv::Mat dummy_query = cv::Mat(3,3, CV_32F, I);
+  cv::Mat dst = ImgResample(dummy_query, 4,4, "linear");
+
+  transpose(dst, dst);
+  cv::Mat img1;
+  dst.convertTo(img1, CV_32F);    
+  float *valuesImgRes = img1.ptr<float>();
+
+
+  FileStorage fs1;
+  fs1.open("yaml/TestImresample1.yml", FileStorage::READ);
+  FileNode rows = fs1["resample"]["rows"];
+  FileNode cols = fs1["resample"]["cols"];
+  FileNode imgMatlab = fs1["resample"]["data"];
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgRes[i] - (float)imgMatlab[i]) < 0.01);
+  }
+}
+
+
+TEST_F(TestUtils, TestResample2){
+  float I[9] = {1 ,1 ,1,2,2,2,3,3,3};
+  cv::Mat dummy_query = cv::Mat(3,3, CV_32F, I);
+  cv::Mat dst = ImgResample(dummy_query, 4,4,"linear",2);
+
+  transpose(dst, dst);
+  cv::Mat img1;
+  dst.convertTo(img1, CV_32F);    
+  float *valuesImgRes = img1.ptr<float>();
+
+
+  FileStorage fs1;
+  fs1.open("yaml/TestImresample2.yml", FileStorage::READ);
+  FileNode rows = fs1["resample"]["rows"];
+  FileNode cols = fs1["resample"]["cols"];
+  FileNode imgMatlab = fs1["resample"]["data"];
+  
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgRes[i] - (float)imgMatlab[i]) < 0.01);
+  }
+}
+
+
+TEST_F(TestUtils, TestResampleReduce){
+  float I[42] = {1 ,1 ,1,2,2,2,2, 2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5,5,5,6,6,6,6,6,6,6,7,7,7,7};
+  cv::Mat dummy_query = cv::Mat(6,7, CV_32F, I);
+  cv::Mat dst = ImgResample(dummy_query, 3,4,"antialiasing",4);
+
+  transpose(dst, dst);
+  cv::Mat img1;
+  dst.convertTo(img1, CV_32F);    
+  float *valuesImgRes = img1.ptr<float>();
+  
+
+  FileStorage fs1;
+  fs1.open("yaml/TestImresampleReduce.yml", FileStorage::READ);
+  FileNode rows = fs1["resample"]["rows"];
+  FileNode cols = fs1["resample"]["cols"];
+  FileNode imgMatlab = fs1["resample"]["data"];
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgRes[i] - (float)imgMatlab[i]) < 0.01);
+  }
+}
+
+
+
 
 TEST_F(TestUtils, TestResampleColorImage)
 {
@@ -119,8 +192,7 @@ TEST_F(TestUtils, TestResampleColorImage)
       }
     }
   }
-
-  ASSERT_TRUE(difPixels < 10);
+  ASSERT_TRUE(difPixels < 1);
 
   cv::Mat bgr_dst1_chng;
   bgr_dst[1].convertTo(bgr_dst1_chng, CV_32F);
