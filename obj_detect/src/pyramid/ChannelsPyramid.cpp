@@ -18,7 +18,7 @@ ChannelsPyramid::load(std::string opts)
   bool existOpts = pPyramid.open(opts, cv::FileStorage::READ);
   if(existOpts){
 	  int nPerOct = pPyramid["nPerOct"]["data"][0];
-      int nOctUp = 0; pPyramid["nOctUp"]["data"][0];
+      int nOctUp = 0; //pPyramid["nOctUp"]["data"][0];
 	  int nApprox = pPyramid["nApprox"]["data"][0];
       //int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
 	  int shrink = pPyramid["pChns.shrink"]["data"];
@@ -52,11 +52,7 @@ ChannelsPyramid::compute
 
   //-------------------------------------------------------------------------
 
-  //GET SCALES AT WHICH TO COMPUTE FEATURES---------------------------------
-
-  //std::vector<float> scales;
-  //scales = getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz);
-
+  //GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
   getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz, scales, scaleshw);
@@ -197,6 +193,10 @@ ChannelsPyramid::getScales
 
   cv::Size2d ratio(double(sz.width) / double(minDs.width), double(sz.height) / double(minDs.height));
   int nScales = std::floor(double(nPerOct) * (double(nOctUp) + log2(std::min(ratio.width, ratio.height))) + 1.0);
+
+  std::cout << "double(nPerOct) = " << double(nPerOct) << std::endl;
+  std::cout << "double(nOctUp) + log2(std::min(ratio.width, ratio.height) = " << double(nOctUp) + log2(std::min(ratio.width, ratio.height)) << std::endl;
+  std::cout << "double(nPerOct) * (double(nOctUp) + log2(std::min(ratio.width, ratio.height))) + 1.0 = " << double(nPerOct) * (double(nOctUp) + log2(std::min(ratio.width, ratio.height))) + 1.0 << std::endl;
 
   double d0 = sz.height, d1 = sz.width;
   if (sz.height >= sz.width)

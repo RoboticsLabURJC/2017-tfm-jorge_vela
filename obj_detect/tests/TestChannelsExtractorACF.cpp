@@ -16,8 +16,8 @@
 #undef DEBUG
 //#define DEBUG
 
-//#undef SHOW_CHANNELS
-#define SHOW_CHANNELS
+#undef SHOW_CHANNELS
+//#define SHOW_CHANNELS
 
 using namespace cv;
 using namespace std;

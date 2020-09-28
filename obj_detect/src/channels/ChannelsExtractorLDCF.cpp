@@ -69,12 +69,13 @@ ChannelsExtractorLDCF::extractFeaturesFromACF
       {
         cv::Mat out_image;
 
-        // NOTE: filter2D is not making real convolucion as conv2 in matlab (it implements correlation).
+        // NOTE: filter2D is not making real convolution as conv2 in matlab (it implements correlation).
         // Thus we have to flip the kernel and change the anchor point. We have already flipped the filters
         // when added them to the constructor!!
         filter2D( acf_channels[i], out_image, CV_32FC1 ,
                   m_flipped_filters[i+(num_acf_channels*j)],
                   cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
+
         out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
         ldcf_channels.push_back(out_image);
       }

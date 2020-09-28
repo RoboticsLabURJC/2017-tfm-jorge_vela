@@ -198,7 +198,7 @@ BadacostDetector::detect(cv::Mat img)
   
   std::vector<std::vector<cv::Mat>> pyramid = m_chnsPyramid.compute(img, m_filters);
   std::vector<cv::Mat> filteredImagesResized;
-  filteredImagesResized = pyramid[1];
+  filteredImagesResized = pyramid[0];
 
 //  if (!m_filters.empty())
 //  {

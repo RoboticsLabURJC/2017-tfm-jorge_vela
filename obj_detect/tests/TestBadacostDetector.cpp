@@ -30,16 +30,16 @@ public:
 
 TEST_F(TestBadacostDetector, loadClassifier){
 
-    std::string clfPath = "yaml/clf.yml";
-    std::string pyrPath = "yaml/pPyramid.yml";
-    std::string filtersPath = "yaml/filterTest.yml";
+  std::string clfPath = "yaml/clf.yml";
+  std::string pyrPath = "yaml/pPyramid.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
 
-    bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
-	ASSERT_TRUE(loadVal);
+  bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
+  ASSERT_TRUE(loadVal);
 
 //    cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
-//    cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
-    cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+//  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
 
   std::vector<cv::Rect2i> detections = badacost.detect(image);
   for(uint i = 0; i < detections.size(); i++)
