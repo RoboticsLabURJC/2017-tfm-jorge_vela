@@ -66,8 +66,9 @@ TEST_F(TestUtils, TestResample1){
   float *valuesImgRes = img1.ptr<float>();
 
 
-  FileStorage fs1;
-  fs1.open("yaml/TestImresample1.yml", FileStorage::READ);
+  FileStorage fs1;  
+  bool file_exists = fs1.open("yaml/TestImresample1.yml", FileStorage::READ);
+  ASSERT_TRUE(file_exists);
   FileNode rows = fs1["resample"]["rows"];
   FileNode cols = fs1["resample"]["cols"];
   FileNode imgMatlab = fs1["resample"]["data"];
@@ -89,9 +90,11 @@ TEST_F(TestUtils, TestResample2){
   dst.convertTo(img1, CV_32F);    
   float *valuesImgRes = img1.ptr<float>();
 
-
   FileStorage fs1;
-  fs1.open("yaml/TestImresample2.yml", FileStorage::READ);
+  bool file_exists = fs1.open("yaml/TestImresample2.yml", FileStorage::READ);
+  ASSERT_TRUE(file_exists);
+
+
   FileNode rows = fs1["resample"]["rows"];
   FileNode cols = fs1["resample"]["cols"];
   FileNode imgMatlab = fs1["resample"]["data"];
@@ -114,8 +117,10 @@ TEST_F(TestUtils, TestResampleReduce){
   float *valuesImgRes = img1.ptr<float>();
   
 
-  FileStorage fs1;
-  fs1.open("yaml/TestImresampleReduce.yml", FileStorage::READ);
+  FileStorage fs1;  
+  bool file_exists = fs1.open("yaml/TestImresampleReduce.yml", FileStorage::READ);
+  ASSERT_TRUE(file_exists);
+
   FileNode rows = fs1["resample"]["rows"];
   FileNode cols = fs1["resample"]["cols"];
   FileNode imgMatlab = fs1["resample"]["data"];
@@ -137,7 +142,8 @@ void testResample
 
   // Read the imResample resuls from Matlab.
   FileStorage fs1;
-  fs1.open(matlab_result_yaml_file, FileStorage::READ);
+  bool file_exists = fs1.open(matlab_result_yaml_file, FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   FileNode scale_fn = fs1["scale"]["data"];
   vector<float> p;
@@ -296,7 +302,8 @@ TEST_F(TestUtils, TestResampleConv){
 
 
   FileStorage fs1;
-  fs1.open("yaml/TestConv2.yml", FileStorage::READ);
+  bool file_exists = fs1.open("yaml/TestConv2.yml", FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   FileNode rows = fs1["convTri"]["rows"];
   FileNode cols = fs1["convTri"]["cols"];
@@ -321,10 +328,9 @@ TEST_F(TestUtils, TestResampleConv2)
   output_image.convertTo(img1, CV_32F);    
   float *valuesImgConv = img1.ptr<float>();
 
-
-
   FileStorage fs1;
-  fs1.open("yaml/TestConv1.yml", FileStorage::READ);
+  bool file_exists = fs1.open("yaml/TestConv1.yml", FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   FileNode rows = fs1["convTri"]["rows"];
   FileNode cols = fs1["convTri"]["cols"];
@@ -353,7 +359,9 @@ TEST_F(TestUtils, TestResampleConvReal)
 
 
   FileStorage fs1;
-  fs1.open("yaml/TestConvReal.yml", FileStorage::READ);
+  bool file_exists = fs1.open("yaml/TestConvReal.yml", FileStorage::READ);
+  ASSERT_TRUE(file_exists);
+
 
   FileNode rows = fs1["convTri"]["rows"];
   FileNode cols = fs1["convTri"]["cols"];

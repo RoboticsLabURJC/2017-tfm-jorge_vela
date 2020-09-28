@@ -73,7 +73,8 @@ TEST_F(TestChannelsExtractorGradHist, TestColorImage){
   float *dirH2 = H2.ptr<float>();
 
   cv::FileStorage fs;
-  fs.open("yaml/TestHColorScale.yml", cv::FileStorage::READ);
+  bool file_exists = fs.open("yaml/TestHColorScale.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   cv::FileNode rows = fs["H"]["rows"];
   cv::FileNode cols = fs["H"]["cols"];
@@ -105,8 +106,9 @@ TEST_F(TestChannelsExtractorGradHist, TestColorImageBinSizeOrients){
   int height = gradHistExtractVector[0].size().height;
   int width = gradHistExtractVector[0].size().width;
 
-  cv::FileStorage fs;
-  fs.open("yaml/TestHColorBinSizeOrients.yml", cv::FileStorage::READ);
+  cv::FileStorage fs;  
+  bool file_exists = fs.open("yaml/TestHColorBinSizeOrients.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   cv::FileNode rows = fs["H"]["rows"];
   cv::FileNode cols = fs["H"]["cols"];

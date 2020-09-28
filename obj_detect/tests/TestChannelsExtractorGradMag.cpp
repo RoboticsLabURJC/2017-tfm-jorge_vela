@@ -53,7 +53,8 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGray)
   float *O = newO.ptr<float>();
 
   cv::FileStorage fs;
-  fs.open("yaml/TestMGrayScale.yml", cv::FileStorage::READ);
+  bool file_exists = fs.open("yaml/TestMGrayScale.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   cv::FileNode rows = fs["M"]["rows"];
   cv::FileNode cols = fs["M"]["cols"];
@@ -70,7 +71,8 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGray)
   }
 
   fs.release();
-  fs.open("yaml/TestOGrayScale.yml", cv::FileStorage::READ);
+  file_exists = fs.open("yaml/TestOGrayScale.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   rows = fs["O"]["rows"];
   cols = fs["O"]["cols"];
@@ -109,7 +111,8 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor)
   float *O = newO.ptr<float>();
 
   cv::FileStorage fs;
-  fs.open("yaml/TestMColorScale.yml", cv::FileStorage::READ);
+  bool file_exists = fs.open("yaml/TestMColorScale.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   cv::FileNode rows = fs["M"]["rows"];
   cv::FileNode cols = fs["M"]["cols"];
@@ -126,7 +129,8 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor)
     } 
   }
 
-  fs.open("yaml/TestOColorScale.yml", cv::FileStorage::READ);
+  file_exists = fs.open("yaml/TestOColorScale.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   rows = fs["O"]["rows"];
   cols = fs["O"]["cols"];
@@ -165,8 +169,9 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNorm)
   gradMagExtractVector[1].convertTo(newO, CV_32F);    
   float *O = gradMagExtractVector[1].ptr<float>();
 
-    cv::FileStorage fs;
-  fs.open("yaml/TestMColorNormRad.yml", cv::FileStorage::READ);
+  cv::FileStorage fs;
+  bool file_exists = fs.open("yaml/TestMColorNormRad.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   cv::FileNode rows = fs["M"]["rows"];
   cv::FileNode cols = fs["M"]["cols"];
@@ -183,7 +188,8 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNorm)
     } 
   }
 
-  fs.open("yaml/TestOColorNormRad.yml", cv::FileStorage::READ);
+  file_exists = fs.open("yaml/TestOColorNormRad.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   rows = fs["O"]["rows"];
   cols = fs["O"]["cols"];
@@ -233,13 +239,14 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNormConst)
 
 
   cv::FileStorage fs;
-  fs.open("yaml/TestMColorNormRadConst.yml", cv::FileStorage::READ);
+  bool file_exists = fs.open("yaml/TestMColorNormRadConst.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   cv::FileNode rows = fs["M"]["rows"];
   cv::FileNode cols = fs["M"]["cols"];
   cv::FileNode MMatrix = fs["M"]["data"];
 
-  int tot = image.cols*image.rows;// (int)rows*(int)cols;
+//  int tot = image.cols*image.rows;// (int)rows*(int)cols;
   int i = 0;
   for(int y=0;y<(int)rows;y++)
   { 
@@ -250,7 +257,8 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNormConst)
     } 
   }
 
-  fs.open("yaml/TestOColorNormRadConst.yml", cv::FileStorage::READ);
+  file_exists = fs.open("yaml/TestOColorNormRadConst.yml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
   rows = fs["O"]["rows"];
   cols = fs["O"]["cols"];
