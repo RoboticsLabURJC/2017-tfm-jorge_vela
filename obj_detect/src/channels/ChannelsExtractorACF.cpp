@@ -79,7 +79,7 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   {
     cv::Mat c_padded;
     c_padded = convTri(c, 1);
-    copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
+    copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
     preprocessedChannels.push_back(c_padded);
   }
 

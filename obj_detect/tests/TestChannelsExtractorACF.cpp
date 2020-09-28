@@ -16,8 +16,8 @@
 #undef DEBUG
 //#define DEBUG
 
-#undef SHOW_CHANNELS
-//#define SHOW_CHANNELS
+//#undef SHOW_CHANNELS
+#define SHOW_CHANNELS
 
 using namespace cv;
 using namespace std;
@@ -109,7 +109,8 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
 
 #ifdef SHOW_CHANNELS
     cv::imshow("Matlab", channel_matlab);
-    cv::imshow("CPP", acf_channels[i]);
+//    cv::imshow("CPP", acf_channels[i]);
+    cv::imshow("absDiff", absDiff);
     cv::waitKey();
 #endif
 
