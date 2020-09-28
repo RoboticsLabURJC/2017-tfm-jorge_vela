@@ -18,6 +18,7 @@ cv::Mat ImgResample
     cv::Mat src,
     int width,
     int height,
+    std::string method = "antialiasing",
     int norm = 1
   );
 

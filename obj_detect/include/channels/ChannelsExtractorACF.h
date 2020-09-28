@@ -33,7 +33,7 @@ public:
     (
       cv::Size padding,
       int shrink,
-      std::string color_space = "LUV"
+      std::string color_space = "antialiasing"
     ) 
     {
       m_padding = padding;

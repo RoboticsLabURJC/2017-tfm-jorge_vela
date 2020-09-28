@@ -173,43 +173,6 @@ ChannelsPyramid::compute
   return chnsPyramidData;
 }
 
-/*
-std::vector<cv::Mat> ChannelsPyramid::badacostFilters
-  (
-  cv::Mat pyramid,
-  //std::string filterName
-  std::vector<cv::Mat> filters
-  )
-{
-  int num_filters_per_channel = 4; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
-  int num_channels = 10; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
-  int filter_size = 5; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
-
-  //EJEMPLO PARA UNA ESCALA, QUE TIENE nChannels CANALES
-  int nChannels = pyramid.channels();
-  cv::Mat bgr_dst[nChannels];
-  split(pyramid,bgr_dst);
-
-  //SE CONVOLUCIONA UNA IMAGEN CON LOS FILTROS Y SE OBTIENEN LAS IMAGENES DE SALIDA
-  std::vector<cv::Mat> out_images;
-  for(int j = 0; j < num_filters_per_channel; j++){
-    for(int i = 0; i < nChannels; i++){
-      cv::Mat out_image; 
-
-      // NOTE: filter2D is not making real convolucion as conv2 in matlab (it implements correlation).
-      // Thus we have to flip the kernel and change the anchor point. We have already flipped the filters
-      // when we loaded them!!
-      filter2D( bgr_dst[i], out_image, CV_32FC1 , filters[i+(nChannels*j)], cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
-      out_image = ImgResample(out_image, round(out_image.size().width/2.0), round(out_image.size().height/2.0));
-      out_images.push_back(out_image);
-    }
-  }
-  //printf("ejem ejem.............\n");
-  //cv::imshow("filtered", out_images[0]);
-  //cv::waitKey(0);
-  return out_images;
-}
-*/
 
 /**
  * Funcion getScales. En funcion de los parámetros de entrada retorna un vector con los distintos valores

@@ -43,19 +43,6 @@ std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
   ChannelsExtractorACF acfExtractor(m_padding, m_shrink, "LUV");
   std::vector<cv::Mat> acf_channels = acfExtractor.extractFeatures(img);
 
-//  // Preprocessing of the ACF channels
-//  std::vector<cv::Mat> preprocessedChannels;
-//  int x = round(m_padding.width / m_shrink);
-//  int y = round(m_padding.height / m_shrink);
-
-//  for (cv::Mat c: acf_channels)
-//  {
-//    cv::Mat c_padded;
-//    c_padded = convTri(c, 1);
-//    copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
-//    preprocessedChannels.push_back(c_padded);
-//  }
-
   if (m_filters.empty())
   {
     return acf_channels; // Returning ACF channels after preprocessing
