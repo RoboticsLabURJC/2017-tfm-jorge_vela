@@ -2,10 +2,10 @@
 # Source files for channels features extraction from images
 FILE(
   GLOB
-  DETECTORS_EXTRACTION_SRC
+  PYRAMID_EXTRACTION_SRC
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/badacostDetector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/badacostDetector.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramid.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramid.h
 
   )
 
@@ -13,6 +13,6 @@ FILE(
 target_sources(
         ${PROJECT_NAME}
         PRIVATE
-        ${DETECTORS_EXTRACTION_SRC}
+        ${PYRAMID_EXTRACTION_SRC}
 )
 

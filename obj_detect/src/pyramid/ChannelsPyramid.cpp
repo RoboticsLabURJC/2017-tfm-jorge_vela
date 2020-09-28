@@ -1,5 +1,5 @@
 
-#include <channels/ChannelsPyramid.h> 
+#include <pyramid/ChannelsPyramid.h>
 #include <channels/Utils.h>
 #include <channels/ChannelsExtractorLDCF.h>
 #include <opencv2/opencv.hpp>

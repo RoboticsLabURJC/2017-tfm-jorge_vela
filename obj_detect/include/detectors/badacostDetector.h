@@ -14,9 +14,8 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
-//#include "gtest/gtest.h"
 #include <iostream>
-#include <channels/ChannelsPyramid.h>
+#include <pyramid/ChannelsPyramid.h>
 
 class BadacostDetector
 {

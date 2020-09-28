@@ -9,7 +9,7 @@
 
 
 #include <detectors/badacostDetector.h>
-#include <channels/ChannelsPyramid.h>
+#include <pyramid/ChannelsPyramid.h>
 #include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
 
