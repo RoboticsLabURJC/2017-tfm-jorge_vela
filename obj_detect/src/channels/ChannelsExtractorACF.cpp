@@ -39,16 +39,16 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 
   cv::Mat luv_image;
   std::vector<cv::Mat> luvImage;
-  if (m_color_space != "LUV")
-  {
+//  if (m_color_space != "LUV")
+//  {
     luvImage = luvExtractor.extractFeatures(imageCropped);
     merge(luvImage, luv_image);
-  }
-  else
-  {
-    luv_image = imageCropped;
-    split(luv_image, luvImage);
-  }
+//  }
+//  else
+//  {
+//    luv_image = imageCropped;
+//    split(luv_image, luvImage);
+//  }
   luv_image = convTri(luv_image, smooth);
 
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);

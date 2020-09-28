@@ -1,7 +1,6 @@
 
 #include <channels/ChannelsPyramid.h> 
 #include <channels/Utils.h>
-#include <channels/ChannelsExtractorLUV.h>
 #include <channels/ChannelsExtractorLDCF.h>
 #include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
@@ -40,8 +39,6 @@ ChannelsPyramid::compute
   )
 {
   int smooth = 1;
-  ChannelsLUVExtractor channExtractLUV{false, smooth};
-
   cv::Size sz = img.size();
   cv::Size minDs;
   minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
@@ -51,16 +48,7 @@ ChannelsPyramid::compute
   pad.height = 4; //6; //6; // <--- TODO: JM: Esto debería de venir de fichero del detector
 
   //int lambdas = {};
-
-  //CONVERT I TO APPROPIATE COLOR SPACE-------------------------------------
-  //img.convertTo(img, CV_32FC1);
-  std::vector<cv::Mat> luvImage = channExtractLUV.extractFeatures(img); //IMAGENES ESCALA DE GRISES??
-  cv::Mat luv_image;
-  cv::Mat luvImageChng;
-  merge(luvImage, luv_image);
-
-  //EN ESTAS LINEAS EL COMPRUEBA QUE SE CUMPLEN LOS REQUISITOS PARA LA CONVERSION
-  cv::Mat imageUse = luv_image;
+  cv::Mat imageUse = img;
 
   //-------------------------------------------------------------------------
 

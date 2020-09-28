@@ -144,7 +144,7 @@ std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
 
   channelsLUV = bgr2luv(img, 1.0f/255.0f);
 
-  
+
   if(m_smooth){
     channelsLUV = smoothImage(channelsLUV);
   }

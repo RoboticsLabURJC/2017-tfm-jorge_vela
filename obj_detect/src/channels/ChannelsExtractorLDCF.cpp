@@ -36,20 +36,19 @@ ChannelsExtractorLDCF::ChannelsExtractorLDCF
 
 std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
   (
-  cv::Mat img // Should be a LUV image!!
+  cv::Mat img
   )
 {
   // Extract the ACF channels
-  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, "LUV");
+  ChannelsExtractorACF acfExtractor(m_padding, m_shrink);
   std::vector<cv::Mat> acf_channels = acfExtractor.extractFeatures(img);
 
   if (m_filters.empty())
   {
     return acf_channels; // Returning ACF channels after preprocessing
-    //return preprocessedChannels; // Returning ACF channels after preprocessing
   }
 
-//  return extractFeaturesFromACF(preprocessedChannels);
+  // Returning LDCF features (filtered ACF channels)
   return extractFeaturesFromACF(acf_channels);
 }
 
@@ -72,7 +71,7 @@ ChannelsExtractorLDCF::extractFeaturesFromACF
 
         // NOTE: filter2D is not making real convolucion as conv2 in matlab (it implements correlation).
         // Thus we have to flip the kernel and change the anchor point. We have already flipped the filters
-        // when we loaded them!!
+        // when added them to the constructor!!
         filter2D( acf_channels[i], out_image, CV_32FC1 ,
                   m_flipped_filters[i+(num_acf_channels*j)],
                   cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );

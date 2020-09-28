@@ -26,19 +26,17 @@ public:
    /**
     * This constructor sets the parameters for computing the ACF features.
     *
+    * @param padding
     * @param shrink
-    * @param color_space string describing the input image to extractFeatures color space.
     */
   ChannelsExtractorACF
     (
       cv::Size padding,
-      int shrink,
-      std::string color_space = "antialiasing"
+      int shrink
     ) 
     {
       m_padding = padding;
       m_shrink = shrink;
-      m_color_space = color_space;
     };
 
   /**

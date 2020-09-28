@@ -45,15 +45,15 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
 #endif
 
   // We first pass the image to LUV:
-  ChannelsLUVExtractor luvExtractor;
-  std::vector<cv::Mat> luv_channels = luvExtractor.extractFeatures(image);
-  cv::Mat luv_image;
-  merge(luv_channels, luv_image);
+//  ChannelsLUVExtractor luvExtractor;
+//  std::vector<cv::Mat> luv_channels = luvExtractor.extractFeatures(image);
+//  cv::Mat luv_image;
+//  merge(luv_channels, luv_image);
 
-#ifdef SHOW_CHANNELS
-    cv::imshow("luv_image", luv_image);
-    cv::waitKey();
-#endif
+//#ifdef SHOW_CHANNELS
+//    cv::imshow("luv_image", luv_image);
+//    cv::waitKey();
+//#endif
 
   // Prepare reading the yaml file with Matlab's results.
   FileStorage fs1;
@@ -80,8 +80,9 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
 
   // Extract ACF channels using paramenters from matlab.
   std::vector<cv::Mat> acf_channels;
-  ChannelsExtractorACF acfExtractor(padding, shrink, "RGB");
-  acf_channels = acfExtractor.extractFeatures(luv_image);
+  ChannelsExtractorACF acfExtractor(padding, shrink);
+//  acf_channels = acfExtractor.extractFeatures(luv_image);
+  acf_channels = acfExtractor.extractFeatures(image);
 
   for (int i=0; i < 10; i++) // read and compare all the channels
   {
