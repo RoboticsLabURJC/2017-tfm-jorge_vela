@@ -11,7 +11,7 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllStrategy.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedStrategy.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedStrategy.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximated`Strategy.h
 
   )
 

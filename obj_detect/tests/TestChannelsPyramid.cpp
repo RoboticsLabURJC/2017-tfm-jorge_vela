@@ -1,6 +1,7 @@
 
 #include <pyramid/ChannelsPyramid.h>
 #include <pyramid/ChannelsPyramidComputeAllStrategy.h>
+#include <pyramid/ChannelsPyramidApproximatedStrategy.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "gtest/gtest.h"
@@ -11,10 +12,15 @@ public:
   ChannelsPyramid* pChnsPyramid;
   virtual void SetUp()
     {
+      pChnsPyramid = nullptr;
     }
 
   virtual void TearDown()
     {
+      if (pChnsPyramid)
+      {
+        delete pChnsPyramid;
+      }
     }
 };
 
@@ -75,7 +81,7 @@ TEST_F(TestChannelsPyramid, TestGetScalesChangeVals)
   }
 }
 
-TEST_F(TestChannelsPyramid, channelsPyramid)
+TEST_F(TestChannelsPyramid, channelsPyramidComputeAllStrategy)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
@@ -93,3 +99,23 @@ TEST_F(TestChannelsPyramid, channelsPyramid)
   std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters);
   //ASSERT_TRUE(pyramid.size()==28);
 }
+
+TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
+{
+  cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+
+  std::string nameOpts = "yaml/pPyramid.yml";
+
+  if (pChnsPyramid)
+  {
+    delete pChnsPyramid;
+  }
+  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedStrategy() );
+
+  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
+  ASSERT_TRUE(loadOk);
+  std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters);
+  //ASSERT_TRUE(pyramid.size()==28);
+}
+
