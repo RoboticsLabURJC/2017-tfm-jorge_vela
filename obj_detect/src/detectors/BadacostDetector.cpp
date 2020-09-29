@@ -251,10 +251,10 @@ BadacostDetector::detect(cv::Mat img)
     for (uint j = 0; j < detections_i.size(); j++)
     {
       DetectionRectangle d = detections_i[j];
-//      d.bbox.x = (d.bbox.x + shift_x)/scaleshw[i].width;
-//      d.bbox.y = (d.bbox.x + shift_y)/scaleshw[i].height;
-//      d.bbox.width = m_modelDs.width / scales[i];
-//      d.bbox.height = m_modelDs.height / scales[i];
+      d.bbox.x = (d.bbox.x + shift_x)/scaleshw[i].width;
+      d.bbox.y = (d.bbox.y + shift_y)/scaleshw[i].height;
+      d.bbox.width = m_modelDs.width / scales[i];
+      d.bbox.height = m_modelDs.height / scales[i];
 
       detections.push_back(d);
     }
