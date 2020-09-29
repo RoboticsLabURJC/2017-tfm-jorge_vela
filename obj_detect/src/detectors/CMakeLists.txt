@@ -4,8 +4,8 @@ FILE(
   GLOB
   DETECTORS_EXTRACTION_SRC
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/badacostDetector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/badacostDetector.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/BadacostDetector.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/BadacostDetector.h
 
   )
 

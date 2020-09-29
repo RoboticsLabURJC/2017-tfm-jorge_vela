@@ -8,7 +8,7 @@
  *  ------------------------------------------------------------------------ */
 
 
-#include <detectors/badacostDetector.h>
+#include <detectors/BadacostDetector.h>
 #include <pyramid/ChannelsPyramid.h>
 #include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
@@ -18,6 +18,9 @@
 
 #undef DEBUG
 //#define DEBUG
+
+#undef SHOW_CHANNELS
+//#define SHOW_CHANNELS
 
 BadacostDetector::BadacostDetector
   (
@@ -144,6 +147,19 @@ bool BadacostDetector::load
     loadedOK = true;
   }
 
+  // TODO: load everything here from the classifier yaml file:
+  m_modelDsPad.width = 96; // JM: Esto debería venir del fichero con el clasificador entrenado.
+  m_modelDsPad.height = 54; // JM: Esto debería venir del fichero con el clasificador entrenado.
+  m_modelDs.width = 84;    // JM: Esto debería venir del fichero con el clasificador entrenado.
+  m_modelDs.height = 48;  // JM: Esto debería venir del fichero con el clasificador entrenado.
+
+  m_shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  m_stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  m_cascThr = -2.239887; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  m_padding.width = 6; //pPyramid["pad"]["data"][1];
+  m_padding.height = 4; //pPyramid["pad"]["data"][0];
+  // <------ END TODO
+
   cv::FileStorage pyramid;
   file_exists = pyramid.open(pyrPath, cv::FileStorage::READ);
   bool loadedOKPyr = false;
@@ -212,35 +228,53 @@ BadacostDetector::loadFilters(std::string filtersPath)
   return filters;
 }
 
-std::vector<cv::Rect2i>
+std::vector<DetectionRectangle>
 BadacostDetector::detect(cv::Mat img)
 {
   if (!m_classifierIsLoaded)
   {
-    throw std::runtime_error("BadacostDetector::load() should be called befor BadacostDetector::detect()"); 
+    throw std::runtime_error("BadacostDetector::load() should be called befor BadacostDetector::detect()");
   }
 
-  //CARGO LOS PARAMETROS, LLAMO A CHNSPYRAMID, SE PASA TODO POR EL FILTRO Y SE HACE RESIZE. 
-  //EQUIVALENTE HASTA LINEA 80 acfDetectBadacost. Mismos resultados aparentemente.
-  
-  std::vector<std::vector<cv::Mat>> pyramid = m_pChnsPyramidStrategy->compute(img, m_filters);
-  std::vector<cv::Mat> filteredImagesResized;
-  filteredImagesResized = pyramid[0];
+  std::vector<std::vector<cv::Mat>> pyramid;
+  std::vector<double> scales;
+  std::vector<cv::Size2d> scaleshw;
+  pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw);
 
-//  if (!m_filters.empty())
-//  {
-//    filteredImagesResized = m_chnsPyramid.badacostFilters(pyramid[0], m_filters);
-//  }
-//  else
-//  {
-//    filteredImagesResized = pyramid;
-//  }
+  std::vector<DetectionRectangle> detections;
+  for (uint i = 0; i < pyramid.size(); i++)
+  {
+    std::vector<DetectionRectangle> detections_i = detectSingleScale(pyramid[i]);
+
+    int shift_x = round((m_modelDsPad.width - m_modelDs.width)/2.0) - m_padding.width;
+    int shift_y = round((m_modelDsPad.height - m_modelDs.height)/2.0) - m_padding.height;
+    for (uint j = 0; j < detections_i.size(); j++)
+    {
+      DetectionRectangle d = detections_i[j];
+//      d.bbox.x = (d.bbox.x + shift_x)/scaleshw[i].width;
+//      d.bbox.y = (d.bbox.x + shift_y)/scaleshw[i].height;
+//      d.bbox.width = m_modelDs.width / scales[i];
+//      d.bbox.height = m_modelDs.height / scales[i];
+
+      detections.push_back(d);
+    }
+  }
+
+  return detections;
+}
+
+std::vector<DetectionRectangle>
+BadacostDetector::detectSingleScale
+  (
+  std::vector<cv::Mat>& channels
+  )
+{
 
 #ifdef SHOW_CHANNELS
   for (int i=0; i < 40; i++)
   {
-    std::cout << filteredImagesResized[i].size() << std::endl;
-    cv::imshow("channel", filteredImagesResized[i]);
+    std::cout << channels[i].size() << std::endl;
+    cv::imshow("channel", channels[i]);
     cv::waitKey();
   }
 #endif
@@ -250,26 +284,13 @@ BadacostDetector::detect(cv::Mat img)
   std::cout << "--> channel's size = " << filteredImagesResized[0].size() << std::endl;
 #endif
 
-  // COMIENZA EL SEGUNDO BUCLE
-  //cv::Size modelDsPad;
-  //modelDsPad.width = 96; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  //modelDsPad.height = 54; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  //int modelDs[2] = {48, 84};    // JM: Esto debería venir del fichero con el clasificador entrenado.
-
-  int shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  int modelHt = 54;  // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  int modelWd = 96;  // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  int stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  float cascThr = -2.239887; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-
-
-  int height = filteredImagesResized[0].size().height;
-  int width = filteredImagesResized[0].size().width;
+  int height = channels[0].size().height;
+  int width = channels[0].size().width;
 
 
 #ifdef DEBUG
-  std::cout << "filteredImagesResized[0].size().height = " << filteredImagesResized[0].size().height << std::endl;
-  std::cout << "filteredImagesResized[0].size().width = " << filteredImagesResized[0].size().width << std::endl;
+  std::cout << "channels[0].size().height = " << filteredImagesResized[0].size().height << std::endl;
+  std::cout << "channels[0].size().width = " << filteredImagesResized[0].size().width << std::endl;
 
   std::cout << "fids.size() = " << m_classifier["fids"].size() << std::endl;
   std::cout << "fhild.size() = " << m_classifier["child"].size() << std::endl;
@@ -281,13 +302,15 @@ BadacostDetector::detect(cv::Mat img)
 
   int nTreeNodes = m_classifier["fids"].size().width;
   int nTrees = m_classifier["fids"].size().height;
-  int height1 = ceil(float((height*shrink)-modelHt+1)/stride);
-  int width1 = ceil(float((width*shrink)-modelWd+1)/stride);
+  int height1 = ceil(float((height*m_shrink)-m_modelDsPad.height+1)/m_stride);
+  int width1 = ceil(float((width*m_shrink)-m_modelDsPad.width+1)/m_stride);
 
+#ifdef DEBUG
   std::cout << "nTrees = " << nTrees << std::endl;
   std::cout << "nTreeNodes = " << nTreeNodes << std::endl;
   std::cout << "height1 = " << height1 << std::endl;
   std::cout << "width1 = " << width1 << std::endl;
+#endif
 
   int num_windows = width1*height1;
   if (num_windows < 0) 
@@ -322,8 +345,8 @@ BadacostDetector::detect(cv::Mat img)
       }
 */
 
-  int modelWd_s = modelWd/shrink;
-  int modelHt_s = modelHt/shrink;
+  int modelWd_s = m_modelDsPad.width/m_shrink;
+  int modelHt_s = m_modelDsPad.height/m_shrink;
   int modelWd_s_times_Ht_s = modelWd_s*modelHt_s;
 
   /*
@@ -345,8 +368,8 @@ BadacostDetector::detect(cv::Mat img)
       int h;
 
       //float *chns1=chns+(r*stride/shrink) + (c*stride/shrink)*height;
-      int posHeight = (r*stride/shrink);
-      int posWidth = (c*stride/shrink);      
+      int posHeight = (r*m_stride/m_shrink);
+      int posWidth = (c*m_stride/m_shrink);
 
       int t;
       for(t = 0; t < nTrees; t++ )
@@ -389,7 +412,7 @@ BadacostDetector::detect(cv::Mat img)
 */
 
           // Obtain the feature value and threshold for the k-th tree node.
-          ftr = filteredImagesResized[ftrChnIndex].at<float>(ftrChnRow, ftrChnCol);
+          ftr = channels[ftrChnIndex].at<float>(ftrChnRow, ftrChnCol);
           thrs = static_cast<float>(m_classifier["thrs"].at<float>(t, k));
 
 #ifdef DEBUG
@@ -433,7 +456,7 @@ BadacostDetector::detect(cv::Mat img)
         // Get the trace for the current detection window
         trace = -(min_positive_cost - neg_cost);
 
-        if (trace <= cascThr) break;
+        if (trace <= m_cascThr) break;
       }
 
 #ifdef DEBUG
@@ -477,7 +500,7 @@ BadacostDetector::detect(cv::Mat img)
 */
 
   // Obtain detection rectangles
-  std::vector<cv::Rect2i> detections;
+  std::vector<DetectionRectangle> detections;
   std::vector<float> scores_out;
   std::vector<float> labels;
 
@@ -485,15 +508,15 @@ BadacostDetector::detect(cv::Mat img)
   {
     if (hs1[i] > 1) // hs1[i]>1 are object windows, hs1[i]==1 are background windows.
     {
-        cv::Rect2i rect;
-        rect.x = cs[i] * stride;
-        rect.y = rs[i] * stride;
-        rect.width = modelWd;
-        rect.height = modelHt;
+        DetectionRectangle det;
+        det.bbox.x = cs[i] * m_stride;
+        det.bbox.y = rs[i] * m_stride;
+        det.bbox.width = m_modelDsPad.width;
+        det.bbox.height = m_modelDsPad.height;
+        det.score = scores[i];
+        det.class_index = hs1[i];
         
-        detections.push_back(rect);
-        scores_out.push_back(scores[i]);
-        labels.push_back(hs1[i]);
+        detections.push_back(det);
     }
   }
 

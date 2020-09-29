@@ -7,16 +7,16 @@
  *
  *  ------------------------------------------------------------------------ */
 
-
 #ifndef BADACOST_DETECTOR
 #define BADACOST_DETECTOR
 
+#include <detectors/DetectionRectangle.hpp>
+#include <pyramid/ChannelsPyramid.h>
+#include <pyramid/ChannelsPyramidComputeAllStrategy.h>
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
-#include <pyramid/ChannelsPyramid.h>
-#include <pyramid/ChannelsPyramidComputeAllStrategy.h>
 
 class BadacostDetector
 {
@@ -30,24 +30,38 @@ public:
     ();
 
   // Loads the trained classfier from a yaml file.
-  bool load(std::string clfPath, std::string pyrPath, std::string filtersPath);
+  bool load
+    (
+    std::string clfPath,
+    std::string pyrPath,
+    std::string filtersPath
+    );
 
   // Detects objects at any scale in an image and return detections as rectangles
-  std::vector<cv::Rect2i> detect(cv::Mat img);
+  std::vector<DetectionRectangle>
+  detect
+    (
+    cv::Mat img
+    );
 
 protected:
   std::vector<cv::Mat> loadFilters(std::string filtersPath);
 
   // Detects objects at a single scale in an image and return detections as rectangles
-//  std::vector<cv::Rect2i> detectSingleScale(cv::Mat img);
+  std::vector<DetectionRectangle>
+  detectSingleScale
+    (
+    std::vector<cv::Mat>& channels
+    );
 
   bool m_classifierIsLoaded;
     
-  int m_srhink;
-  int m_modelHt;
-  int m_modelWd;
+  int m_shrink;
   int m_stride;
-  int m_cascThr;
+  float m_cascThr;
+  cv::Size m_modelDsPad;
+  cv::Size m_modelDs;
+  cv::Size m_padding;
 
   // From here, this variables are read from a yaml file obtained from 
   // trained detector in Matlab.

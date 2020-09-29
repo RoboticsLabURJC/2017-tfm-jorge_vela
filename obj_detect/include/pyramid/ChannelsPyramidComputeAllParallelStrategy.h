@@ -36,7 +36,9 @@ public:
   virtual std::vector<std::vector<cv::Mat>> compute
     (
     cv::Mat img,
-    std::vector<cv::Mat> filters
+    std::vector<cv::Mat> filters,
+    std::vector<double>& scales,
+    std::vector<cv::Size2d>& scaleshw
     );
 };
 

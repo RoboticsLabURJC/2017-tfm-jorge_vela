@@ -37,24 +37,24 @@ std::vector<std::vector<cv::Mat>>
 ChannelsPyramidComputeAllParrallelStrategy::compute
   (
   cv::Mat img,
-  std::vector<cv::Mat> filters
+  std::vector<cv::Mat> filters,
+  std::vector<double>& scales,
+  std::vector<cv::Size2d>& scaleshw
   )
 {
   int smooth = 1;
   cv::Size sz = img.size();
-  cv::Size minDs;
-  minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-  minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
-  cv::Size pad;
-  pad.width = 6; //12; //12; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-  pad.height = 4; //6; //6; // <--- TODO: JM: Esto debería de venir de fichero del detector
+//  cv::Size minDs;
+//  minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
+//  minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
+//  cv::Size pad;
+//  pad.width = 6; //12; //12; // <--- TODO: JM: Esto debería de venir del fichero del detector.
+//  pad.height = 4; //6; //6; // <--- TODO: JM: Esto debería de venir de fichero del detector
 
   //int lambdas = {};
   cv::Mat imageUse = img;
 
-  std::vector<double> scales;
-  std::vector<cv::Size2d> scaleshw;
-  getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz, scales, scaleshw);
+  getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
   std::cout << "--> scales = ";
@@ -68,7 +68,7 @@ ChannelsPyramidComputeAllParrallelStrategy::compute
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, pad, m_shrink);
+  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
 
 
   cv::parallel_for_({ 0, nScales }, [&](const cv::Range& r) {

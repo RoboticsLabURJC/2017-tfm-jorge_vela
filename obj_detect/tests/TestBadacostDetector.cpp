@@ -8,7 +8,7 @@
  *  ------------------------------------------------------------------------ */
 
 
-#include <detectors/badacostDetector.h>
+#include <detectors/BadacostDetector.h>
 #include <pyramid/ChannelsPyramidApproximatedStrategy.h>
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
@@ -42,13 +42,13 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
   cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
 //  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
 
-  std::vector<cv::Rect2i> detections = badacost.detect(image);
-  for(uint i = 0; i < detections.size(); i++)
+  std::vector<DetectionRectangle> detections = badacost.detect(image);
+  for(DetectionRectangle d: detections)
   {
-    std::cout << "[ x=" << detections[i].x << ", y=";
-    std::cout << detections[i].y << ", w=" << detections[i].width << ", h=" << detections[i].height;
+    std::cout << "[ x=" << d.bbox.x << ", y=";
+    std::cout << d.bbox.y << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
     std::cout << " ] " << std::endl;
-    cv::rectangle(image, detections[i], cv::Scalar(200,0,0),2);
+    cv::rectangle(image, d.bbox, cv::Scalar(200,0,0),2);
   }
   std::cout << "detections.size() = " << detections.size() << std::endl;
 
@@ -72,13 +72,13 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
   cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
 //  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
 
-  std::vector<cv::Rect2i> detections = badacost.detect(image);
-  for(uint i = 0; i < detections.size(); i++)
+  std::vector<DetectionRectangle> detections = badacost.detect(image);
+  for(DetectionRectangle d: detections)
   {
-    std::cout << "[ x=" << detections[i].x << ", y=";
-    std::cout << detections[i].y << ", w=" << detections[i].width << ", h=" << detections[i].height;
+    std::cout << "[ x=" << d.bbox.x << ", y=";
+    std::cout << d.bbox.y << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
     std::cout << " ] " << std::endl;
-    cv::rectangle(image, detections[i], cv::Scalar(200,0,0),2);
+    cv::rectangle(image, d.bbox, cv::Scalar(200,0,0),2);
   }
   std::cout << "detections.size() = " << detections.size() << std::endl;
 

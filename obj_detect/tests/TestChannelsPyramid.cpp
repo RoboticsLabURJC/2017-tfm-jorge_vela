@@ -97,7 +97,9 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllStrategy)
   bool loadOk = pChnsPyramid->load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
-  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters);
+  std::vector<double> scales;
+  std::vector<cv::Size2d> scaleshw;
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
   //ASSERT_TRUE(pyramid.size()==28);
 }
 
@@ -116,7 +118,9 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
   bool loadOk = pChnsPyramid->load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
-  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters);
+  std::vector<double> scales;
+  std::vector<cv::Size2d> scaleshw;
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
   //ASSERT_TRUE(pyramid.size()==28);
 }
 
@@ -135,7 +139,9 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
   bool loadOk = pChnsPyramid->load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
-  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters);
+  std::vector<double> scales;
+  std::vector<cv::Size2d> scaleshw;
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
   //ASSERT_TRUE(pyramid.size()==28);
 }
 

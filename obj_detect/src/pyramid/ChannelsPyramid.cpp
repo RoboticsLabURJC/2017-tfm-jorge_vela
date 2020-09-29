@@ -22,17 +22,19 @@ ChannelsPyramid::load(std::string opts)
 //  bool loadValue = true;
   cv::FileStorage pPyramid;
   bool existOpts = pPyramid.open(opts, cv::FileStorage::READ);
-  if(existOpts){
-	  int nPerOct = pPyramid["nPerOct"]["data"][0];
-      int nOctUp = 0; //pPyramid["nOctUp"]["data"][0];
-	  int nApprox = pPyramid["nApprox"]["data"][0];
-      //int pad[2] = {pPyramid["pad"]["data"][0], pPyramid["pad"]["data"][1]};
-	  int shrink = pPyramid["pChns.shrink"]["data"];
 
-	  m_nOctUp = nOctUp;  
-	  m_nPerOct = nPerOct;
-	  m_nApprox = nApprox;
-	  m_shrink = shrink;
+  if(existOpts)
+  {
+    m_padding.width = 6; //pPyramid["pad"]["data"][1];
+    m_padding.height = 4; //pPyramid["pad"]["data"][0];
+    m_nOctUp = 0; //pPyramid["nOctUp"]["data"][0];
+    m_nPerOct = pPyramid["nPerOct"]["data"][0];
+    m_nApprox = pPyramid["nApprox"]["data"][0];
+    m_shrink =  pPyramid["pChns.shrink"]["data"];
+
+    // TODO: Cargar del fichero!!
+    m_minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
+    m_minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
   }
   return existOpts;
 }

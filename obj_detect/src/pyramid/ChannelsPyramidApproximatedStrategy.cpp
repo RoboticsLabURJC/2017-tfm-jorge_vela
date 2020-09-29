@@ -20,17 +20,19 @@ std::vector<std::vector<cv::Mat>>
 ChannelsPyramidApproximatedStrategy::compute
   (
   cv::Mat img,
-  std::vector<cv::Mat> filters
+  std::vector<cv::Mat> filters,
+  std::vector<double>& scales,
+  std::vector<cv::Size2d>& scaleshw
   )
 {
   int smooth = 1;
   cv::Size sz = img.size();
-  cv::Size minDs;
-  minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-  minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
-  cv::Size pad;
-  pad.width = 6; //12; //12; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-  pad.height = 4; //6; //6; // <--- TODO: JM: Esto debería de venir de fichero del detector
+//  cv::Size minDs;
+//  minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
+//  minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
+//  cv::Size pad;
+//  pad.width = 6; //12; //12; // <--- TODO: JM: Esto debería de venir del fichero del detector.
+//  pad.height = 4; //6; //6; // <--- TODO: JM: Esto debería de venir de fichero del detector
 
   //int lambdas = {};
   cv::Mat imageUse = img;
@@ -38,9 +40,7 @@ ChannelsPyramidApproximatedStrategy::compute
   //-------------------------------------------------------------------------
 
   //GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
-  std::vector<double> scales;
-  std::vector<cv::Size2d> scaleshw;
-  getScales(m_nPerOct, m_nOctUp, minDs, m_shrink, sz, scales, scaleshw);
+  getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
   std::cout << "--> scales = ";
@@ -75,7 +75,7 @@ ChannelsPyramidApproximatedStrategy::compute
 
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, pad, m_shrink);
+  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
   //for (const auto& i : isR) // <-- JM: Para solo escalas reales
   for(int i=0; i< nScales; i++) // <-- JM: De momento lo hacemos para todas las escalas (y no solo para las que hay en isR).
   {

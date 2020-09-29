@@ -37,7 +37,9 @@ public:
   virtual std::vector<std::vector<cv::Mat>> compute
     (
     cv::Mat img,
-    std::vector<cv::Mat> filters
+    std::vector<cv::Mat> filters,
+    std::vector<double>& scales,
+    std::vector<cv::Size2d>& scaleshw
     ) = 0;
 
   virtual int getScales
@@ -56,7 +58,8 @@ protected:
   int m_nPerOct;
   int m_nApprox;
   int m_shrink;
-  std::vector<int> m_minDs;
+  cv::Size m_padding;
+  cv::Size m_minDs;
 };
 
 
