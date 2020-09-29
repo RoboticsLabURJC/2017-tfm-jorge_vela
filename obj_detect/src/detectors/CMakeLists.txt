@@ -7,6 +7,9 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/BadacostDetector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BadacostDetector.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/DetectionRectangle.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/DetectionRectangle.h
+
   )
 
 # Set the sources for the main target

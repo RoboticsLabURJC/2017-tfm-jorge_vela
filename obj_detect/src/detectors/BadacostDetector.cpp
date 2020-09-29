@@ -103,8 +103,7 @@ bool BadacostDetector::load
     cv::Mat m_RatioFixed = cv::Mat::zeros(1, 1, CV_32F);
     p.clear();
     dataRatioFixed >> p;
-    m_aRatioFixedWidth = static_cast<int>(p[0]);
-
+    m_aRatioFixedWidth = static_cast<bool>(p[0]);
 
     // Read Cprime data
     int rows = static_cast<int>(classifier["Cprime"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
@@ -136,13 +135,16 @@ bool BadacostDetector::load
    
 
     // Read aRatio data
-    rows = static_cast<int>(classifier["aRatio"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    cols = static_cast<int>(classifier["aRatio"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    data = classifier["aRatio"]["data"];
-    m_aRatio = cv::Mat::zeros(rows, cols, CV_32F);
-    p.clear();
-    data >> p;
-    memcpy(m_aRatio.data, p.data(), p.size()*sizeof(float));
+    if (!classifier["aRatio"].empty())
+    {
+      rows = static_cast<int>(classifier["aRatio"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+      cols = static_cast<int>(classifier["aRatio"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+      data = classifier["aRatio"]["data"];
+      m_aRatio = cv::Mat::zeros(rows, cols, CV_32F);
+      p.clear();
+      data >> p;
+      memcpy(m_aRatio.data, p.data(), p.size()*sizeof(float));
+    }
 
     loadedOK = true;
   }
@@ -228,6 +230,39 @@ BadacostDetector::loadFilters(std::string filtersPath)
   return filters;
 }
 
+void BadacostDetector::correctToClassSpecificBbs
+  (
+  std::vector<DetectionRectangle>& dts,
+  std::vector<float> aRatios,
+  bool fixedWidth // In this case we keep the h fixed and modify w
+  )
+{
+  // We assume that the background class has index 1. So we have to
+  // remove 1 to the positive class index to get the correct median
+  // aspect ratio. Therefore, if the positive class label is i, we get
+  // its aspect ratio for its BBoxes as aRatio(i-1).
+
+  if (dts.size() == 0)
+  {
+    return;
+  }
+
+  int squarify_param = 0;
+  if (fixedWidth)
+  {
+    squarify_param = 2; // use original w, alter h
+  }
+  else
+  {
+    squarify_param = 3; // use original h, alter w
+  }
+
+  for (uint i = 0; i < dts.size(); i++)
+  {
+    dts[i].squarify(squarify_param, aRatios[dts[i].class_index-2]);
+  }
+}
+
 std::vector<DetectionRectangle>
 BadacostDetector::detect(cv::Mat img)
 {
@@ -236,11 +271,13 @@ BadacostDetector::detect(cv::Mat img)
     throw std::runtime_error("BadacostDetector::load() should be called befor BadacostDetector::detect()");
   }
 
+  // Compute feature channels pyramid
   std::vector<std::vector<cv::Mat>> pyramid;
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
   pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw);
 
+  // Execute the detector over all the scales
   std::vector<DetectionRectangle> detections;
   for (uint i = 0; i < pyramid.size(); i++)
   {
@@ -258,6 +295,15 @@ BadacostDetector::detect(cv::Mat img)
 
       detections.push_back(d);
     }
+  }
+
+  if  (m_aRatio.rows > 0)
+  {
+    // Change bounding boxes to class specific bounding box. For
+    // example in the KITTI benchmark we have cars. At each orientation the
+    // bounding box of the car has a specific aspect ratio (a size view of the
+    // car is rectangular and a frontal car is squared).
+    correctToClassSpecificBbs(detections, m_aRatio, m_aRatioFixedWidth);
   }
 
   return detections;

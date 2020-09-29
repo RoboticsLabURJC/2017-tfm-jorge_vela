@@ -10,7 +10,7 @@
 #ifndef BADACOST_DETECTOR
 #define BADACOST_DETECTOR
 
-#include <detectors/DetectionRectangle.hpp>
+#include <detectors/DetectionRectangle.h>
 #include <pyramid/ChannelsPyramid.h>
 #include <pyramid/ChannelsPyramidComputeAllStrategy.h>
 #include <opencv2/opencv.hpp>
@@ -54,6 +54,13 @@ protected:
     std::vector<cv::Mat>& channels
     );
 
+  void correctToClassSpecificBbs
+    (
+    std::vector<DetectionRectangle>& dts,
+    std::vector<float> aRatios,
+    bool fixedWidth = false // In this case we keep the h fixed and modify w
+    );
+
   bool m_classifierIsLoaded;
     
   int m_shrink;
@@ -67,7 +74,7 @@ protected:
   // trained detector in Matlab.
   int m_treeDepth;
   int m_num_classes;
-  int m_aRatioFixedWidth;    
+  bool m_aRatioFixedWidth;
     
   cv::Mat m_Cprime;
   cv::Mat m_Y;
