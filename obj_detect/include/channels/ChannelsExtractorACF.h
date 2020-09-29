@@ -58,6 +58,11 @@ private:
   std::string m_color_space;
   cv::Size m_padding;
 
+  struct channel {
+    cv::Mat image;
+    std::string type;
+  };
+
 
 };
 

@@ -131,6 +131,85 @@ TEST_F(TestUtils, TestResampleReduce){
   }
 }
 
+TEST_F(TestUtils, TestResampleReal){
+  cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR); 
+
+  int h = 0;
+  int w = 0;
+  if(image.size().height % 2 == 0)
+  {
+    h = image.size().height / 2;
+  }
+  else
+  {
+    h = image.size().height / 2 + 1;
+  }
+
+  if(image.size().height % 2 == 0)
+  {
+    w = image.size().width / 2;
+  }
+  else
+  {
+    w = image.size().width / 2 + 1;
+  }
+
+  cv::Mat img2;
+  image.convertTo(img2, CV_32F, 1.0 / 255, 0);
+
+  cv::Mat dst = ImgResample(img2, 10, 10, "antialiasing", 2);
+
+  std::vector<cv::Mat> splitted;
+  split(dst, splitted);
+ 
+  cv::Mat dst1;
+  transpose(splitted[0], dst1);
+  cv::Mat img1;
+  dst1.convertTo(img1, CV_32F);    
+  float *valuesImgRes = img1.ptr<float>();
+  
+  FileStorage fs1;
+  fs1.open("yaml/TestImresampleReal_1.yml", FileStorage::READ);
+  FileNode rows = fs1["resample"]["rows"];
+  FileNode cols = fs1["resample"]["cols"];
+  FileNode imgMatlab = fs1["resample"]["data"];
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgRes[i] - (float)imgMatlab[i]) < 0.1);
+  }
+
+
+  transpose(splitted[1], dst1);    
+  dst1.convertTo(img1, CV_32F); 
+  float *valuesImgRes1 = img1.ptr<float>();
+  
+  fs1.open("yaml/TestImresampleReal_2.yml", FileStorage::READ);
+  rows = fs1["resample"]["rows"];
+  cols = fs1["resample"]["cols"];
+  imgMatlab = fs1["resample"]["data"];
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgRes1[i] - (float)imgMatlab[i]) < 0.1);
+  }
+
+  transpose(splitted[2], dst1);
+  dst1.convertTo(img1, CV_32F);    
+  float *valuesImgRes2 = img1.ptr<float>();
+  
+  fs1.open("yaml/TestImresampleReal_3.yml", FileStorage::READ);
+  rows = fs1["resample"]["rows"];
+  cols = fs1["resample"]["cols"];
+  imgMatlab = fs1["resample"]["data"];
+
+  for(int i=0;i<(int)rows*(int)cols;i++)
+  { 
+    ASSERT_TRUE(abs((float)valuesImgRes2[i] - (float)imgMatlab[i]) < 0.1);
+  }
+
+}
+
 void testResample
   (
   std::string image_path,
