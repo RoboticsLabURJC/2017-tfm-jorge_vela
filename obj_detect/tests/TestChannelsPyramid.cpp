@@ -144,4 +144,3 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
   std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
   //ASSERT_TRUE(pyramid.size()==28);
 }
-

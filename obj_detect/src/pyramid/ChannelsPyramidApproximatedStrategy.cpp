@@ -76,11 +76,11 @@ ChannelsPyramidApproximatedStrategy::compute
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
   ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
-  //for (const auto& i : isR) // <-- JM: Para solo escalas reales
-  for(int i=0; i< nScales; i++) // <-- JM: De momento lo hacemos para todas las escalas (y no solo para las que hay en isR).
+  for (const auto& i : isR) // <-- JM: Para solo escalas reales
+  //for(int i=0; i< nScales; i++) // <-- JM: De momento lo hacemos para todas las escalas (y no solo para las que hay en isR).
   {
     // double s = scales[i - 1]; // <-- JM Para solo escalas reales.
-    double s = scales[i];
+    double s = scales[i-1];
     cv::Size sz1;
     sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
     sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
@@ -100,29 +100,41 @@ ChannelsPyramidApproximatedStrategy::compute
       imageUse = I1;
     }
 
-    chnsPyramidData[i] = ldcfExtractor.extractFeatures(I1);
+    chnsPyramidData[i-1] = ldcfExtractor.extractFeatures(I1);
   }
 
-  //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
-  /*
+  //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]------------------------------- 
+  float lambdas[3] = {0.000000, 0.073930, 0.072470};
   for(int i=0; i< isA.size(); i++)
   {
     int x = isA[i] -1;
     int iR =  isN[x];
-    int sz_1 = round(sz[0]*scales[x]/m_shrink);
-    int sz_2 = round(sz[1]*scales[x]/m_shrink);
+    double s = scales[x];
+    int sz_1 = round(sz.width*scales[i]/m_shrink); //round((sz.width * s) / m_shrink) * m_shrink; //
+    int sz_2 = round(sz.height*scales[i]/m_shrink); //round((sz.height * s) / m_shrink) * m_shrink; //
+    int pad_x = round(m_padding.width / m_shrink);
+    int pad_y = round(m_padding.height / m_shrink);
+
+    sz_1 = round(round((sz_1+pad_x))*0.5);
+    sz_2 = round(round((sz_2+pad_y))*0.5);
+
     int sz1[2] = {sz_1, sz_2};
-    for(int j=0; j < pChnsCompute.size(); j++){
-      cv::Mat dataResample = pChnsCompute[j];
       std::vector<cv::Mat> resampleVect;
-      for(int k = 0; k < strucData[iR-1].size(); k++){
-        cv::Mat resample = ImgResample(strucData[iR-1][k], sz1[0] , sz1[1]); //RATIO
+      for(int k = 0; k < chnsPyramidData[iR-1].size(); k++){
+        int lambda;
+        if(k%10 < 3){
+          lambda = 0;
+        }else if(k%10 == 3){
+          lambda = 1;
+        }else if(k&10 > 3){
+          lambda = 2;
+        }
+        float ratio=pow((scales[i]/scales[iR]),-lambdas[lambda]);
+        cv::Mat resample = ImgResample(chnsPyramidData[iR-1][k], sz1[0] , sz1[1], "antialiasing", ratio); //RATIO
         resampleVect.push_back(resample);
-      }
-      strucData[x] = resampleVect;
     }
+    chnsPyramidData[x] = resampleVect;
   }
-  */
 
   /*
   std::vector<cv::Mat> channelsConcat;
