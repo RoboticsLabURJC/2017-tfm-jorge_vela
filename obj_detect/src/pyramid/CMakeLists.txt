@@ -10,6 +10,9 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllStrategy.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllStrategy.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllParallelStrategy.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllParallelStrategy.h
+
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedStrategy.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximated`Strategy.h
 

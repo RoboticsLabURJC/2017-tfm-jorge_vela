@@ -1,6 +1,7 @@
 
 #include <pyramid/ChannelsPyramid.h>
 #include <pyramid/ChannelsPyramidComputeAllStrategy.h>
+#include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
 #include <pyramid/ChannelsPyramidApproximatedStrategy.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -92,6 +93,25 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllStrategy)
     delete pChnsPyramid;
   }
   pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
+
+  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
+  ASSERT_TRUE(loadOk);
+  std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters);
+  //ASSERT_TRUE(pyramid.size()==28);
+}
+
+TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
+{
+  cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+
+  std::string nameOpts = "yaml/pPyramid.yml";
+
+  if (pChnsPyramid)
+  {
+    delete pChnsPyramid;
+  }
+  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParrallelStrategy() );
 
   bool loadOk = pChnsPyramid->load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
