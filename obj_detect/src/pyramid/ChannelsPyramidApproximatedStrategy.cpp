@@ -104,7 +104,6 @@ ChannelsPyramidApproximatedStrategy::compute
   }
 
   //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]------------------------------- 
-  float lambdas[3] = {0.000000, 0.073930, 0.072470};
   for(int i=0; i< isA.size(); i++)
   {
     int x = isA[i] -1;
@@ -129,7 +128,7 @@ ChannelsPyramidApproximatedStrategy::compute
         }else if(k&10 > 3){
           lambda = 2;
         }
-        float ratio=pow((scales[i]/scales[iR]),-lambdas[lambda]);
+        float ratio=pow((scales[i]/scales[iR]),-m_lambdas[lambda]);
         cv::Mat resample = ImgResample(chnsPyramidData[iR-1][k], sz1[0] , sz1[1], "antialiasing", ratio); //RATIO
         resampleVect.push_back(resample);
     }
