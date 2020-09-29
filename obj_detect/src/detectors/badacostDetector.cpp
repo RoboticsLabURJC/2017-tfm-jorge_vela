@@ -19,6 +19,43 @@
 #undef DEBUG
 //#define DEBUG
 
+BadacostDetector::BadacostDetector
+  (
+  int shrink,
+  int modelHt,
+  int modelWd,
+  int stride,
+  int cascThr,
+  ChannelsPyramid* pChnsPyramidStrategy
+  )
+  {
+    m_srhink = shrink;
+    m_modelHt = modelHt;
+    m_modelWd = modelWd;
+    m_stride = stride;
+    m_cascThr = cascThr;
+    m_classifierIsLoaded = false;
+
+    // By defult the strategy is computing all channels in all scales (none is approximated).
+    if  (!pChnsPyramidStrategy)
+    {
+      m_pChnsPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
+    }
+    else
+    {
+      m_pChnsPyramidStrategy = pChnsPyramidStrategy;
+    }
+  };
+
+BadacostDetector::~BadacostDetector
+  ()
+{
+  if (m_pChnsPyramidStrategy)
+  {
+    delete m_pChnsPyramidStrategy;
+  }
+}
+
 bool BadacostDetector::load
   (
   std::string clfPath,
@@ -126,7 +163,7 @@ bool BadacostDetector::load
 
     // TODO: JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
     // no existe no se hace nada, si existe se pasan los filtros.
-    loadedOKPyr = m_chnsPyramid.load(pyrPath.c_str());
+    loadedOKPyr = m_pChnsPyramidStrategy->load(pyrPath.c_str());
   }
 
   cv::FileStorage filters;
@@ -196,7 +233,7 @@ BadacostDetector::detect(cv::Mat img)
   //CARGO LOS PARAMETROS, LLAMO A CHNSPYRAMID, SE PASA TODO POR EL FILTRO Y SE HACE RESIZE. 
   //EQUIVALENTE HASTA LINEA 80 acfDetectBadacost. Mismos resultados aparentemente.
   
-  std::vector<std::vector<cv::Mat>> pyramid = m_chnsPyramid.compute(img, m_filters);
+  std::vector<std::vector<cv::Mat>> pyramid = m_pChnsPyramidStrategy->compute(img, m_filters);
   std::vector<cv::Mat> filteredImagesResized;
   filteredImagesResized = pyramid[0];
 

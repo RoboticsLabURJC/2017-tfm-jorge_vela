@@ -7,6 +7,9 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramid.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramid.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllStrategy.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllStrategy.h
+
   )
 
 # Set the sources for the main target

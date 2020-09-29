@@ -90,21 +90,18 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   int y = round(m_padding.height / m_shrink);
 
 
-  /*for (cv::Mat c: chnsCompute)
-  {
-    cv::Mat c_padded;
-    c_padded = convTri(c, 1);
-    copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
-    preprocessedChannels.push_back(c_padded);
-  }*/
   for (channel c: chnsCompute)
   {
     cv::Mat c_padded;
     c_padded = convTri(c.image, 1);
-    if(c.type == "LUV")
+    if (c.type == "LUV")
+    {
       copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
+    }
     else
+    {
       copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
+    }
      
     preprocessedChannels.push_back(c_padded);
   }

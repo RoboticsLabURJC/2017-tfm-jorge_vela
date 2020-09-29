@@ -16,26 +16,23 @@
 #include <string>
 #include <iostream>
 #include <pyramid/ChannelsPyramid.h>
+#include <pyramid/ChannelsPyramidComputeAllStrategy.h>
 
 class BadacostDetector
 {
 public:
   BadacostDetector
     (
-    int shrink = 2, 
+    int shrink = 2,
     int modelHt = 2, 
     int modelWd = 2, 
     int stride = 2, 
-    int cascThr = 2
-    )
-    {   
-      m_srhink = shrink;
-      m_modelHt = modelHt;
-      m_modelWd = modelWd;
-      m_stride = stride;
-      m_cascThr = cascThr;
-      m_classifierIsLoaded = false;
-    };
+    int cascThr = 2,
+    ChannelsPyramid* pChnsPyramidStrategy = nullptr
+    );
+
+  ~BadacostDetector
+    ();
 
   // Loads the trained classfier from a yaml file.
   bool load(std::string clfPath, std::string pyrPath, std::string filtersPath);
@@ -68,14 +65,13 @@ protected:
   cv::Mat m_wl_weights;
   cv::Mat m_aRatio;
   
-
   // After load it contains the cv::Mat variables: 
   // "fids", "thrs", "child", "hs", "weights", "depth"
   std::map<std::string, cv::Mat> m_classifier;
 
   // After load it contains the variables for build the pyramid of channel features
   // "fids", "thrs", "child", "hs", "weights", "depth"
-  ChannelsPyramid m_chnsPyramid;
+  ChannelsPyramid* m_pChnsPyramidStrategy;
 
   std::vector<cv::Mat> m_filters;
 };

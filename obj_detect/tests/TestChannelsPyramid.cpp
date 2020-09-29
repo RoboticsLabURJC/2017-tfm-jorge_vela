@@ -1,15 +1,14 @@
 
 #include <pyramid/ChannelsPyramid.h>
+#include <pyramid/ChannelsPyramidComputeAllStrategy.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "gtest/gtest.h"
 
-
-
 class TestChannelsPyramid: public testing::Test
 {
 public:
-  ChannelsPyramid chnsPyramid;
+  ChannelsPyramid* pChnsPyramid;
   virtual void SetUp()
     {
     }
@@ -17,9 +16,6 @@ public:
   virtual void TearDown()
     {
     }
-
-
-
 };
 
 TEST_F(TestChannelsPyramid, TestGetScales)
@@ -35,7 +31,14 @@ TEST_F(TestChannelsPyramid, TestGetScales)
   size.width = 16;
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
-  chnsPyramid.getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
+
+  if (pChnsPyramid)
+  {
+    delete pChnsPyramid;
+  }
+  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
+
+  pChnsPyramid->getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
   std::vector<float> check = {2.1463, 1.8537, 1.6589, 1.4632, 1.2684, 1.0737, 0.8779};
 
   for(uint i = 0; i < scales.size(); i++){
@@ -56,10 +59,15 @@ TEST_F(TestChannelsPyramid, TestGetScalesChangeVals)
   size.width = 16;
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
-  chnsPyramid.getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
 
+  if (pChnsPyramid)
+  {
+    delete pChnsPyramid;
+  }
+  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
 
-  chnsPyramid.getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
+  pChnsPyramid->getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
+  pChnsPyramid->getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
   std::vector<float> check = {1.0667, 0.9333, 0.8000, 0.6667, 0.5333};
 
   for(uint i = 0; i < scales.size(); i++){
@@ -67,54 +75,21 @@ TEST_F(TestChannelsPyramid, TestGetScalesChangeVals)
   }
 }
 
-
-TEST_F(TestChannelsPyramid, channelsPyramid){
+TEST_F(TestChannelsPyramid, channelsPyramid)
+{
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
   std::string nameOpts = "yaml/pPyramid.yml";
-  bool loadOk = chnsPyramid.load(nameOpts.c_str());
+
+  if (pChnsPyramid)
+  {
+    delete pChnsPyramid;
+  }
+  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
+
+  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
-  std::vector<std::vector<cv::Mat>> pyramid = chnsPyramid.compute(image, filters);
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters);
   //ASSERT_TRUE(pyramid.size()==28);
 }
-
-
-
-//TEST_F(TestChannelsPyramid, badacostFilters){
-////  cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
-//  cv::Mat image = cv::imread("images/coches3.jpg", cv::IMREAD_COLOR);
-//  std::string nameOpts = "yaml/pPyramid.yml";
-//  bool loadOk = chnsPyramid.load(nameOpts.c_str());
-//  if (!loadOk)
-//  {
-//      throw std::runtime_error("TestChannelsPyramid: pPyramid.yml not found");
-//  }
-//  std::vector<cv::Mat> filters; // empty filters to compute ACF pyramid
-//  std::vector<std::vector<cv::Mat>> pyramid = chnsPyramid.compute(image, filters);
-
-//  /*std::vector<cv::Mat> filtered = chnsPyramid.badacostFilters(pyramid[11], "yaml/filterTest.yml");
-
-
-//  printf("%d %d \n", filtered[0].size().height, filtered[0].size().width);
-
-//  for(int k = 0; k < 40; k++){
-//    double minVal;
-//    double maxVal;
-//    cv::Point minLoc;
-//    cv::Point maxLoc;
-//    minMaxLoc( filtered[k], &minVal, &maxVal, &minLoc, &maxLoc );
-//    std::cout << "min val: " << minVal << " max val:" << maxVal << std::endl;
-//  }*/
-//  //cv::imshow("", filtered[0]);
-//  //cv::waitKey(0);
-
-
-
-//}
-
-
-
-
-
- 
