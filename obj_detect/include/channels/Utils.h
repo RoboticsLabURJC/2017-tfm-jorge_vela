@@ -19,7 +19,7 @@ cv::Mat ImgResample
     int width,
     int height,
     std::string method = "antialiasing",
-    int norm = 1
+    float norm = 1
   );
 
 cv::Mat convTri

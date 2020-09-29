@@ -28,7 +28,7 @@
  * @return cv::Mat: Imagen redimensionada
  * 
  */
-cv::Mat ImgResample(cv::Mat src, int width, int height, std::string method, int norm)
+cv::Mat ImgResample(cv::Mat src, int width, int height, std::string method, float norm)
 {
   cv::Mat dst(height, width, CV_32F, cv::Scalar(0, 0, 0));
   if(method == "antialiasing")
