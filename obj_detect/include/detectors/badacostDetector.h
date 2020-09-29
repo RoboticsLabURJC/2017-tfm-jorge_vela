@@ -23,11 +23,6 @@ class BadacostDetector
 public:
   BadacostDetector
     (
-    int shrink = 2,
-    int modelHt = 2, 
-    int modelWd = 2, 
-    int stride = 2, 
-    int cascThr = 2,
     ChannelsPyramid* pChnsPyramidStrategy = nullptr
     );
 

@@ -21,19 +21,9 @@
 
 BadacostDetector::BadacostDetector
   (
-  int shrink,
-  int modelHt,
-  int modelWd,
-  int stride,
-  int cascThr,
   ChannelsPyramid* pChnsPyramidStrategy
   )
   {
-    m_srhink = shrink;
-    m_modelHt = modelHt;
-    m_modelWd = modelWd;
-    m_stride = stride;
-    m_cascThr = cascThr;
     m_classifierIsLoaded = false;
 
     // By defult the strategy is computing all channels in all scales (none is approximated).

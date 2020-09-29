@@ -1,14 +1,14 @@
 /** ------------------------------------------------------------------------
  *
- *  @brief ChannelsPyramidComputeAllStrategy
+ *  @brief ChannelsPyramidApproximatedStrategy
  *  @author Jorge Vela
  *  @author Jose M. Buenaposada (josemiguel.buenaposada@urjc.es)
- *  @date 2020/06/01
+ *  @date 2020/09/29
  *
  *  ------------------------------------------------------------------------ */
 
-#ifndef CHANNELS_PYRAMID_COMPUTE_ALL_STRATEGY
-#define CHANNELS_PYRAMID_COMPUTE_ALL_STRATEGY
+#ifndef CHANNELS_PYRAMID_APPROXIMATED_STRATEGY
+#define CHANNELS_PYRAMID_APPROXIMATED_STRATEGY
 
 #include <pyramid/ChannelsPyramid.h>
 #include <opencv2/opencv.hpp>
@@ -16,21 +16,24 @@
 #include <string>
 #include <iostream>
 
+
 /** ------------------------------------------------------------------------
  *
  *  @brief Class channels pyramid computation with approximated channels
  *
- *  In this class we compute all channels in the pyramid
- *  with a combination of ImgResample + extractChannels`.
+ *  In this class we implement the strategy given by P.Dollar in his original
+ *  Matlab toolbox. In this case some channels in the pyramid are computed
+ *  with a combination of ImgResample + extractChannels while most of them
+ *  are approximated by doing ImgResample of the computed channels.
  *
  *  ------------------------------------------------------------------------ */
-class ChannelsPyramidComputeAllStrategy: public ChannelsPyramid
+class ChannelsPyramidApproximatedStrategy: public ChannelsPyramid
 {
 public:
-  ChannelsPyramidComputeAllStrategy
+  ChannelsPyramidApproximatedStrategy
     ();
 
-  virtual ~ChannelsPyramidComputeAllStrategy
+  virtual ~ChannelsPyramidApproximatedStrategy
     ();
 
   virtual std::vector<std::vector<cv::Mat>> compute
