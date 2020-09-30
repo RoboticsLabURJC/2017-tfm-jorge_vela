@@ -32,11 +32,13 @@ public:
   ChannelsExtractorACF
     (
       cv::Size padding,
-      int shrink
+      int shrink,
+      bool postprocess_channels = true
     ) 
     {
       m_padding = padding;
       m_shrink = shrink;
+      m_postprocess_channels = postprocess_channels;
     };
 
   /**
@@ -53,10 +55,19 @@ public:
       cv::Mat img
     );
 
+  std::vector<cv::Mat>
+  postProcessChannels
+    (
+    std::vector<cv::Mat>& acf_channels_no_postprocessed // input
+    );
+
+  int getNumChannels() { return 10; }
+
 private:
   int m_shrink;
   std::string m_color_space;
   cv::Size m_padding;
+  bool m_postprocess_channels;
 
   struct channel {
     cv::Mat image;

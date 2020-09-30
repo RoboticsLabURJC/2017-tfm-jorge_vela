@@ -2,6 +2,7 @@
 #include <pyramid/ChannelsPyramidApproximatedStrategy.h>
 #include <channels/Utils.h>
 #include <channels/ChannelsExtractorLDCF.h>
+#include <channels/ChannelsExtractorACF.h>
 #include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
 #include <cmath>
@@ -25,21 +26,10 @@ ChannelsPyramidApproximatedStrategy::compute
   std::vector<cv::Size2d>& scaleshw
   )
 {
-  int smooth = 1;
   cv::Size sz = img.size();
-//  cv::Size minDs;
-//  minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-//  minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
-//  cv::Size pad;
-//  pad.width = 6; //12; //12; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-//  pad.height = 4; //6; //6; // <--- TODO: JM: Esto debería de venir de fichero del detector
-
-  //int lambdas = {};
   cv::Mat imageUse = img;
 
-  //-------------------------------------------------------------------------
-
-  //GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
+  // GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
   getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
@@ -73,13 +63,12 @@ ChannelsPyramidApproximatedStrategy::compute
     }
   }
 
-  std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
+  std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
-  for (const auto& i : isR) // <-- JM: Para solo escalas reales
-  //for(int i=0; i< nScales; i++) // <-- JM: De momento lo hacemos para todas las escalas (y no solo para las que hay en isR).
+  bool postprocess_acf_channels = false;
+  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels);
+  for (const auto& i : isR) // Full computation for the real scales (ImResample+extractFeatures)
   {
-    // double s = scales[i - 1]; // <-- JM Para solo escalas reales.
     double s = scales[i-1];
     cv::Size sz1;
     sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
@@ -100,55 +89,52 @@ ChannelsPyramidApproximatedStrategy::compute
       imageUse = I1;
     }
 
-    chnsPyramidData[i-1] = ldcfExtractor.extractFeatures(I1);
+    chnsPyramidDataACF[i-1] = acfExtractor.extractFeatures(I1);
   }
 
-  //COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]------------------------------- 
-  for(int i=0; i< isA.size(); i++)
+  //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
+  for (const auto& i : isA)
   {
-    int x = isA[i] -1;
-    int iR =  isN[x];
-    double s = scales[x];
-    int sz_1 = round(sz.width*scales[i]/m_shrink); //round((sz.width * s) / m_shrink) * m_shrink; //
-    int sz_2 = round(sz.height*scales[i]/m_shrink); //round((sz.height * s) / m_shrink) * m_shrink; //
-    int pad_x = round(m_padding.width / m_shrink);
-    int pad_y = round(m_padding.height / m_shrink);
+    int i1 = i - 1;
+    int iR = isN[i1] - 1;
 
-    sz_1 = round(round((sz_1+pad_x))*0.5);
-    sz_2 = round(round((sz_2+pad_y))*0.5);
+    cv::Size2f sz1(round(sz.width*scales[i1]/m_shrink),
+                   round(sz.height*scales[i1]/m_shrink));
+    std::vector<cv::Mat> resampleVect;
+    for (int k = 0; k < acfExtractor.getNumChannels(); k++)
+    {
+      int type_of_channel_index;
+      if (k < 3)
+      {
+        type_of_channel_index = 0; // LUV channels
+      }
+      else if (k == 3)
+      {
+        type_of_channel_index = 1; // Magnitude of gradient channel
+      }
+      else //if (k > 3)
+      {
+        type_of_channel_index = 2; // HoG channels.
+      }
 
-    int sz1[2] = {sz_1, sz_2};
-      std::vector<cv::Mat> resampleVect;
-      for(int k = 0; k < chnsPyramidData[iR-1].size(); k++){
-        int lambda;
-        if(k%10 < 3){
-          lambda = 0;
-        }else if(k%10 == 3){
-          lambda = 1;
-        }else if(k&10 > 3){
-          lambda = 2;
-        }
-        float ratio=pow((scales[i]/scales[iR]),-m_lambdas[lambda]);
-        cv::Mat resample = ImgResample(chnsPyramidData[iR-1][k], sz1[0] , sz1[1], "antialiasing", ratio); //RATIO
-        resampleVect.push_back(resample);
+      float ratio = pow((scales[i1]/scales[iR]),-m_lambdas[type_of_channel_index]);
+      cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio); //RATIO
+      resampleVect.push_back(resample);
     }
-    chnsPyramidData[x] = resampleVect;
+    chnsPyramidDataACF[i1] = resampleVect;
   }
 
-  /*
-  std::vector<cv::Mat> channelsConcat;
-  int x = pad.width / m_shrink;
-  int y = pad.height / m_shrink;
-  for(int i = 0; i < nScales; i++)
+  // Now we can filter the channels to get the LDCF ones.
+  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
+  std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
+  for (uint i=0; i < chnsPyramidDataACF.size(); i++)
   {
-      cv::Mat concat;
-      merge(chnsPyramidData[i], concat);
-      concat = convTri(concat, 1);
-      copyMakeBorder( concat, concat, y, y, x, x, cv::BORDER_REFLECT, 0 );
-      //copyMakeBorder( concat, concat, 2, 2, 3, 3, cv::BORDER_REPLICATE, 0 );
-      channelsConcat.push_back(concat);
+    // Postprocess the non-postprocessed ACF channels
+    std::vector<cv::Mat> acfChannels = acfExtractor.postProcessChannels(chnsPyramidDataACF[i]);
+
+    // Compute LDCF from the postprocessed ACF channels
+    chnsPyramidData[i] = ldcfExtractor.extractFeaturesFromACF(acfChannels);
   }
-  */
 
   return chnsPyramidData;
 }

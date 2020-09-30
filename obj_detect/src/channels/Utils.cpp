@@ -30,16 +30,18 @@
  */
 cv::Mat ImgResample(cv::Mat src, int width, int height, std::string method, float norm)
 {
-  cv::Mat dst(height, width, CV_32F, cv::Scalar(0, 0, 0));
-  if(method == "antialiasing")
+  cv::Mat dst; //(width, height, CV_32F, cv::Scalar(0, 0, 0)); // JM: The image creation is not needed ... increases the time?
+  if (method == "antialiasing")
   {
-    resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_AREA); //DICE QUE EN ALGUNOS CASOS NO UTILIZA ANTIALIASING OFF, POR LO QUE SERÍA INTER_AREA, EL CASO NORMAL ES INTER_LINEAR
+    resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA); //DICE QUE EN ALGUNOS CASOS NO UTILIZA ANTIALIASING OFF, POR LO QUE SERÍA INTER_AREA, EL CASO NORMAL ES INTER_LINEAR
   }
   else
   {
-    resize(src, dst,cv::Size(width,height), 0,0, cv::INTER_LINEAR);
+    resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
   }
-  dst = norm*dst;
+
+  dst *= norm;
+
   return dst;
 }
 
