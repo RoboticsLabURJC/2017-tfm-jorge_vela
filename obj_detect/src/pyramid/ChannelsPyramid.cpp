@@ -32,6 +32,12 @@ ChannelsPyramid::load(std::string opts)
     m_nApprox = pPyramid["nApprox"]["data"][0];
     m_shrink =  pPyramid["pChns.shrink"]["data"];
 
+
+    int lambdasSize = pPyramid["lambdas"]["cols"];
+    for(int i = 0; i < lambdasSize; i++)
+      m_lambdas.push_back((float)pPyramid["lambdas"]["data"][i]);
+    //m_lambdas[0] =  pPyramid["lambdas"]["data"][0];
+
     // TODO: Cargar del fichero!!
     m_minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
     m_minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
