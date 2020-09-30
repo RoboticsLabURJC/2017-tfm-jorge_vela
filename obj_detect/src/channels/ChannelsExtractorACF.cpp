@@ -116,15 +116,14 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   return postprocessedChannels;
 }
 
-
-std::vector<cv::Mat>
+void
 ChannelsExtractorACF::postProcessChannels
   (
-  std::vector<cv::Mat>& acf_channels_no_postprocessed
+  const std::vector<cv::Mat>& acf_channels_no_postprocessed,
+  std::vector<cv::Mat>& postprocessedChannels
   )
 {
     // Postprocessing of the ACF channels
-    std::vector<cv::Mat> postprocessedChannels;
     int x = round(m_padding.width / m_shrink);
     int y = round(m_padding.height / m_shrink);
 
@@ -143,6 +142,4 @@ ChannelsExtractorACF::postProcessChannels
 
       postprocessedChannels.push_back(c_padded);
     }
-
-    return postprocessedChannels;
 }

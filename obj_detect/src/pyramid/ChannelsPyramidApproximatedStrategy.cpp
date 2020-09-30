@@ -65,7 +65,7 @@ ChannelsPyramidApproximatedStrategy::compute
 
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  bool postprocess_acf_channels = false;
+  bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
   ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels);
   for (const auto& i : isR) // Full computation for the real scales (ImResample+extractFeatures)
   {
@@ -130,7 +130,8 @@ ChannelsPyramidApproximatedStrategy::compute
   for (uint i=0; i < chnsPyramidDataACF.size(); i++)
   {
     // Postprocess the non-postprocessed ACF channels
-    std::vector<cv::Mat> acfChannels = acfExtractor.postProcessChannels(chnsPyramidDataACF[i]);
+    std::vector<cv::Mat> acfChannels;
+    acfExtractor.postProcessChannels(chnsPyramidDataACF[i], acfChannels);
 
     // Compute LDCF from the postprocessed ACF channels
     chnsPyramidData[i] = ldcfExtractor.extractFeaturesFromACF(acfChannels);

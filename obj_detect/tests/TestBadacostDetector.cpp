@@ -10,6 +10,7 @@
 
 #include <detectors/BadacostDetector.h>
 #include <pyramid/ChannelsPyramidApproximatedStrategy.h>
+#include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
 
@@ -52,9 +53,41 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
   }
   std::cout << "detections.size() = " << detections.size() << std::endl;
 
-  cv::imshow("image", image);
-  cv::waitKey();
+//  cv::imshow("image", image);
+//  cv::waitKey();
 }
+
+TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParrallelStrategy){
+
+  std::string clfPath = "yaml/clf.yml";
+  std::string pyrPath = "yaml/pPyramid.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  ChannelsPyramid* pPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParrallelStrategy() );
+  BadacostDetector badacost(pPyramidStrategy);
+
+  bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
+  ASSERT_TRUE(loadVal);
+
+//    cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+//  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
+
+  std::vector<DetectionRectangle> detections = badacost.detect(image);
+  for(DetectionRectangle d: detections)
+  {
+    std::cout << "[ x=" << d.bbox.x << ", y=";
+    std::cout << d.bbox.y << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
+    std::cout << " ] " << std::endl;
+    cv::rectangle(image, d.bbox, cv::Scalar(200,0,0),2);
+  }
+  std::cout << "detections.size() = " << detections.size() << std::endl;
+
+//  cv::imshow("image", image);
+//  cv::waitKey();
+
+}
+
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 
@@ -82,8 +115,8 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
   }
   std::cout << "detections.size() = " << detections.size() << std::endl;
 
-  cv::imshow("image", image);
-  cv::waitKey();
+//  cv::imshow("image", image);
+//  cv::waitKey();
 
 }
 

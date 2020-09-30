@@ -61,7 +61,7 @@ public:
    */
   std::vector<cv::Mat> extractFeaturesFromACF
     (
-      std::vector<cv::Mat> acf_features
+      const std::vector<cv::Mat>& acf_features
     );
 
 private:

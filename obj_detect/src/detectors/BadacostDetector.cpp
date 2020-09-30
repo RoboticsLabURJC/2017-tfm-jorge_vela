@@ -407,7 +407,9 @@ BadacostDetector::detectSingleScale
     #pragma omp parallel for num_threads(nThreads)
     #endif
   */
-  for( int c=0; c < width1; c++ )
+  cv::parallel_for_({ 0, width1 }, [&](const cv::Range& r) {
+  for (int c = r.start; c < r.end; c++)
+  //for( int c=0; c < width1; c++ )
   {
     for( int r=0; r < height1 ; r++ ) 
     { 
@@ -540,8 +542,10 @@ BadacostDetector::detectSingleScale
         hs1[index] = h; 
         scores[index] = trace; 
       }
-    }  
+    }    
   } // End detector execution for all windows through rows and cols.
+  }
+  ); // parallel_for_
 
 /*
   delete [] cids;

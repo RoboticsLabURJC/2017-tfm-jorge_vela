@@ -55,10 +55,11 @@ public:
       cv::Mat img
     );
 
-  std::vector<cv::Mat>
+  void
   postProcessChannels
     (
-    std::vector<cv::Mat>& acf_channels_no_postprocessed // input
+    const std::vector<cv::Mat>& acf_channels_no_postprocessed, // input
+    std::vector<cv::Mat>& postprocessedChannels // output
     );
 
   int getNumChannels() { return 10; }

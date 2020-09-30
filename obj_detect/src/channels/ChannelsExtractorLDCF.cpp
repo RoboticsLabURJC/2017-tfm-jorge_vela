@@ -55,7 +55,7 @@ std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
 std::vector<cv::Mat>
 ChannelsExtractorLDCF::extractFeaturesFromACF
   (
-    std::vector<cv::Mat> acf_channels
+    const std::vector<cv::Mat>& acf_channels
   )
 {
     // Now use convolution over the preprocessed ACF channels with the LDCF filters.
