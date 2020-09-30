@@ -44,17 +44,10 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 //  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
 
   std::vector<DetectionRectangle> detections = badacost.detect(image);
-  for(DetectionRectangle d: detections)
-  {
-    std::cout << "[ x=" << d.bbox.x << ", y=";
-    std::cout << d.bbox.y << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
-    std::cout << " ] " << std::endl;
-    cv::rectangle(image, d.bbox, cv::Scalar(200,0,0),2);
-  }
-  std::cout << "detections.size() = " << detections.size() << std::endl;
-
-//  cv::imshow("image", image);
-//  cv::waitKey();
+  std::cout << detections;
+  badacost.showResults(image, detections);
+  cv::imshow("image", image);
+  cv::waitKey();
 }
 
 TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParrallelStrategy){
@@ -74,15 +67,8 @@ TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParrallelStrategy){
 //  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
 
   std::vector<DetectionRectangle> detections = badacost.detect(image);
-  for(DetectionRectangle d: detections)
-  {
-    std::cout << "[ x=" << d.bbox.x << ", y=";
-    std::cout << d.bbox.y << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
-    std::cout << " ] " << std::endl;
-    cv::rectangle(image, d.bbox, cv::Scalar(200,0,0),2);
-  }
-  std::cout << "detections.size() = " << detections.size() << std::endl;
-
+  std::cout << detections;
+  badacost.showResults(image, detections);
 //  cv::imshow("image", image);
 //  cv::waitKey();
 
@@ -106,15 +92,8 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 //  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
 
   std::vector<DetectionRectangle> detections = badacost.detect(image);
-  for(DetectionRectangle d: detections)
-  {
-    std::cout << "[ x=" << d.bbox.x << ", y=";
-    std::cout << d.bbox.y << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
-    std::cout << " ] " << std::endl;
-    cv::rectangle(image, d.bbox, cv::Scalar(200,0,0),2);
-  }
-  std::cout << "detections.size() = " << detections.size() << std::endl;
-
+  std::cout << detections;
+  badacost.showResults(image, detections);
 //  cv::imshow("image", image);
 //  cv::waitKey();
 

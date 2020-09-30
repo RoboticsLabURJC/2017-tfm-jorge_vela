@@ -401,17 +401,11 @@ BadacostDetector::detectSingleScale
   int modelHt_s = m_modelDsPad.height/m_shrink;
   int modelWd_s_times_Ht_s = modelWd_s*modelHt_s;
 
-  /*
-    #ifdef USEOMP
-    int nThreads = omp_get_max_threads();
-    #pragma omp parallel for num_threads(nThreads)
-    #endif
-  */
-  cv::parallel_for_({ 0, width1 }, [&](const cv::Range& r) {
-  for (int c = r.start; c < r.end; c++)
+  cv::parallel_for_({ 0, width1 }, [&](const cv::Range& rang) {
+  for (int c = rang.start; c < rang.end; c++)
   //for( int c=0; c < width1; c++ )
   {
-    for( int r=0; r < height1 ; r++ ) 
+    for( int r=0; r < height1 ; r++ )
     { 
       //std::cout << "c = " << c << ", " << "r = " << r << ", " << "width1 = " << width1 << ", " << "height1 = " << height1 << std::endl;
 
@@ -542,7 +536,7 @@ BadacostDetector::detectSingleScale
         hs1[index] = h; 
         scores[index] = trace; 
       }
-    }    
+    }
   } // End detector execution for all windows through rows and cols.
   }
   ); // parallel_for_
@@ -665,10 +659,43 @@ void BadacostDetector::nonMaximumSuppression
   }
 }
 
+void
+BadacostDetector::showResults
+  (
+  cv::Mat img,
+  const std::vector<DetectionRectangle>& detections
+  )
+{
+  for(DetectionRectangle d: detections)
+  {
+    cv::rectangle(img, d.bbox, cv::Scalar(0, 255, 0), 2);
 
+    // score with 2 decimal positions
+    std::ostringstream out;
+    out.precision(2);
+    out << std::fixed << d.score;
+    std::string score_txt = out.str();
 
+    // The score is up left in the bbox rectangle
+    cv::putText(img, //target image
+                score_txt,
+                cv::Point(d.bbox.x, d.bbox.y-5),
+                cv::FONT_HERSHEY_DUPLEX,
+                0.5,
+                CV_RGB(255, 255, 0),
+                1);
 
+    // Class - 1 shown in the left bottom corner
+    cv::putText(img, //target image
+                std::to_string(d.class_index-1),
+                cv::Point(d.bbox.x, d.bbox.y+d.bbox.height+15),
+                cv::FONT_HERSHEY_DUPLEX,
+                0.5,
+                CV_RGB(255, 255, 0),
+                1);
 
+  }
+}
 
 
 

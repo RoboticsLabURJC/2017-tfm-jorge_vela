@@ -19,24 +19,22 @@ ChannelsPyramid::~ChannelsPyramid
 bool
 ChannelsPyramid::load(std::string opts)
 {
-//  bool loadValue = true;
   cv::FileStorage pPyramid;
   bool existOpts = pPyramid.open(opts, cv::FileStorage::READ);
 
-  if(existOpts)
+  if (existOpts)
   {
     m_padding.width = 6; //pPyramid["pad"]["data"][1];
     m_padding.height = 4; //pPyramid["pad"]["data"][0];
     m_nOctUp = 0; //pPyramid["nOctUp"]["data"][0];
-    m_nPerOct = pPyramid["nPerOct"]["data"][0];
-    m_nApprox = pPyramid["nApprox"]["data"][0];
-    m_shrink =  pPyramid["pChns.shrink"]["data"];
+    m_nPerOct = 3; //pPyramid["nPerOct"]["data"][0];
+    m_nApprox = 2; //pPyramid["nApprox"]["data"][0];
+    m_shrink = pPyramid["pChns.shrink"]["data"];
 
 
     int lambdasSize = pPyramid["lambdas"]["cols"];
     for(int i = 0; i < lambdasSize; i++)
       m_lambdas.push_back((float)pPyramid["lambdas"]["data"][i]);
-    //m_lambdas[0] =  pPyramid["lambdas"]["data"][0];
 
     // TODO: Cargar del fichero!!
     m_minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
@@ -80,10 +78,6 @@ ChannelsPyramid::getScales
 
   cv::Size2d ratio(double(sz.width) / double(minDs.width), double(sz.height) / double(minDs.height));
   int nScales = std::floor(double(nPerOct) * (double(nOctUp) + log2(std::min(ratio.width, ratio.height))) + 1.0);
-
-//  std::cout << "double(nPerOct) = " << double(nPerOct) << std::endl;
-//  std::cout << "double(nOctUp) + log2(std::min(ratio.width, ratio.height) = " << double(nOctUp) + log2(std::min(ratio.width, ratio.height)) << std::endl;
-//  std::cout << "double(nPerOct) * (double(nOctUp) + log2(std::min(ratio.width, ratio.height))) + 1.0 = " << double(nPerOct) * (double(nOctUp) + log2(std::min(ratio.width, ratio.height))) + 1.0 << std::endl;
 
   double d0 = sz.height, d1 = sz.width;
   if (sz.height >= sz.width)

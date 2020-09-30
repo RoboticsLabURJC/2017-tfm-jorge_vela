@@ -44,6 +44,13 @@ public:
     cv::Mat img
     );
 
+  void
+  showResults
+    (
+    cv::Mat img,
+    const std::vector<DetectionRectangle>& detections
+    );
+
 protected:
   std::vector<cv::Mat> loadFilters(std::string filtersPath);
 

@@ -76,4 +76,36 @@ struct DetectionRectangle
 
 };
 
+inline std::ostream&
+operator<<
+(
+  std::ostream& os,
+  const DetectionRectangle& d
+)
+{
+  os << "[ x=" << d.bbox.x << ", y=" <<  d.bbox.y;
+  os << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
+  os << ", score=" << d.score;
+  os << " ] " << std::endl;
+
+  return os;
+}
+
+inline std::ostream&
+operator<<
+(
+  std::ostream& os,
+  const std::vector<DetectionRectangle>& detections
+)
+{
+  for(DetectionRectangle d: detections)
+  {
+    os << d;
+  }
+  os << "#detections = " << detections.size() << std::endl;
+
+  return os;
+}
+
+
 #endif // DETECTION_HPP
