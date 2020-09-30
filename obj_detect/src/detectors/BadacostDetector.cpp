@@ -288,8 +288,8 @@ BadacostDetector::detect(cv::Mat img)
     for (uint j = 0; j < detections_i.size(); j++)
     {
       DetectionRectangle d = detections_i[j];
-      d.bbox.x = (d.bbox.x + shift_x)/scaleshw[i].width;
-      d.bbox.y = (d.bbox.y + shift_y)/scaleshw[i].height;
+      d.bbox.x = (d.bbox.x + shift_x) / scaleshw[i].width;
+      d.bbox.y = (d.bbox.y + shift_y) / scaleshw[i].height;
       d.bbox.width = m_modelDs.width / scales[i];
       d.bbox.height = m_modelDs.height / scales[i];
 
@@ -306,7 +306,13 @@ BadacostDetector::detect(cv::Mat img)
     correctToClassSpecificBbs(detections, m_aRatio, m_aRatioFixedWidth);
   }
 
-  return detections;
+  std::vector<DetectionRectangle> detections_nms;
+  nonMaximumSuppression(detections, detections_nms);
+
+  std::cout << "detections.size() = " << detections.size() << std::endl;
+  std::cout << "detections_nms.size() = " << detections_nms.size() << std::endl;
+
+  return detections_nms;
 }
 
 std::vector<DetectionRectangle>
@@ -513,20 +519,19 @@ BadacostDetector::detectSingleScale
       {
         h = 1;
       }
-      else //if (trace > 0)
-      //if (h > 1)
+      else
       {
         // WARNING: Change with respect to the Matlab's implementation ... there is a bug in the matlab implementation
         //          as it returns the h (positive class) of the last executed tree and not the minimum cost one !!! :-(.
         // If trace is negative we have a background window (class is 1)
         // Otherwise we have a positive (object) class)
-//        double min_cost;
-//        double max_cost;
-//        int min_ind[2];
-//        int max_ind[2];
-//        cv::minMaxIdx(costs_vector.rowRange(1,m_num_classes),
-//                      &min_cost, &max_cost, min_ind, max_ind, cv::Mat());
-//        h = min_ind[0] + 2; // +1 because of 0 index, and +1 because of negative class is 1.
+        double min_cost;
+        double max_cost;
+        int min_ind[2];
+        int max_ind[2];
+        cv::minMaxIdx(costs_vector.rowRange(1,m_num_classes),
+                      &min_cost, &max_cost, min_ind, max_ind, cv::Mat());
+        h = min_ind[0] + 2; // +1 because of 0 index, and +1 because of negative class is 1.
         // End of corrected code w.r.t. Matlab's implementation.
 
         int index = c + (r * width1);
@@ -569,6 +574,92 @@ BadacostDetector::detectSingleScale
   return detections;
 }
 
+void BadacostDetector::nonMaximumSuppression
+  (
+  std::vector<DetectionRectangle>& dts,  // input
+  std::vector<DetectionRectangle>& dts_nms // output
+  )
+{
+  //float thr = -std::numeric_limits<float>::infinity();
+  //float maxn = std::numeric_limits<float>::infinity(); // Maximum number of bboxes to output
+  bool ovrDnm = true;
+  float overlap = 0.3;
+  std::vector<float> radii = {0.15, 0.15, 1., 1.};
+
+  if (dts.size() == 0)
+  {
+    return;
+  }
+
+  // -----------------------------------------------------------
+  // for each i suppress all j st j>i and area-overlap>overlap
+  // -----------------------------------------------------------
+
+  // Order dts rectangles by descending order of score.
+  auto greater_score = [](DetectionRectangle& d1, DetectionRectangle& d2){ return d1.score > d2.score; };
+  std::sort(dts.begin(), dts.end(), greater_score);
+
+  std::vector<bool> kp(dts.size(), true);
+  std::vector<int> areas;
+  std::vector<int> x2, y2;
+  for (DetectionRectangle d: dts)
+  {
+    areas.push_back(d.bbox.height * d.bbox.width);
+    x2.push_back(d.bbox.x + d.bbox.width);
+    y2.push_back(d.bbox.y + d.bbox.height);
+  }
+
+  for (uint i = 0; i < dts.size(); i++)
+  {
+    if (!kp[i])
+    {
+      continue;
+    }
+    for (uint j = (i+1); j <= dts.size(); j++)
+    {
+      if (!kp[j])
+      {
+        continue;
+      }
+
+      int iw = std::min(x2[i], x2[j]) - std::max(dts[i].bbox.x, dts[j].bbox.x);
+      if (iw <= 0)
+      {
+        continue;
+      }
+
+      int ih = std::min(y2[i], y2[j]) - std::max(dts[i].bbox.y, dts[j].bbox.y);
+      if (ih <= 0)
+      {
+        continue;
+      }
+
+      float o = iw*ih;
+      int u;
+      if (ovrDnm)
+      {
+        u = areas[i] + areas[j] - o;
+      }
+      else
+      {
+        u = std::min(areas[i], areas[j]);
+      }
+      o = o / static_cast<float>(u);
+      if (o > overlap)
+      {
+        kp[j] = false;
+      }
+    }
+  }
+
+  for (uint i=0; i<dts.size(); i++)
+  {
+    if (kp[i])
+    {
+      dts_nms.push_back(dts[i]);
+    }
+  }
+}
 
 
 

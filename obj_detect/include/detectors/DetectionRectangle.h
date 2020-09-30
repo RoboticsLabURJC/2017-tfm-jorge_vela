@@ -22,6 +22,11 @@ struct DetectionRectangle
   float score;     // Detection score (the higher the more confident).
   int class_index; // Detected class index (e.g. representing car orientation)
 
+//  bool operator<(DetectionRectangle& d)
+//  {
+//    return this->score < d.score;
+//  }
+
   /**
    * Resize the bbox (without moving their centers).
    *
