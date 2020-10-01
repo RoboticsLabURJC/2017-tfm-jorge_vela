@@ -25,16 +25,7 @@ ChannelsPyramidComputeAllStrategy::compute
   std::vector<cv::Size2d>& scaleshw
   )
 {
-  int smooth = 1;
   cv::Size sz = img.size();
-//  cv::Size minDs;
-//  minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-//  minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
-//  cv::Size pad;
-//  pad.width = 6; //12; //12; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-//  pad.height = 4; //6; //6; // <--- TODO: JM: Esto debería de venir de fichero del detector
-
-  //int lambdas = {};
   cv::Mat imageUse = img;
 
   getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);

@@ -157,7 +157,7 @@ bool BadacostDetector::load
 
   m_shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
   m_stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  m_cascThr = -2.239887; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  m_cascThr = -2.239887 * 0.1; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
   m_padding.width = 6; //pPyramid["pad"]["data"][1];
   m_padding.height = 4; //pPyramid["pad"]["data"][0];
   // <------ END TODO
@@ -399,12 +399,17 @@ BadacostDetector::detectSingleScale
   int modelHt_s = m_modelDsPad.height/m_shrink;
   int modelWd_s_times_Ht_s = modelWd_s*modelHt_s;
 
-  cv::parallel_for_({ 0, width1 }, [&](const cv::Range& rang) {
-  for (int c = rang.start; c < rang.end; c++)
-  //for( int c=0; c < width1; c++ )
+  cv::parallel_for_({ 0, width1*height1 }, [&](const cv::Range& rang)
   {
-    for( int r=0; r < height1 ; r++ )
-    { 
+    for (int k = rang.start; k < rang.end; k++)
+    {
+//  for( int c=0; c < width1; c++ )
+//  {
+//    for( int r=0; r < height1 ; r++ )
+//    {
+      int r = k / width1;
+      int c = k % width1;
+
       //std::cout << "c = " << c << ", " << "r = " << r << ", " << "width1 = " << width1 << ", " << "height1 = " << height1 << std::endl;
 
       // Initialise the margin_vector memory to 0.0
@@ -534,10 +539,9 @@ BadacostDetector::detectSingleScale
         hs1[index] = h; 
         scores[index] = trace; 
       }
-    }
-  } // End detector execution for all windows through rows and cols.
-  }
-  ); // parallel_for_
+    } // for (int k = rang.start; k < rang.end; k++)
+  }  // End detector execution for all windows through rows and cols.
+  ); // parallel_for_ clossing.
 
 /*
   delete [] cids;

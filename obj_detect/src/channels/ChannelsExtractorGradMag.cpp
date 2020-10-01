@@ -108,9 +108,9 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
   // allocate memory for storing one column of output (padded so h4%4==0)
   h4=(h%4==0) ? h : h-(h%4)+4; s=d*h4*sizeof(float);
 
-  M2= new float[s+16](); _M2=(__m128*) M2;
-  Gx= new float[s+16](); _Gx=(__m128*) Gx;
-  Gy= new float[s+16](); _Gy=(__m128*) Gy;
+  M2 = new float[s+16](); _M2=(__m128*) M2;
+  Gx = new float[s+16](); _Gx=(__m128*) Gx;
+  Gy = new float[s+16](); _Gy=(__m128*) Gy;
 
   // compute gradient magnitude and orientation for each column
   for( x=0; x<w; x++ ) {
@@ -148,7 +148,9 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
       for( ; y<h; y++ ) O[y+x*h]+=(Gy[y]<0)*PI;
     }
   }
-  delete(Gx); delete(Gy); delete(M2);     
+  delete [] Gx;
+  delete [] Gy;
+  delete [] M2;
 }
 
 /**
