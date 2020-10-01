@@ -167,8 +167,6 @@ bool BadacostDetector::load
   bool loadedOKPyr = false;
   if (file_exists)
   {
-    std::cout << "Pyramids file exists!" << std::endl;
-
     // TODO: JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
     // no existe no se hace nada, si existe se pasan los filtros.
     loadedOKPyr = m_pChnsPyramidStrategy->load(pyrPath.c_str());
@@ -178,7 +176,6 @@ bool BadacostDetector::load
   file_exists = pyramid.open(filtersPath, cv::FileStorage::READ);
   if (file_exists)
   {
-    std::cout << "Filters exists!" << std::endl;
     m_filters = loadFilters(filtersPath);
   }
 
@@ -197,7 +194,6 @@ BadacostDetector::loadFilters(std::string filtersPath)
   std::vector<std::string> namesFilters;
   int num_filters_per_channel = 4; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
   int num_channels = 10; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
-//  int filter_size = 5; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
   for(int i = 1; i <= num_filters_per_channel; i++)
   {
     for(int j = 1; j <= num_channels; j++)
@@ -309,8 +305,10 @@ BadacostDetector::detect(cv::Mat img)
   std::vector<DetectionRectangle> detections_nms;
   nonMaximumSuppression(detections, detections_nms);
 
+#ifdef DEBUG
   std::cout << "detections.size() = " << detections.size() << std::endl;
   std::cout << "detections_nms.size() = " << detections_nms.size() << std::endl;
+#endif
 
   return detections_nms;
 }

@@ -113,7 +113,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
   {
     delete pChnsPyramid;
   }
-  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParrallelStrategy() );
+  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParallelStrategy() );
 
   bool loadOk = pChnsPyramid->load(nameOpts.c_str());
   ASSERT_TRUE(loadOk);

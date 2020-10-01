@@ -15,10 +15,10 @@
 #undef DEBUG
 //#define DEBUG
 
-ChannelsPyramidComputeAllParrallelStrategy::ChannelsPyramidComputeAllParrallelStrategy
+ChannelsPyramidComputeAllParallelStrategy::ChannelsPyramidComputeAllParallelStrategy
   () {};
 
-ChannelsPyramidComputeAllParrallelStrategy::~ChannelsPyramidComputeAllParrallelStrategy
+ChannelsPyramidComputeAllParallelStrategy::~ChannelsPyramidComputeAllParallelStrategy
   () {};
 
 inline std::vector<int>
@@ -34,7 +34,7 @@ create_random_indices
 }
 
 std::vector<std::vector<cv::Mat>>
-ChannelsPyramidComputeAllParrallelStrategy::compute
+ChannelsPyramidComputeAllParallelStrategy::compute
   (
   cv::Mat img,
   std::vector<cv::Mat> filters,

@@ -24,13 +24,13 @@
  *  compute channels in a parallel loop.
  *
  *  ------------------------------------------------------------------------ */
-class ChannelsPyramidComputeAllParrallelStrategy: public ChannelsPyramid
+class ChannelsPyramidComputeAllParallelStrategy: public ChannelsPyramid
 {
 public:
-  ChannelsPyramidComputeAllParrallelStrategy
+  ChannelsPyramidComputeAllParallelStrategy
     ();
 
-  virtual ~ChannelsPyramidComputeAllParrallelStrategy
+  virtual ~ChannelsPyramidComputeAllParallelStrategy
     ();
 
   virtual std::vector<std::vector<cv::Mat>> compute

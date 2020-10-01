@@ -22,10 +22,17 @@ struct DetectionRectangle
   float score;     // Detection score (the higher the more confident).
   int class_index; // Detected class index (e.g. representing car orientation)
 
-//  bool operator<(DetectionRectangle& d)
-//  {
-//    return this->score < d.score;
-//  }
+  /**
+   * Computes the IoU of d.bbox with this->bbox rectangles.
+   *
+   * @param d rectangle detection to compare with.
+   * @return The IoU score of d.bbox and this->bbox.
+   */
+  float
+  overlap
+    (
+    const DetectionRectangle& d
+    ) const;
 
   /**
    * Resize the bbox (without moving their centers).
@@ -86,6 +93,7 @@ operator<<
   os << "[ x=" << d.bbox.x << ", y=" <<  d.bbox.y;
   os << ", w=" << d.bbox.width << ", h=" << d.bbox.height;
   os << ", score=" << d.score;
+  os << ", class_index=" << d.class_index;
   os << " ] " << std::endl;
 
   return os;
