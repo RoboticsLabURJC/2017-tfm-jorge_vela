@@ -36,38 +36,42 @@ public:
 TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
 {
   cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
-  std::vector<cv::Mat> filters;
   int shrink = 4;
   cv::Size padding;
   padding.width = 2;
   padding.height = 2;
+
   cv::FileStorage filter;
   filter.open("yaml/filterTest.yml", cv::FileStorage::READ);
-
   //OBTENER EL NOMBRE DE LOS DISTINTOS FILTROS PARA ESTE CASO
   std::vector<std::string> namesFilters;
-  for(int i = 1; i < 5; i++){
-    for(int j = 1; j< 11; j++){
+  int num_filters_per_channel = 4;
+  int num_channels = 10; //
+  for(int i = 1; i <= num_filters_per_channel; i++)
+  {
+    for(int j = 1; j <= num_channels; j++)
+    {
       std::string name  = "filter_" + std::to_string(j) + "_" + std::to_string(i);
       namesFilters.push_back(name);
     }
   }
 
-  //SE CARGAN LOS DISTINTOS FILTROS, CON LOS NOMBRES ANTERIORES DESDE EL YML
-  for(int k = 0; k < namesFilters.size(); k++){
-    cv::FileNode filterData = filter[namesFilters[k].c_str()]["data"];
-    cv::FileNode filterRows = filter[namesFilters[k].c_str()]["rows"];
-    cv::FileNode filterCols = filter[namesFilters[k].c_str()]["cols"];
-    float* filt = new float[25*sizeof(float)];
+  std::vector<cv::Mat> filters;
+  std::vector<float> p;
+  for(uint k = 0; k < namesFilters.size(); k++)
+  {
+    cv::FileNode filterData = filter[namesFilters[k]]["data"];
+    cv::FileNode filterRows = filter[namesFilters[k]]["cols"];
+    cv::FileNode filterCols = filter[namesFilters[k]]["rows"];
 
-    for(int i = 0; i < (int)filterRows; i++){
-      for(int j = 0; j < (int)filterCols; j++){
-        float x = (float)filterData[i*5+j];
-        filt[j*5+i] = x;
-      }
-    }
-    cv::Mat filterConver = cv::Mat(5,5, CV_32FC1, filt);
+    cv::Mat filterConver = cv::Mat::zeros(filterRows, filterCols, CV_32F);
+    p.clear();
+    filterData >> p;
+    memcpy(filterConver.data, p.data(), p.size()*sizeof(float));
     transpose(filterConver,filterConver);
+    // NOTE: filter2D is a correlation and to do convolution as in Matlab's conv2 we have to flip the kernels in advance.
+    //       We have do it when loading them from file.
+    cv::flip(filterConver, filterConver, -1);
     filters.push_back(filterConver);
   }
   ChannelsExtractorLDCF ldcfExtractor(filters, padding, shrink);
@@ -79,11 +83,11 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
 
   cv::FileStorage fs1;
   bool file_exists = fs1.open("yaml/LDCF.yml", cv::FileStorage::READ);
-  std::cout << file_exists << std::endl;
   cv::FileNode rows = fs1["filtered_1"]["rows"];
   cv::FileNode cols = fs1["filtered_1"]["cols"];
   cv::FileNode Filtered = fs1["filtered_1"]["data"];
 
+  std::cout << filters[0] << std::endl;
   int j = 0;
   int difference = 0;
   for(int y=0;y<(int)rows;y++)
@@ -97,62 +101,6 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
     }
   }
   ASSERT_TRUE(difference < 40);
-  //printf("%d %d \n", image.size().height, image.size().width);
- 
-//  int shrink = 2;
-//  cv::Size padding;
-//  padding.width = 3;
-//  padding.height = 2;
-//  // Extract ACF channels using paramenters from matlab.
-//  std::vector<cv::Mat> acf_channels;
-//  ChannelsExtractorACF acfExtractor(padding, shrink);
-//  //acf_channels = acfExtractor.extractFeatures(luv_image);
-//  acf_channels = acfExtractor.extractFeatures(image);
-//  //printf("%d %d \n", acf_channels[0].size().height, acf_channels[0].size().width);
-
-//  ASSERT_TRUE(acf_channels.size() == 10);
-
-//  cv::FileStorage filter;
-//  filter.open("yaml/filterTest.yml", cv::FileStorage::READ);
-
-//  //OBTENER EL NOMBRE DE LOS DISTINTOS FILTROS PARA ESTE CASO
-//  std::vector<std::string> namesFilters;
-//  for(int i = 1; i < 5; i++){
-//    for(int j = 1; j< 11; j++){
-//      std::string name  = "filter_" + std::to_string(j) + "_" + std::to_string(i);
-//      namesFilters.push_back(name);
-//    }
-//  }
-
-//  //SE CARGAN LOS DISTINTOS FILTROS, CON LOS NOMBRES ANTERIORES DESDE EL YML
-//  std::vector<cv::Mat> filters;
-//  for(int k = 0; k < namesFilters.size(); k++){
-//    cv::FileNode filterData = filter[namesFilters[k].c_str()]["data"];
-//    cv::FileNode filterRows = filter[namesFilters[k].c_str()]["rows"];
-//    cv::FileNode filterCols = filter[namesFilters[k].c_str()]["cols"];
-
-//    float* filt = new float[25*sizeof(float)];
-
-//    for(int i = 0; i < (int)filterRows; i++){
-//      for(int j = 0; j < (int)filterCols; j++){
-//        float x = (float)filterData[i*5+j];
-//        filt[j*5+i] = x;
-//      }
-//    }
-//    cv::Mat filterConver = cv::Mat(5,5, CV_32FC1, filt);
-//    transpose(filterConver,filterConver);
-//    filters.push_back(filterConver);
-//  }
-
-
-//  ChannelsExtractorLDCF ldcfExtractor(filters, padding, shrink);
-
-  //std::vector<cv::Mat> ldcfExtractImages = ldcfExtractor.extractFeaturesFromACF(acf_channels);
-  //ASSERT_TRUE(ldcfExtractImages.size() == 40);
-
-  //std::vector<cv::Mat> ldcfExtractFeatures = ldcfExtractor.extractFeatures(image);
-  //ASSERT_TRUE(ldcfExtractFeatures.size() == 40);
-
 }
 
 
