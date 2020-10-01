@@ -17,47 +17,50 @@
 
 class GradMagExtractor
 {
+public:
+  GradMagExtractor
+    (
+      int normRad = 0,
+      float normConst = 0.005
+    )
+  {
+    m_normRad = normRad;
+    m_normConst = normConst;
+  };
+    
+  std::vector<cv::Mat> extractFeatures
+    (
+      cv::Mat img 
+    );
 
 private:
   int m_normRad;
   float m_normConst;
 
-    float* allocW
+  float*
+  allocW
     (
-      int size, 
+      int size,
       int sf,
       int misalign
     );
 
-  std::vector<cv::Mat> gradM
+  std::vector<cv::Mat>
+  gradM
     (
       cv::Mat image,
       float* M,
       float* O
     );
 
-  void gradMagNorm
+  void
+  gradMagNorm
     (
-      float *M, 
-      float *S, 
-      int h, 
-      int w, 
-      float norm 
-    );
-
-public:
-  GradMagExtractor
-    (
-      int normRad = 0,
-      float normConst = 0.005
-    ){
-      m_normRad = normRad;
-      m_normConst = normConst;
-    };
-    
-  std::vector<cv::Mat> extractFeatures
-    (
-      cv::Mat img 
+      float *M,
+      float *S,
+      int h,
+      int w,
+      float norm
     );
 };
 

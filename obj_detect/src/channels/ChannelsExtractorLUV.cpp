@@ -13,8 +13,26 @@
 #include <opencv2/opencv.hpp>
 
 // ------------------- Adapted from Piotr Dollar Matlab Toolbox --------------------
+
+ChannelsLUVExtractor::ChannelsLUVExtractor
+  (
+    float smooth,
+    int smooth_kernel_size
+  )
+{
+    m_smooth = smooth;
+    m_smooth_kernel_size = smooth_kernel_size;
+
+    m_scaling_factor = 1.0f/255.0f;
+
+    // Look-Up Table for L values.
+    m_L_LUT = cv::Mat::zeros(1064, 1, CV_32FC1);
+    bgr2luvSetup(m_scaling_factor, m_mr, m_mg, m_mb, m_minu, m_minv, m_un, m_vn, m_L_LUT);
+}
+
 // Constants for rgb2luv conversion and lookup table for y-> l conversion
-cv::Mat ChannelsLUVExtractor::bgr2luvSetup
+void
+ChannelsLUVExtractor::bgr2luvSetup
   (
     float scaling_factor, // if image values uint8 -> 1.0/255.0, if float -> 1.0.
     float* mr,
@@ -23,13 +41,10 @@ cv::Mat ChannelsLUVExtractor::bgr2luvSetup
     float& minu,
     float& minv,
     float& un,
-    float& vn
+    float& vn,
+    cv::Mat& L_LUT
   )
 {
-  // Look-Up Table for L values.
-  static cv::Mat L_LUT = cv::Mat::zeros(1064, 1, CV_32FC1);
-  static bool L_LUT_initialized = false;
-
   // Constants for conversion
   const float y0 = ((6.0f/29)*(6.0f/29)*(6.0f/29));
   const float a = ((29.0f/3)*(29.0f/3)*(29.0f/3));
@@ -51,11 +66,7 @@ cv::Mat ChannelsLUVExtractor::bgr2luvSetup
   minu = -88*maxi;
   minv = -134*maxi;
 
-  // build (padded) lookup table for y->l conversion assuming y in [0,1]
-  if (L_LUT_initialized)
-  {
-    return L_LUT;
-  }
+  // build lookup table for y->l conversion assuming y in [0,1]
   float y, l;
   for(int i=0; i<1025; i++)
   {
@@ -63,53 +74,109 @@ cv::Mat ChannelsLUVExtractor::bgr2luvSetup
     l = y>y0 ? 116.0f*static_cast<float>(pow(static_cast<double>(y),1.0/3.0))-16 : y*a;
     L_LUT.at<float>(i, 0) = l*maxi;
   }
+
   for(int i=1025; i<1064; i++)
   {
     L_LUT.at<float>(i, 0) = L_LUT.at<float>(i-1, 0);
   }
-  L_LUT_initialized = true;
-  return L_LUT;
 }
 
 // Convert from rgb to luv
 std::vector<cv::Mat> ChannelsLUVExtractor::bgr2luv
   (
-  cv::Mat bgr_img,
-  float scaling_factor
+  cv::Mat bgr_img
   )
 {
   std::vector<cv::Mat> luv(3);
   std::vector<cv::Mat> bgr(3);
   cv::Size img_sz = bgr_img.size();
 
-  float minu, minv, un, vn, mr[3], mg[3], mb[3];
-  cv::Mat L_LUT = bgr2luvSetup(scaling_factor, mr, mg, mb, minu, minv, un, vn);
+//  float minu, minv, un, vn, mr[3], mg[3], mb[3];
+//  cv::Mat L_LUT = bgr2luvSetup(scaling_factor, mr, mg, mb, minu, minv, un, vn);
   luv[0] = cv::Mat::zeros(img_sz, CV_32FC1);
   luv[1] = cv::Mat::zeros(img_sz, CV_32FC1);
   luv[2] = cv::Mat::zeros(img_sz, CV_32FC1);
   cv::split(bgr_img, bgr);
 
-  float x, y, z, l;
-  float r, g, b;
+#define USE_CVMAT_IMPLEMENTATION
+#ifdef USE_CVMAT_IMPLEMANTATION
+  cv::Mat b;
+  bgr[0].convertTo(b, CV_32FC1);
+  cv::Mat g;
+  bgr[1].convertTo(g, CV_32FC1);
+  cv::Mat r;
+  bgr[2].convertTo(r, CV_32FC1);
+
+  cv::Mat x = m_mr[0] * r + m_mg[0] * g + m_mb[0]*b;
+  cv::Mat y = m_mr[1] * r + m_mg[1] * g + m_mb[1]*b;
+  cv::Mat z = m_mr[2] * r + m_mg[2] * g + m_mb[2]*b;
+
+  cv::Mat l = cv::Mat::zeros(img_sz, CV_32FC1);
   for(int i=0; i < img_sz.height; i++)
   {
     for(int j=0; j < img_sz.width; j++)
     {
-      b = bgr[0].at<uint8_t>(i,j);
-      g = bgr[1].at<uint8_t>(i,j);
-      r = bgr[2].at<uint8_t>(i,j);
-
-      x = mr[0]*r + mg[0]*g + mb[0]*b;
-      y = mr[1]*r + mg[1]*g + mb[1]*b;
-      z = mr[2]*r + mg[2]*g + mb[2]*b;
-
-      l = L_LUT.at<float>(static_cast<int>(y*1024), 0);
-      z = 1/(x + 15*y + 3*z + 1e-35f);
-      luv[0].at<float>(i, j) = l;
-      luv[1].at<float>(i, j) = l * (13*4*x*z - 13*un) - minu;
-      luv[2].at<float>(i, j) = l * (13*9*y*z - 13*vn) - minv;
+      float y_val = y.at<float>(i,j);
+      l.at<float>(i,j) = m_L_LUT.at<float>(static_cast<int>(y_val*1024), 0);
     }
   }
+
+  cv::Mat d = (x + 15*y + 3*z + 1e-35f);
+  z = 1.0 / d;
+  luv[0] = l;
+  luv[1] = l.mul(13. * 4. * x.mul(z) - 13.*m_un) - m_minu;
+  luv[2] = l.mul(13. * 9. * y.mul(z) - 13.*m_vn) - m_minv;
+#else
+  // ---------------
+  float x_, y_, z_, l_;
+  float r_, g_, b_;
+  for(int i=0; i < img_sz.height; i++)
+  {
+    for(int j=0; j < img_sz.width; j++)
+    {
+      b_ = bgr[0].at<uint8_t>(i,j);
+      g_ = bgr[1].at<uint8_t>(i,j);
+      r_ = bgr[2].at<uint8_t>(i,j);
+
+//      std::cout << "r_=" << r_ << std::endl;
+//      std::cout << "r.at<float>(i,j)=" << r.at<float>(i,j) << std::endl;
+//      std::cout << "g_=" << g_ << std::endl;
+//      std::cout << "g.at<float>(i,j)=" << g.at<float>(i,j) << std::endl;
+//      std::cout << "b_=" << b_ << std::endl;
+//      std::cout << "b.at<float>(i,j)=" << b.at<float>(i,j) << std::endl;
+
+      x_ = m_mr[0]*r_ + m_mg[0]*g_ + m_mb[0]*b_;
+      y_ = m_mr[1]*r_ + m_mg[1]*g_ + m_mb[1]*b_;
+      z_ = m_mr[2]*r_ + m_mg[2]*g_ + m_mb[2]*b_;
+
+//      std::cout << "x_=" << x_ << std::endl;
+//      std::cout << "x.at<float>(i,j)=" << x.at<float>(i,j) << std::endl;
+//      std::cout << "y_=" << y_ << std::endl;
+//      std::cout << "y.at<float>(i,j)=" << y.at<float>(i,j) << std::endl;
+//      std::cout << "z_=" << z_ << std::endl;
+//      std::cout << "z.at<float>(i,j)=" << z.at<float>(i,j) << std::endl;
+
+      l_ = m_L_LUT.at<float>(static_cast<int>(y_*1024), 0);
+      z_ = 1/(x_ + 15*y_ + 3*z_ + 1e-35f);
+
+//      std::cout << "l_=" << l_ << std::endl;
+//      std::cout << "l.at<float>(i,j)=" << l.at<float>(i,j) << std::endl;
+//      std::cout << "z_=" << z_ << std::endl;
+//      std::cout << "z.at<float>(i,j)=" << z.at<float>(i,j) << std::endl;
+
+//      std::cout << "l_=" << l_ << std::endl;
+//      std::cout << "luv[0].at<float>(i,j)=" << luv[0].at<float>(i,j) << std::endl;
+//      std::cout << "l_ * (13*4*x_*z_ - 13*m_un) - m_minu=" << l_ * (13*4*x_*z_ - 13*m_un) - m_minu << std::endl;
+//      std::cout << "luv[1].at<float>(i,j)=" << luv[1].at<float>(i,j) << std::endl;
+//      std::cout << "l_ * (13*9*y_*z_ - 13*m_vn) - m_minv=" << l_ * (13*9*y_*z_ - 13*m_vn) - m_minv << std::endl;
+//      std::cout << "luv[2].at<float>(i,j)=" << luv[2].at<float>(i,j) << std::endl;
+
+      luv[0].at<float>(i, j) = l_;
+      luv[1].at<float>(i, j) = l_ * (13*4*x_*z_ - 13*m_un) - m_minu;
+      luv[2].at<float>(i, j) = l_ * (13*9*y_*z_ - 13*m_vn) - m_minv;
+    }
+  }
+#endif
 
   return luv;
 }
@@ -123,10 +190,6 @@ std::vector<cv::Mat> ChannelsLUVExtractor::smoothImage
     channelsLUV_output[0] = convTri(inputImg[0], m_smooth_kernel_size); //5
     channelsLUV_output[1] = convTri(inputImg[1], m_smooth_kernel_size); //5
     channelsLUV_output[2] = convTri(inputImg[2], m_smooth_kernel_size); //5
-
-    //cv::GaussianBlur(inputImg[0], channelsLUV_output[0], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
-    //cv::GaussianBlur(inputImg[1], channelsLUV_output[1], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
-    //cv::GaussianBlur(inputImg[2], channelsLUV_output[2], cv::Size(m_smooth_kernel_size, m_smooth_kernel_size), 0,0, cv::BORDER_REFLECT);
 
     return channelsLUV_output;
 }
@@ -142,10 +205,10 @@ std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
   std::vector<cv::Mat> channelsLUV_normalized(3);
   cv::Mat imgLUV;
 
-  channelsLUV = bgr2luv(img, 1.0f/255.0f);
+  channelsLUV = bgr2luv(img);
 
-
-  if(m_smooth){
+  if (m_smooth)
+  {
     channelsLUV = smoothImage(channelsLUV);
   }
 

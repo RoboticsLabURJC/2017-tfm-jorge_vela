@@ -255,9 +255,7 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
 std::vector<cv::Mat> GradMagExtractor::extractFeatures(cv::Mat img){
 
   //printf("GradMag: -->8UC3 %d , 8UC1 %d , imageType %d \n",CV_8UC3, CV_8UC1 ,  img.type() );
-
   //assert(img.type() == CV_8UC3 || img.type() == CV_8UC1);
-
 
   int dChan = img.channels();
   int width = img.size().width;

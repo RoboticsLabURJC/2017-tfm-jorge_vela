@@ -33,7 +33,6 @@ public:
       m_full = full;
     };
 
-
   std::vector<cv::Mat> extractFeatures
     (
       cv::Mat img, 
@@ -47,7 +46,8 @@ private:
 	int m_full;
 
 
-  std::vector<cv::Mat> gradH
+  std::vector<cv::Mat>
+  gradH
     (
       cv::Mat image,
       float* M,
@@ -55,38 +55,52 @@ private:
       float* H
     );
 
-	void gradHist
+  void
+  gradHist
     (
-		  float *M, 
-	  	float *O, 
-  		float *H, 
-		  int h,
-		  int w,
-  		int bin, 
-  		int nOrients, 
-  		int softBin, 
-  		bool full
-      /* CON RESPECTO A MATLAB, NO ESTAN AÑADIDAS useHOG y clipHOG*/
+    float *M,
+    float *O,
+    float *H,
+    int h,
+    int w,
+    int bin,
+    int nOrients,
+    int softBin,
+    bool full
+     /* CON RESPECTO A MATLAB, NO ESTAN AÑADIDAS useHOG y clipHOG*/
     );
 
-	void gradQuantize
-    ( 
-		  float *O, 
-	  	float *M, 
-		  int *O0, 
-  		int *O1, 
-	  	float *M0, 
-		  float *M1,
-  		int nb, 
-  		int n, 
-  		float norm, 
-  		int nOrients, 
-  		bool full, 
-  		bool interpolate 
+  void
+  gradQuantize
+    (
+    float *O,
+    float *M,
+    int *O0,
+    int *O1,
+    float *M0,
+    float *M1,
+    int nb,
+    int n,
+    float norm,
+    int nOrients,
+    bool full,
+    bool interpolate
     );
 
-  void hog( float *M, float *O, float *H, int h, int w, int binSize,
-  int nOrients, int softBin, bool full, float clip );
+  void
+  hog
+    (
+    float *M,
+    float *O,
+    float *H,
+    int h,
+    int w,
+    int binSize,
+    int nOrients,
+    int softBin,
+    bool full,
+    float clip
+    );
 };
 
 #endif
