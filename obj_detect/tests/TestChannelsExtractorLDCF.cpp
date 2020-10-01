@@ -87,7 +87,6 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
   cv::FileNode cols = fs1["filtered_1"]["cols"];
   cv::FileNode Filtered = fs1["filtered_1"]["data"];
 
-  std::cout << filters[0] << std::endl;
   int j = 0;
   int difference = 0;
   for(int y=0;y<(int)rows;y++)
