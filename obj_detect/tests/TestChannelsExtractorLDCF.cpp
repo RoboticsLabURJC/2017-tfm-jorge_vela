@@ -35,7 +35,68 @@ public:
 
 TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
 {
-  cv::Mat image = cv::imread("images/carretera.jpg", cv::IMREAD_COLOR);
+  cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
+  std::vector<cv::Mat> filters;
+  int shrink = 4;
+  cv::Size padding;
+  padding.width = 2;
+  padding.height = 2;
+  cv::FileStorage filter;
+  filter.open("yaml/filterTest.yml", cv::FileStorage::READ);
+
+  //OBTENER EL NOMBRE DE LOS DISTINTOS FILTROS PARA ESTE CASO
+  std::vector<std::string> namesFilters;
+  for(int i = 1; i < 5; i++){
+    for(int j = 1; j< 11; j++){
+      std::string name  = "filter_" + std::to_string(j) + "_" + std::to_string(i);
+      namesFilters.push_back(name);
+    }
+  }
+
+  //SE CARGAN LOS DISTINTOS FILTROS, CON LOS NOMBRES ANTERIORES DESDE EL YML
+  for(int k = 0; k < namesFilters.size(); k++){
+    cv::FileNode filterData = filter[namesFilters[k].c_str()]["data"];
+    cv::FileNode filterRows = filter[namesFilters[k].c_str()]["rows"];
+    cv::FileNode filterCols = filter[namesFilters[k].c_str()]["cols"];
+    float* filt = new float[25*sizeof(float)];
+
+    for(int i = 0; i < (int)filterRows; i++){
+      for(int j = 0; j < (int)filterCols; j++){
+        float x = (float)filterData[i*5+j];
+        filt[j*5+i] = x;
+      }
+    }
+    cv::Mat filterConver = cv::Mat(5,5, CV_32FC1, filt);
+    transpose(filterConver,filterConver);
+    filters.push_back(filterConver);
+  }
+  ChannelsExtractorLDCF ldcfExtractor(filters, padding, shrink);
+  std::vector<cv::Mat> ldcfExtractFeatures = ldcfExtractor.extractFeatures(image);
+
+  cv::Mat valFiltered;
+  ldcfExtractFeatures[0].convertTo(valFiltered, CV_32F);
+  float *ldcfExtracted = valFiltered.ptr<float>();
+
+  cv::FileStorage fs1;
+  bool file_exists = fs1.open("yaml/LDCF.yml", cv::FileStorage::READ);
+  std::cout << file_exists << std::endl;
+  cv::FileNode rows = fs1["filtered_1"]["rows"];
+  cv::FileNode cols = fs1["filtered_1"]["cols"];
+  cv::FileNode Filtered = fs1["filtered_1"]["data"];
+
+  int j = 0;
+  int difference = 0;
+  for(int y=0;y<(int)rows;y++)
+  {
+    for(int x=0;x<(int)cols;x++)
+    {
+      if(abs(ldcfExtracted[x*(int)cols+y] - (float)Filtered[j]) > 0.5){
+        difference +=1;
+      }
+      j++;
+    }
+  }
+  ASSERT_TRUE(difference < 40);
   //printf("%d %d \n", image.size().height, image.size().width);
  
 //  int shrink = 2;
