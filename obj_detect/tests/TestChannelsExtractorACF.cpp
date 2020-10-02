@@ -44,17 +44,6 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
     cv::waitKey();
 #endif
 
-  // We first pass the image to LUV:
-//  ChannelsLUVExtractor luvExtractor;
-//  std::vector<cv::Mat> luv_channels = luvExtractor.extractFeatures(image);
-//  cv::Mat luv_image;
-//  merge(luv_channels, luv_image);
-
-//#ifdef SHOW_CHANNELS
-//    cv::imshow("luv_image", luv_image);
-//    cv::waitKey();
-//#endif
-
   // Prepare reading the yaml file with Matlab's results.
   FileStorage fs1;
   bool file_exists = fs1.open("yaml/acfChannelsScale0_coche_solo1_png.yaml", FileStorage::READ);
@@ -81,14 +70,9 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
   // Extract ACF channels using paramenters from matlab.
   std::vector<cv::Mat> acf_channels;
   ChannelsExtractorACF acfExtractor(padding, shrink);
-//  acf_channels = acfExtractor.extractFeatures(luv_image);
   acf_channels = acfExtractor.extractFeatures(image);
 
   cv::Size acf_channel_sz = acf_channels[0].size();
-//  float crop_perct = 0.2;
-//  cv::Size crop_sz(round(acf_channel_sz.width * crop_perct), round(acf_channel_sz.height * crop_perct));
-//  cv::Rect crop_rect(crop_sz.width, crop_sz.height,
-//                     acf_channel_sz.width - crop_sz.width*2, acf_channel_sz.height - crop_sz.height*2);
   for (int i=0; i < 10; i++) // read and compare all the channels
   {
     std::string var_name = "acf_channel_" + std::to_string(i+1);
@@ -125,28 +109,17 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
     int max_ind[2];
     cv::minMaxIdx(acf_channels[i], &min_val, &max_val, min_ind, max_ind, cv::Mat());
     float channel_range = max_val - min_val;
-    float threshold = 0.2*channel_range; // Asume a 20% of the maximum value is an acceptable error.
+    float threshold = 0.1*channel_range; // Asume a 10% of the channel's range is an acceptable error.
+    int num_differences = cv::sum((absDiff > threshold)/255.0)[0];
 
-    int num_differences = 0;
-    for (int i = 0; i < acf_channel_sz.height; i++)
-    {
-      for (int j = 0; j < acf_channel_sz.width; j++)
-      {
-        if (absDiff.at<float>(i,j) > threshold)
-        {
-          num_differences++;
-        }
-      }
-    }
-
-  int num_pixels = acf_channel_sz.height*acf_channel_sz.height;
+    int num_pixels = acf_channel_sz.height*acf_channel_sz.height;
 #ifdef DEBUG
-  std::cout << "threshold=" << threshold << std::endl;
-  std::cout << "num_pixels=" << num_pixels << std::endl;
-  std::cout << "num_differences=" << num_differences << std::endl;
-  std::cout << "num_pixels*0.3 =" << num_pixels*0.3 << std::endl;
+    std::cout << "threshold=" << threshold << std::endl;
+    std::cout << "num_pixels=" << num_pixels << std::endl;
+    std::cout << "num_differences=" << num_differences << std::endl;
+    std::cout << "num_pixels*0.5 =" << num_pixels*0.3 << std::endl;
 #endif
-  // Assume 30% of the pixels beyond the error threshold is acceptable.
-  ASSERT_TRUE(num_differences < num_pixels*0.3);
+    // Assume 50% of the pixels beyond the error threshold is acceptable.
+    ASSERT_TRUE(num_differences < num_pixels*0.5);
   }
 }

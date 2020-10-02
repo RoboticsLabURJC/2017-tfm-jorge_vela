@@ -20,7 +20,7 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   )
 {
   int smooth = 1;
-  ChannelsLUVExtractor luvExtractor(false, smooth);
+  ChannelsLUVExtractor luvExtractor(true, smooth);
   GradMagExtractor gradMagExtract(5);
   GradHistExtractor gradHistExtract(2,6,1,0);  // <--- JM: Cuidado!! Estos parámetros dependerán del clasificador entrenado?
 
