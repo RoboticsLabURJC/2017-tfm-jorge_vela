@@ -170,8 +170,8 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
   int nChannels = image.channels();
 
   int size = h*w*nChannels;
-  int sizeData = sizeof(float);
-  int misalign=1;
+//  int sizeData = sizeof(float);
+//  int misalign=1;
 
   if (nChannels == 1)
   {
@@ -264,11 +264,11 @@ std::vector<cv::Mat> GradMagExtractor::extractFeatures(cv::Mat img){
   int height = img.size().height;
 
   int size = width*height*dChan;
-  float *M = new float[size](); 
-  float *O = new float[size]();  
+  float *M = new float[size]();
+  float *O = new float[size]();
 
   std::vector<cv::Mat> channelsGradMag(2);
-  channelsGradMag = gradM(img,M,O);
+  channelsGradMag = gradM(img, M, O);
 
   return channelsGradMag;
 }  

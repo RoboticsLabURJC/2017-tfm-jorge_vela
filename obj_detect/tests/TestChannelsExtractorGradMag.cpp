@@ -14,16 +14,14 @@
 #include <string>
 #include <chrono> 
 
-#undef VISUALIZE_RESULTS
+#undef SHOW_CHANNELS
+//#define SHOW_CHANNELS
 
 class TestChannelsExtractorGradMag: public testing::Test
 {
 public:
   const int ROWS = 2;
   const int COLS = 4;
-  GradMagExtractor gradMagExtract;
-  GradMagExtractor gradMagExtractNorm{5};
-  GradMagExtractor gradMagExtractNormConst{5, 0.07};
 
   virtual void SetUp()
     {
@@ -32,245 +30,144 @@ public:
   virtual void TearDown()
     {
     }
+
+  void
+  compareGradientMagnitudeAndOrientation
+    (
+    cv::Mat img,
+    std::string matlab_grad_mag_yaml_filename,
+    std::string matlab_grad_orient_yaml_filename
+    );
 };
+
+void
+TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
+  (
+  cv::Mat img,
+  std::string matlab_grad_mag_yaml_filename,
+  std::string matlab_grad_orient_yaml_filename
+  )
+{
+  cv::FileStorage fs;
+  bool file_exists = fs.open(matlab_grad_mag_yaml_filename, cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
+
+  // Read matlab gradient magnitude parameters from yaml file
+  cv::FileNode data = fs["normRad"]["data"];
+  std::vector<float> p;
+  data >> p;
+  float normRad = p[0];
+
+  data = fs["normConst"]["data"];
+  p.clear();
+  data >> p;
+  float normConst = p[0];
+
+  GradMagExtractor extractor(normRad, normConst);
+
+  // Extract the gradient magnitude and orientation channels
+  std::vector<cv::Mat> gradMagExtractVector;
+  gradMagExtractVector = extractor.extractFeatures(img);
+
+  int rows = static_cast<int>(fs["M"]["rows"]);
+  int cols = static_cast<int>(fs["M"]["cols"]);
+  cv::Mat MatlabMag;
+  MatlabMag = cv::Mat::zeros(rows, cols, CV_32F);
+  data = fs["M"]["data"];
+  p.clear();
+  data >> p;
+  memcpy(MatlabMag.data, p.data(), p.size()*sizeof(float));
+
+  // Compare Matlab gradient magnitude with C++ implementation
+  double min_val;
+  double max_val;
+  int min_ind[2];
+  int max_ind[2];
+  cv::minMaxIdx(MatlabMag, &min_val, &max_val, min_ind, max_ind, cv::Mat());
+  float channel_range = max_val - min_val;
+  float threshold = 0.05*channel_range; // Asume a 5% of the maximum value is an acceptable error.
+  cv::Mat absDiff = cv::abs(gradMagExtractVector[0] - MatlabMag);
+  cv::Mat lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
+
+#ifdef SHOW_CHANNELS
+  cv::imshow("cpp-Mag", gradMagExtractVector[0]);
+  cv::imshow("matlab-Mag", MatlabMag);
+  cv::waitKey();
+#endif
+
+  int num_pixels_ok = cv::sum(lessThanThr)[0];
+//  std::cout << "num_pixels_ok = " << num_pixels_ok << std::endl;
+  ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
+  fs.release();
+
+  // Read matlab gradient orientation from yaml file.
+  file_exists = fs.open(matlab_grad_orient_yaml_filename, cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
+
+  rows = static_cast<int>(fs["O"]["rows"]);
+  cols = static_cast<int>(fs["O"]["cols"]);
+  cv::Mat MatlabO;
+  MatlabO = cv::Mat::zeros(rows, cols, CV_32F);
+  data = fs["O"]["data"];
+  p.clear();
+  data >> p;
+  memcpy(MatlabO.data, p.data(), p.size()*sizeof(float));
+
+  // Compare Matlab gradient orientation with C++ implementation
+  cv::minMaxIdx(MatlabMag, &min_val, &max_val, min_ind, max_ind, cv::Mat());
+  channel_range = max_val - min_val;
+  threshold = 0.05*channel_range; // Asume a 5% of the maximum value is an acceptable error.
+  absDiff = cv::abs(gradMagExtractVector[1] - MatlabO);
+  lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
+
+#ifdef SHOW_CHANNELS
+  cv::imshow("cpp-O", gradMagExtractVector[1]);
+  cv::imshow("matlab-O", MatlabO);
+  cv::waitKey();
+#endif
+
+  num_pixels_ok = cv::sum(lessThanThr)[0];
+//  std::cout << "num_pixels_ok = " << num_pixels_ok << std::endl;
+  ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
+}
+
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_GradientChannels.yaml",
+                                         "yaml/index_jpeg_GradientChannels.yaml");
+}
 
 
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGray)
 {
   cv::Mat image;
-  image = cv::imread("images/index2.jpeg", cv::IMREAD_GRAYSCALE); //IMREAD_COLOR);
-
-  int size = image.cols*image.rows*1;
-  int sizeData = sizeof(float);
-
-  std::vector<cv::Mat> gradMagExtractVector;
-  gradMagExtractVector = gradMagExtract.extractFeatures(image);
-  cv::Mat newM, newO;
-  gradMagExtractVector[0].convertTo(newM, CV_32F);    
-  float *M = newM.ptr<float>();
-
-  gradMagExtractVector[1].convertTo(newO, CV_32F);    
-  float *O = newO.ptr<float>();
-
-  cv::FileStorage fs;
-  bool file_exists = fs.open("yaml/TestMGrayScale.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  cv::FileNode rows = fs["M"]["rows"];
-  cv::FileNode cols = fs["M"]["cols"];
-  cv::FileNode MMatrix = fs["M"]["data"];
-
-  int i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(M[x*(int)cols+y] - (float)MMatrix[i]) < 1.e-3f);
-      i++;	
-    } 
-  }
-
-  fs.release();
-  file_exists = fs.open("yaml/TestOGrayScale.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  rows = fs["O"]["rows"];
-  cols = fs["O"]["cols"];
-  cv::FileNode OMatrix = fs["O"]["data"];	
-
-  i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(O[x*(int)cols+y] - (float)OMatrix[i]) < 1.e-3f);
-      i++;	
-    } 
-  }
-
-  M = NULL; O = NULL;
-  free(M); free(O);	
+  image = cv::imread("images/index.jpeg", cv::IMREAD_GRAYSCALE);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_gray_GradientChannels.yaml",
+                                         "yaml/index_jpeg_gray_GradientChannels.yaml");
 }
 
-
-TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor)
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormConst0_07)
 {
   cv::Mat image;
-  image = cv::imread("images/index2.jpeg", cv::IMREAD_COLOR); //IMREAD_COLOR);
-
-  int size = image.cols*image.rows*3;
-  int sizeData = sizeof(float);
-
-  std::vector<cv::Mat> gradMagExtractVector;
-  gradMagExtractVector = gradMagExtract.extractFeatures(image);
-  cv::Mat newM, newO;
-  gradMagExtractVector[0].convertTo(newM, CV_32F);    
-  float *M = newM.ptr<float>();
-
-  gradMagExtractVector[1].convertTo(newO, CV_32F);    
-  float *O = newO.ptr<float>();
-
-  cv::FileStorage fs;
-  bool file_exists = fs.open("yaml/TestMColorScale.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  cv::FileNode rows = fs["M"]["rows"];
-  cv::FileNode cols = fs["M"]["cols"];
-  cv::FileNode MMatrix = fs["M"]["data"];
-
-  int tot = image.cols*image.rows;// (int)rows*(int)cols;
-  int i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(M[x*(int)cols+y] - (float)MMatrix[i]) < 1.e-3f);
-      i++;  
-    } 
-  }
-
-  file_exists = fs.open("yaml/TestOColorScale.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  rows = fs["O"]["rows"];
-  cols = fs["O"]["cols"];
-  cv::FileNode OMatrix = fs["O"]["data"];
-
-  i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(O[x*(int)cols+y] - (float)OMatrix[i]) < 1.e-3f);
-      i++;  
-    } 
-  }
-  //free(M); free(O);	
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml",
+                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml");
 }
 
-
-TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNorm)
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0)
 {
   cv::Mat image;
-  image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); //IMREAD_COLOR);
-
-  int size = image.cols*image.rows*3;
-  int sizeData = sizeof(float);
-
-
-  std::vector<cv::Mat> gradMagExtractVector;
-
-  gradMagExtractVector = gradMagExtractNorm.extractFeatures(image);
-
-  cv::Mat newM, newO;
-  gradMagExtractVector[0].convertTo(newM, CV_32F);    
-  float *M = gradMagExtractVector[0].ptr<float>();
-
-  gradMagExtractVector[1].convertTo(newO, CV_32F);    
-  float *O = gradMagExtractVector[1].ptr<float>();
-
-  cv::FileStorage fs;
-  bool file_exists = fs.open("yaml/TestMColorNormRad.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  cv::FileNode rows = fs["M"]["rows"];
-  cv::FileNode cols = fs["M"]["cols"];
-  cv::FileNode MMatrix = fs["M"]["data"];
-
-  int tot = image.cols*image.rows;// (int)rows*(int)cols;
-  int i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(M[x*(int)cols+y] - (float)MMatrix[i]) < 1.e-3f);
-      i++;  
-    } 
-  }
-
-  file_exists = fs.open("yaml/TestOColorNormRad.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  rows = fs["O"]["rows"];
-  cols = fs["O"]["cols"];
-  cv::FileNode OMatrix = fs["O"]["data"];
-
-  i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(O[x*(int)cols+y] - (float)OMatrix[i]) < 1.e-3f);
-      i++;  
-    } 
-  }
-}
-
-
-TEST_F(TestChannelsExtractorGradMag, TestCompleteColorMagNormConst)
-{
-  cv::Mat image;
-  image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); //IMREAD_COLOR);
-
-  int size = image.cols*image.rows*3;
-  int sizeData = sizeof(float);
-
-  std::vector<cv::Mat> gradMagExtractVector;
-
-  auto start = std::chrono::high_resolution_clock::now();
-  
-  gradMagExtractVector = gradMagExtractNormConst.extractFeatures(image);
-
-  auto stop = std::chrono::high_resolution_clock::now(); 
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start); 
-  std::cout << "time ms: " << duration.count() << std::endl;
-
-  cv::Mat newM, newO;
-  gradMagExtractVector[0].convertTo(newM, CV_32F);    
-  float *M = newM.ptr<float>();
-
-  gradMagExtractVector[1].convertTo(newO, CV_32F);    
-  float *O = newO.ptr<float>();
-
-
-  //cv::imshow("M",gradMagExtractVector[0]);
-  //cv::imshow("O",gradMagExtractVector[1]);
-  //cv::waitKey(0);
-
-
-  cv::FileStorage fs;
-  bool file_exists = fs.open("yaml/TestMColorNormRadConst.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  cv::FileNode rows = fs["M"]["rows"];
-  cv::FileNode cols = fs["M"]["cols"];
-  cv::FileNode MMatrix = fs["M"]["data"];
-
-//  int tot = image.cols*image.rows;// (int)rows*(int)cols;
-  int i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(M[x*(int)cols+y] - (float)MMatrix[i]) < 1.e-3f);
-      i++;  
-    } 
-  }
-
-  file_exists = fs.open("yaml/TestOColorNormRadConst.yml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-
-  rows = fs["O"]["rows"];
-  cols = fs["O"]["cols"];
-  cv::FileNode OMatrix = fs["O"]["data"];
-
-  i = 0;
-  for(int y=0;y<(int)rows;y++)
-  { 
-    for(int x=0;x<(int)cols;x++)
-    {
-      ASSERT_TRUE(abs(O[x*(int)cols+y] - (float)OMatrix[i]) < 1.e-3f);
-      i++;  
-    } 
-  }
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml",
+                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml");
 }

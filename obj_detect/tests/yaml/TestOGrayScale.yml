@@ -1,5 +1,5 @@
 %YAML:1.0
-    O1: !!opencv-matrix
+    O: !!opencv-matrix
         rows: 13
         cols: 13
         dt: f
