@@ -58,39 +58,22 @@ ChannelsPyramidComputeAllParallelStrategy::compute
 
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
-  std::vector<cv::Mat> pChnsCompute;
-  std::vector<cv::Mat> resampledImages;
   ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
 
-  for (int i = 0; i < nScales; i++)
-  {
-    double s = scales[i];
-    cv::Size sz1;
-    sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
-    sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
-
-    cv::Mat I1;
-    if (sz == sz1)
-    {
-      I1 = imageUse;
-    }
-    else
-    {
-      I1 = ImgResample(imageUse, sz1.width , sz1.height);
-    }
-    I1 = ImgResample(img, sz1.width , sz1.height);
-    resampledImages.push_back(I1);
-  }
-
-  cv::parallel_for_({ 0, nScales }, [&](const cv::Range& r)
+  // It is more efficient to compute the
+  cv::parallel_for_(cv::Range( 0, nScales ), [&](const cv::Range& r)
   {
     for (int i = r.start; i < r.end; i++)
     {
-      chnsPyramidData[i] = ldcfExtractor.extractFeatures(resampledImages[i]);
-    }
-  }
-  ); // parallel_for_
+      double s = scales[i];
+      cv::Size sz1;
+      sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
+      sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
 
+      cv::Mat I1 = ImgResample(imageUse, sz1.width , sz1.height);
+      chnsPyramidData[i] = ldcfExtractor.extractFeatures(I1);
+    }
+  });
 
   return chnsPyramidData;
 }

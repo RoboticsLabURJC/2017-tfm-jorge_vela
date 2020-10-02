@@ -399,7 +399,7 @@ BadacostDetector::detectSingleScale
   int modelHt_s = m_modelDsPad.height/m_shrink;
   int modelWd_s_times_Ht_s = modelWd_s*modelHt_s;
 
-  cv::parallel_for_({ 0, width1*height1 }, [&](const cv::Range& rang)
+  cv::parallel_for_(cv::Range(0, width1*height1), [&](const cv::Range& rang)
   {
     for (int k = rang.start; k < rang.end; k++)
     {
@@ -540,8 +540,7 @@ BadacostDetector::detectSingleScale
         scores[index] = trace; 
       }
     } // for (int k = rang.start; k < rang.end; k++)
-  }  // End detector execution for all windows through rows and cols.
-  ); // parallel_for_ clossing.
+  }); // parallel_for_ clossing.
 
 /*
   delete [] cids;
