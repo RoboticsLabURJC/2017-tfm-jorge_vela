@@ -19,7 +19,7 @@ class ChannelsLUVExtractor
 public:
   ChannelsLUVExtractor
     (
-      float smooth = false,
+      float smooth = true,
       int smooth_kernel_size = 1
     );
 

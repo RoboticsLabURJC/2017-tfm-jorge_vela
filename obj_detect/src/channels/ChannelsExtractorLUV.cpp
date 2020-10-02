@@ -91,15 +91,13 @@ std::vector<cv::Mat> ChannelsLUVExtractor::bgr2luv
   std::vector<cv::Mat> bgr(3);
   cv::Size img_sz = bgr_img.size();
 
-//  float minu, minv, un, vn, mr[3], mg[3], mb[3];
-//  cv::Mat L_LUT = bgr2luvSetup(scaling_factor, mr, mg, mb, minu, minv, un, vn);
   luv[0] = cv::Mat::zeros(img_sz, CV_32FC1);
   luv[1] = cv::Mat::zeros(img_sz, CV_32FC1);
   luv[2] = cv::Mat::zeros(img_sz, CV_32FC1);
   cv::split(bgr_img, bgr);
 
-#define USE_CVMAT_IMPLEMENTATION
-#ifdef USE_CVMAT_IMPLEMANTATION
+//#define USE_CVMAT_IMPLEMENTATION
+#ifdef USE_CVMAT_IMPLEMENTATION
   cv::Mat b;
   bgr[0].convertTo(b, CV_32FC1);
   cv::Mat g;
@@ -215,7 +213,7 @@ std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
   return channelsLUV;
 }
 
-// Not equivalent at all to the P. Dollar one :-(.
+// Not equivalent at all to the P. Dollar's one :-(.
 //std::vector<cv::Mat> ChannelsLUVExtractor::extractFeaturesOpenCV
 //  (
 //  cv::Mat img
