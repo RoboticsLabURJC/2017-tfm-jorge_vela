@@ -88,22 +88,10 @@ bool BadacostDetector::load
       m_classifier.insert({clf_variable_labels[i].c_str(), matrix });    
     }
     
-    cv::FileNode dataNumClases = classifier["num_classes"]["data"];
-    p.clear();
-    dataNumClases >> p;
-    m_num_classes = static_cast<int>(p[0]);
+    m_num_classes = static_cast<int>(readScalarFromFileNode(classifier["num_classes"]));
+    m_treeDepth = static_cast<int>(readScalarFromFileNode(classifier["treeDepth"]));
+    m_aRatioFixedWidth = static_cast<bool>(readScalarFromFileNode(classifier["aRatioFixedWidth"]));
 
-    cv::FileNode dataTreeDepth= classifier["treeDepth"]["data"];
-    cv::Mat m_tr_dpth = cv::Mat::zeros(1, 1, CV_32F);
-    p.clear();
-    dataTreeDepth >> p;
-    m_treeDepth = static_cast<int>(p[0]);
-
-    cv::FileNode dataRatioFixed= classifier["aRatioFixedWidth"]["data"];
-    cv::Mat m_RatioFixed = cv::Mat::zeros(1, 1, CV_32F);
-    p.clear();
-    dataRatioFixed >> p;
-    m_aRatioFixedWidth = static_cast<bool>(p[0]);
 
     // Read Cprime data
     int rows = static_cast<int>(classifier["Cprime"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).

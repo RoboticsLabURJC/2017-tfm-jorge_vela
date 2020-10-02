@@ -28,4 +28,25 @@ cv::Mat convTri
   int kernel_size
   );
 
+float
+readScalarFromFileNode
+  (
+  cv::FileNode fn
+  );
+
+cv::Mat
+readMatrixFromFileNode
+  (
+  cv::FileNode fn
+  );
+
+std::vector<int>
+create_random_indices
+  (
+  int n
+  );
+
+
+
+
 #endif

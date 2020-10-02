@@ -16,6 +16,8 @@
 
 #include <iostream>
 
+#undef DEBUG
+//#define DEBUG
 
 class TestBadacostDetector: public testing::Test
 {

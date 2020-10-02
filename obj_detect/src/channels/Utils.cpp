@@ -13,7 +13,10 @@
 #include <channels/ChannelsExtractorGradHist.h>
 #include <opencv2/opencv.hpp>
 #include <channels/Utils.h>
-#include <math.h>
+#include <cmath>
+#include <functional>
+#include <numeric>
+#include <random>
 
 //using namespace cv;
 
@@ -92,6 +95,47 @@ cv::Mat convTri(cv::Mat input_image, int kernel_size)
   cv::Rect myRoi2(0, kernel_size, widthSize, heightSize);
   output_image = output_image(myRoi2);
   return output_image;
+}
+
+std::vector<int>
+create_random_indices
+  (
+  int n
+  )
+{
+  std::vector<int> indices(n);
+  std::iota(indices.begin(), indices.end(), 0);
+  std::shuffle(indices.begin(), indices.end(), std::mt19937(std::random_device()()));
+  return indices;
+}
+
+float
+readScalarFromFileNode
+  (
+  cv::FileNode fn
+  )
+{
+  cv::FileNode data = fn["data"];
+  std::vector<float> p;
+  data >> p;
+
+  return static_cast<float>(p[0]);
+}
 
 
+cv::Mat
+readMatrixFromFileNode
+  (
+  cv::FileNode fn
+  )
+{
+  int rows = static_cast<int>(fn["rows"]);
+  int cols = static_cast<int>(fn["cols"]);
+  cv::Mat matrix = cv::Mat::zeros(rows, cols, CV_32F);
+  cv::FileNode data = fn["data"];
+  std::vector<float> p;
+  data >> p;
+  memcpy(matrix.data, p.data(), p.size()*sizeof(float));
+
+  return matrix;
 }

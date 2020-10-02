@@ -8,9 +8,6 @@
 #include <channels/Utils.h>
 #include <cmath>
 #include <iostream>
-#include <functional>
-#include <numeric>
-#include <random>
 
 #undef DEBUG
 //#define DEBUG
@@ -20,18 +17,6 @@ ChannelsPyramidComputeAllParallelStrategy::ChannelsPyramidComputeAllParallelStra
 
 ChannelsPyramidComputeAllParallelStrategy::~ChannelsPyramidComputeAllParallelStrategy
   () {};
-
-inline std::vector<int>
-create_random_indices
-  (
-  int n
-  )
-{
-    std::vector<int> indices(n);
-    std::iota(indices.begin(), indices.end(), 0);
-    std::shuffle(indices.begin(), indices.end(), std::mt19937(std::random_device()()));
-    return indices;
-}
 
 std::vector<std::vector<cv::Mat>>
 ChannelsPyramidComputeAllParallelStrategy::compute

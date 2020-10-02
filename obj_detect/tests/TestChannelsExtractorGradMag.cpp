@@ -7,6 +7,7 @@
  *  ------------------------------------------------------------------------ */
 
 #include <channels/ChannelsExtractorGradMag.h>
+#include <channels/Utils.h>
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
@@ -53,15 +54,18 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   ASSERT_TRUE(file_exists);
 
   // Read matlab gradient magnitude parameters from yaml file
-  cv::FileNode data = fs["normRad"]["data"];
-  std::vector<float> p;
-  data >> p;
-  float normRad = p[0];
+//  cv::FileNode data = fs["normRad"]["data"];
+//  std::vector<float> p;
+//  data >> p;
+//  float normRad = p[0];
 
-  data = fs["normConst"]["data"];
-  p.clear();
-  data >> p;
-  float normConst = p[0];
+//  data = fs["normConst"]["data"];
+//  p.clear();
+//  data >> p;
+//  float normConst = p[0];
+
+  float normConst = readScalarFromFileNode(fs["normConst"]);
+  float normRad = readScalarFromFileNode(fs["normRad"]);
 
   GradMagExtractor extractor(normRad, normConst);
 
@@ -69,14 +73,14 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   std::vector<cv::Mat> gradMagExtractVector;
   gradMagExtractVector = extractor.extractFeatures(img);
 
-  int rows = static_cast<int>(fs["M"]["rows"]);
-  int cols = static_cast<int>(fs["M"]["cols"]);
-  cv::Mat MatlabMag;
-  MatlabMag = cv::Mat::zeros(rows, cols, CV_32F);
-  data = fs["M"]["data"];
-  p.clear();
-  data >> p;
-  memcpy(MatlabMag.data, p.data(), p.size()*sizeof(float));
+//  int rows = static_cast<int>(fs["M"]["rows"]);
+//  int cols = static_cast<int>(fs["M"]["cols"]);
+//  cv::Mat MatlabMag = cv::Mat::zeros(rows, cols, CV_32F);
+//  data = fs["M"]["data"];
+//  p.clear();
+//  data >> p;
+//  memcpy(MatlabMag.data, p.data(), p.size()*sizeof(float));
+  cv::Mat MatlabMag = readMatrixFromFileNode(fs["M"]);
 
   // Compare Matlab gradient magnitude with C++ implementation
   double min_val;
@@ -104,14 +108,15 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   file_exists = fs.open(matlab_grad_orient_yaml_filename, cv::FileStorage::READ);
   ASSERT_TRUE(file_exists);
 
-  rows = static_cast<int>(fs["O"]["rows"]);
-  cols = static_cast<int>(fs["O"]["cols"]);
-  cv::Mat MatlabO;
-  MatlabO = cv::Mat::zeros(rows, cols, CV_32F);
-  data = fs["O"]["data"];
-  p.clear();
-  data >> p;
-  memcpy(MatlabO.data, p.data(), p.size()*sizeof(float));
+//  rows = static_cast<int>(fs["O"]["rows"]);
+//  cols = static_cast<int>(fs["O"]["cols"]);
+//  cv::Mat MatlabO = cv::Mat::zeros(rows, cols, CV_32F);
+//  data = fs["O"]["data"];
+//  p.clear();
+//  data >> p;
+//  memcpy(MatlabO.data, p.data(), p.size()*sizeof(float));
+
+  cv::Mat MatlabO = readMatrixFromFileNode(fs["O"]);
 
   // Compare Matlab gradient orientation with C++ implementation
   cv::minMaxIdx(MatlabMag, &min_val, &max_val, min_ind, max_ind, cv::Mat());
