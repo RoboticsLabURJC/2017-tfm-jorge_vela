@@ -7,10 +7,16 @@
 #include <channels/Utils.h>
 #include <cmath>
 #include <iostream>
-
+#include <omp.h>
 #undef DEBUG
 //#define DEBUG
+#include <chrono>
 
+#define USEOMP
+
+#ifdef USEOMP
+#include <omp.h>
+#endif
 ChannelsPyramidApproximatedStrategy::ChannelsPyramidApproximatedStrategy
   () {};
 
@@ -40,7 +46,6 @@ ChannelsPyramidApproximatedStrategy::compute
   }
   std::cout << std::endl;
 #endif
-
   int nScales = static_cast<int>(scales.size());
   std::vector<int> isR, isA, isN(nScales, 0), *isRA[2] = { &isR, &isA };
   for (int i = 0; i < nScales; i++)
@@ -48,6 +53,7 @@ ChannelsPyramidApproximatedStrategy::compute
     isRA[(i % (m_nApprox + 1)) > 0]->push_back(i + 1);
   }
 
+  
   std::vector<int> isH((isR.size() + 1), 0);
   isH.back() = nScales;
   for (int i = 0; i < std::max(int(isR.size()) - 1, 0); i++)
@@ -63,13 +69,18 @@ ChannelsPyramidApproximatedStrategy::compute
     }
   }
 
+
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
-  std::vector<cv::Mat> pChnsCompute;
+  //std::vector<cv::Mat> pChnsCompute;
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
   ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels);
-  for (const auto& i : isR) // Full computation for the real scales (ImResample+extractFeatures)
+  #ifdef USEOMP
+  int nThreads2 = omp_get_max_threads();
+  #pragma omp parallel for num_threads(nThreads2)
+  #endif 
+  for(uint i = 0; i < isR.size(); i++)//for (const auto& i : isR) // Full computation for the real scales (ImResample+extractFeatures)
   {
-    double s = scales[i-1];
+    double s = scales[isR[i]-1];
     cv::Size sz1;
     sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
     sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
@@ -89,13 +100,13 @@ ChannelsPyramidApproximatedStrategy::compute
       imageUse = I1;
     }
 
-    chnsPyramidDataACF[i-1] = acfExtractor.extractFeatures(I1);
+    chnsPyramidDataACF[isR[i]-1] = acfExtractor.extractFeatures(I1);
   }
 
-  //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
-  for (const auto& i : isA)
+  //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------  //printf("helloooo1\n");
+  for (const auto& i : isA)// for(int i=0; i< isA.size(); i++) // 
   {
-    int i1 = i - 1;
+    int i1 = i- 1; //i - 1
     int iR = isN[i1] - 1;
 
     cv::Size2f sz1(round(sz.width*scales[i1]/m_shrink),
@@ -124,10 +135,18 @@ ChannelsPyramidApproximatedStrategy::compute
     chnsPyramidDataACF[i1] = resampleVect;
   }
 
+
   // Now we can filter the channels to get the LDCF ones.
   ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
-  for (uint i=0; i < chnsPyramidDataACF.size(); i++)
+
+
+  uint i;
+  #ifdef USEOMP
+  int nThreads = omp_get_max_threads();
+  #pragma omp parallel for num_threads(nThreads)
+  #endif 
+  for (i=0; i < chnsPyramidDataACF.size(); i++)
   {
     // Postprocess the non-postprocessed ACF channels
     std::vector<cv::Mat> acfChannels;
@@ -135,8 +154,7 @@ ChannelsPyramidApproximatedStrategy::compute
 
     // Compute LDCF from the postprocessed ACF channels
     chnsPyramidData[i] = ldcfExtractor.extractFeaturesFromACF(acfChannels);
-  }
-
+  } 
   return chnsPyramidData;
 }
 
