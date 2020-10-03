@@ -141,6 +141,10 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
+  auto start = std::chrono::system_clock::now(); 
   std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
   //ASSERT_TRUE(pyramid.size()==28);
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> duration = end - start;
+  std::cout << duration.count() << "ms" << std::endl;
 }
