@@ -15,8 +15,8 @@
 #include <string>
 #include <chrono> 
 
-#undef SHOW_CHANNELS
-//#define SHOW_CHANNELS
+#undef DEBUG
+//#define DEBUG
 
 class TestChannelsExtractorGradMag: public testing::Test
 {
@@ -54,16 +54,6 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   ASSERT_TRUE(file_exists);
 
   // Read matlab gradient magnitude parameters from yaml file
-//  cv::FileNode data = fs["normRad"]["data"];
-//  std::vector<float> p;
-//  data >> p;
-//  float normRad = p[0];
-
-//  data = fs["normConst"]["data"];
-//  p.clear();
-//  data >> p;
-//  float normConst = p[0];
-
   float normConst = readScalarFromFileNode(fs["normConst"]);
   float normRad = readScalarFromFileNode(fs["normRad"]);
 
@@ -73,13 +63,7 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   std::vector<cv::Mat> gradMagExtractVector;
   gradMagExtractVector = extractor.extractFeatures(img);
 
-//  int rows = static_cast<int>(fs["M"]["rows"]);
-//  int cols = static_cast<int>(fs["M"]["cols"]);
-//  cv::Mat MatlabMag = cv::Mat::zeros(rows, cols, CV_32F);
-//  data = fs["M"]["data"];
-//  p.clear();
-//  data >> p;
-//  memcpy(MatlabMag.data, p.data(), p.size()*sizeof(float));
+  // Get the matlab magnitude matrix from disk
   cv::Mat MatlabMag = readMatrixFromFileNode(fs["M"]);
 
   // Compare Matlab gradient magnitude with C++ implementation
@@ -93,7 +77,7 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   cv::Mat absDiff = cv::abs(gradMagExtractVector[0] - MatlabMag);
   cv::Mat lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
 
-#ifdef SHOW_CHANNELS
+#ifdef DEBUG
   cv::imshow("cpp-Mag", gradMagExtractVector[0]);
   cv::imshow("matlab-Mag", MatlabMag);
   cv::waitKey();
@@ -108,14 +92,7 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   file_exists = fs.open(matlab_grad_orient_yaml_filename, cv::FileStorage::READ);
   ASSERT_TRUE(file_exists);
 
-//  rows = static_cast<int>(fs["O"]["rows"]);
-//  cols = static_cast<int>(fs["O"]["cols"]);
-//  cv::Mat MatlabO = cv::Mat::zeros(rows, cols, CV_32F);
-//  data = fs["O"]["data"];
-//  p.clear();
-//  data >> p;
-//  memcpy(MatlabO.data, p.data(), p.size()*sizeof(float));
-
+  // Get the matlab magnitude matrix from disk
   cv::Mat MatlabO = readMatrixFromFileNode(fs["O"]);
 
   // Compare Matlab gradient orientation with C++ implementation
@@ -125,7 +102,7 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   absDiff = cv::abs(gradMagExtractVector[1] - MatlabO);
   lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
 
-#ifdef SHOW_CHANNELS
+#ifdef DEBUG
   cv::imshow("cpp-O", gradMagExtractVector[1]);
   cv::imshow("matlab-O", MatlabO);
   cv::waitKey();

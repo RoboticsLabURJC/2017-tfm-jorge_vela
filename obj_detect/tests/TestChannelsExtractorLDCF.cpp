@@ -83,15 +83,17 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
 
   cv::FileStorage fs1;
   bool file_exists = fs1.open("yaml/LDCF.yml", cv::FileStorage::READ);
-  cv::FileNode rows = fs1["filtered_1"]["rows"];
-  cv::FileNode cols = fs1["filtered_1"]["cols"];
+  ASSERT_TRUE(file_exists);
+
+  int rows = fs1["filtered_1"]["rows"];
+  int cols = fs1["filtered_1"]["cols"];
   cv::FileNode Filtered = fs1["filtered_1"]["data"];
 
   int j = 0;
   int difference = 0;
-  for(int y=0;y<(int)rows;y++)
+  for(int y=0;y<rows;y++)
   {
-    for(int x=0;x<(int)cols;x++)
+    for(int x=0;x<cols;x++)
     {
       if(abs(ldcfExtracted[x*(int)cols+y] - (float)Filtered[j]) > 0.5){
         difference +=1;

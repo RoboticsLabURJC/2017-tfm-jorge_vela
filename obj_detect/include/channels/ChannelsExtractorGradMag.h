@@ -36,32 +36,6 @@ public:
 private:
   int m_normRad;
   float m_normConst;
-
-  float*
-  allocW
-    (
-      int size,
-      int sf,
-      int misalign
-    );
-
-  std::vector<cv::Mat>
-  gradM
-    (
-      cv::Mat image,
-      float* M,
-      float* O
-    );
-
-  void
-  gradMagNorm
-    (
-      float *M,
-      float *S,
-      int h,
-      int w,
-      float norm
-    );
 };
 
 #endif

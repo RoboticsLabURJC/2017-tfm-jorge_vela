@@ -1,4 +1,4 @@
-/** ------------------------------------------------------------------------
+﻿/** ------------------------------------------------------------------------
  *
  *  @brief Implementation of Channel feature extractors for magnitude and orient gradients.
  *  @author Jorge Vela
@@ -12,16 +12,30 @@
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
 #include "sse.hpp"
+#include <exception>
 
 #define PI 3.14159265f
+
+#undef DEBUG
+//#define DEBUG
 
 // compute x and y gradients for just one column (uses sse)
 /**
  * Funcion grad1. Calcula los gradientes x e y por cada columna
  *
  */
-void grad1( float *I, float *Gx, float *Gy, int h, int w, int x ) {
+void grad1
+  (
+  float *I,
+  float *Gx,
+  float *Gy,
+  int h,
+  int w,
+  int x
+  )
+{
   int y, y1; float *Ip, *In, r; __m128 *_Ip, *_In, *_G, _r;
+
   // compute column of Gx
   Ip=I-h; In=I+h; r=.5f;
   if(x==0) { r=1; Ip+=h; } else if(x==w-1) { r=1; In-=h; }
@@ -31,6 +45,7 @@ void grad1( float *I, float *Gx, float *Gy, int h, int w, int x ) {
     _G=(__m128*) Gx; _Ip=(__m128*) Ip; _In=(__m128*) In; _r = SET(r);
     for(y=0; y<h; y+=4) *_G++=MUL(SUB(*_In++,*_Ip++),_r);
   }
+
   // compute column of Gy
   #define GRADY(r) *Gy++=(*In++-*Ip++)*r;
   Ip=I; In=Ip+1;
@@ -68,26 +83,6 @@ float* acosTable() {
   init=true; return a1;
 }
 
-// normalize gradient magnitude at each location (uses sse)
-/**
- * Funcion gradMagNorm. Normaliza la magnitud del gradiente en cada píxel.
- *
- * @param M: Dirección de memoria donde está la magnitud del gradiente a normalizar
- * @param S: Nueva dirección de memoria donde se guarda la magnitud del gradiente normalizada
- * @param h: Altura correspondiente al cv::Mat de la magnitud del gradiente
- * @param w: Anchura correspondiente al cv::Mat de la magnitud del gradiente
- * @param norm: Valor por el que se quiere normalizar
- *
- */
-void GradMagExtractor::gradMagNorm( float *M, float *S, int h, int w, float norm ) {
-  __m128 *_M, *_S, _norm; int i=0, n=h*w, n4=n/4;
-  _S = (__m128*) S; _M = (__m128*) M; _norm = SET(norm);
-  bool sse = !(size_t(M)&15) && !(size_t(S)&15);
-  if(sse) for(; i<n4; i++) { *_M=MUL(*_M,RCP(ADD(*_S++,_norm))); _M++; }
-  if(sse) i*=4; for(; i<n; i++) M[i] /= (S[i] + norm);
-}
-
-
 // compute gradient magnitude and orientation at each location (uses sse)
 /**
  * Funcion gradMag. Se ha obtenido de p.dollar y alguna cosa modificada.
@@ -102,7 +97,18 @@ void GradMagExtractor::gradMagNorm( float *M, float *S, int h, int w, float norm
  * @param full: Si es verdadero calcula ángulos en [0,2*pi), sino en [0,pi)
  *
  */
-void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
+void
+gradMag
+  (
+  float* I,
+  float* M,
+  float* O,
+  int h,
+  int w,
+  int d,
+  bool full
+  )
+{
   int x, y, y1, c, h4, s; float *Gx, *Gy, *M2; __m128 *_Gx, *_Gy, *_M2, _m;
   float *acost = acosTable(), acMult=10000.0f;
   // allocate memory for storing one column of output (padded so h4%4==0)
@@ -154,99 +160,6 @@ void gradMag( float *I, float *M, float *O, int h, int w, int d, bool full ) {
 }
 
 /**
- * Funcion gradM. Tiene como entrada la imagen de la que se quieren obtener la magnitud y orientación
- * del gradiente y la variable donde se guardarán los valores. Retorna el vector de cv::Mat con las
- * características. La funcion extractFeatures llama a esta función.
- *
- * @param image: Imagen de la cual se quieren obtener las características.
- * @param *M: Dirección de memoria donde se guarda la magnitud del gradiente.
- * @param *O: Dirección de memoria donde se guarda la orientación del gradiente. 
- *
- * @return std::vector<cv::Mat>: Estructura que contiene las imagenes con los la magnitud y orientación.
- */
-std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
-  int h = image.size().height;
-  int w = image.size().width;
-  int nChannels = image.channels();
-
-  int size = h*w*nChannels;
-//  int sizeData = sizeof(float);
-//  int misalign=1;
-
-  if (nChannels == 1)
-  {
-    cv::Mat dst;
-    image.convertTo(dst, CV_32F);
-    transpose(dst, dst);
-    dst = dst/255.0;
-    float *data = dst.ptr<float>();
-
-    gradMag(data, M, O, h, w, nChannels,  false ); //ESTABA AL CONTRARIO ( w,h) ¿porque?
-
-  }
-  else if(nChannels == 3)
-  {
-    //std::vector<cv::Mat> channelsGradMag(2);
-
-    std::vector<float*> MVal{new float[size](), new float[size](), new float[size]() };
-    std::vector<float*> OVal{new float[size](), new float[size](), new float[size]() };
-
-    transpose(image, image);  //cambio que se hacia por cada canal
-    //image = image/255;        //cambio que se hacia por cada canal
-    cv::Mat image_split[3];
-    split(image,image_split); 
-
-    cv::Mat dst;
-    image_split[0].convertTo(dst, CV_32F);
-    float *data = dst.ptr<float>();
-
-    gradMag(data, MVal[0], OVal[0], h, w, 1,  false ); 
-
-    cv::Mat dst2;
-    image_split[1].convertTo(dst2, CV_32F);
-    float *data2 = dst2.ptr<float>();
-    gradMag(data2, MVal[1], OVal[1], h, w, 1,  false ); 
-
-    cv::Mat dst3;
-    image_split[2].convertTo(dst3, CV_32F);
-    float *data3 = dst3.ptr<float>();
-    gradMag(data3, MVal[2], OVal[2], h, w, 1,  false ); 
-
-
-    int tot = h*w;
-
-    for(int i=0; i < tot; i++)
-    {
-      int max = ( MVal[0][i] < MVal[1][i] ) ? 1  : 0 ;
-      int max2 =  ( MVal[max][i] < MVal[2][i] ) ? 2 : max;
-
-      M[i] = MVal[max2][i];
-      O[i] = OVal[max2][i];
-    }
-  }  
-
-  if (m_normRad != 0)
-  {
-    cv::Mat dummy_query = cv::Mat(w, h, CV_32FC1, M);
-    cv::Mat M_to_img = convTri(dummy_query, m_normRad);
-    cv::Mat newM;
-    M_to_img.convertTo(newM, CV_32FC1);    
-    float *dataM = newM.ptr<float>();
-    gradMagNorm(M, dataM, w, h, m_normConst);
-  }
-
-  std::vector<cv::Mat> channelsGradMag(2);
-  cv::Mat gradM = cv::Mat(w,h, CV_32FC1, M);
-  transpose(gradM, gradM);
-  channelsGradMag[0] = gradM;
-  cv::Mat gradO = cv::Mat(w,h, CV_32FC1, O);
-  transpose(gradO, gradO);
-  channelsGradMag[1] = gradO;
-
-  return channelsGradMag;
-}
-
-/**
  * Función extractFeatures. 
  * Se le pasa una imagen y se encarga de calcular la magnitud del gradiente y la orientación del gradiente.
  * La orientación del graciente no la utiliza como parámetro final, pero sirve para calcular el histograma.
@@ -254,21 +167,91 @@ std::vector<cv::Mat> GradMagExtractor::gradM(cv::Mat image, float *M, float *O){
  * @param img: Contiene la imagen de la cual se quieren obtener las características
  * @return std::vector<cv::Mat>: Vector con la magnitud y el gradiente en formato cv::Mat
  */
-std::vector<cv::Mat> GradMagExtractor::extractFeatures(cv::Mat img){
+std::vector<cv::Mat>
+GradMagExtractor::extractFeatures
+  (
+  cv::Mat img
+  )
+{
+  int nChannels = img.channels();
+  if ((nChannels != 1) && (nChannels != 3))
+  {
+    throw std::domain_error("Only gray level or BGR (3 channels) images allowed");
+  }
 
-  //printf("GradMag: -->8UC3 %d , 8UC1 %d , imageType %d \n",CV_8UC3, CV_8UC1 ,  img.type() );
-  //assert(img.type() == CV_8UC3 || img.type() == CV_8UC1);
+  cv::Size orig_sz = img.size();
+  transpose(img, img);
+  cv::Mat M;
+  cv::Mat O;
+  if (nChannels == 1)
+  {
+    cv::Mat img_float;
+    img.convertTo(img_float, CV_32FC1);
+    O = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+    M = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+    gradMag(img_float.ptr<float>(),
+            M.ptr<float>(),
+            O.ptr<float>(),
+            orig_sz.height, orig_sz.width, 1,  false );
+  }
+  else if (nChannels == 3)
+  {
+    cv::Mat image_split[3];
+    split(img, image_split);
 
-  int dChan = img.channels();
-  int width = img.size().width;
-  int height = img.size().height;
+    std::vector<cv::Mat> M_split(3);
+    std::vector<cv::Mat> O_split(3);
+    for (int i=0; i<3; i++)
+    {
+      image_split[i].convertTo(image_split[i], CV_32FC1); // important to have continuous memory in img_aux.ptr<float>
+      M_split[i] = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+      O_split[i] = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+      gradMag(image_split[i].ptr<float>(),
+              M_split[i].ptr<float>(),
+              O_split[i].ptr<float>(),
+              orig_sz.height, orig_sz.width, 1,  false);
+    }
 
-  int size = width*height*dChan;
-  float *M = new float[size]();
-  float *O = new float[size]();
+    M = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+    O = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+    int num_pixels = orig_sz.height * orig_sz.width;
+    float* pO = O.ptr<float>();
+    float* pM = M.ptr<float>();
+    float* pO_split[3];
+    float* pM_split[3];
+    for (int i=0; i < 3; i++)
+    {
+      pM_split[i] = M_split[i].ptr<float>();
+      pO_split[i] = O_split[i].ptr<float>();
+    }
+
+    for (int i=0; i < num_pixels; i++)
+    {
+      int max = ( pM_split[0][i] < pM_split[1][i] ) ? 1  : 0 ;
+      int max2 = ( pM_split[max][i] < pM_split[2][i] ) ? 2 : max;
+
+      pM[i] = pM_split[max2][i];
+      pO[i] = pO_split[max2][i];
+    }
+  }
+
+  if (m_normRad != 0)
+  {
+    cv::Mat S = convTri(M, m_normRad);
+    M = M / (S + m_normConst);
+  }
+
+#ifdef DEBUG
+  cv::imshow("M", M);
+  cv::imshow("O", O);
+  cv::waitKey();
+#endif
 
   std::vector<cv::Mat> channelsGradMag(2);
-  channelsGradMag = gradM(img, M, O);
+  transpose(M, M);
+  channelsGradMag[0] = M;
+  transpose(O, O);
+  channelsGradMag[1] = O;
 
   return channelsGradMag;
-}  
+}
