@@ -33,7 +33,6 @@ ChannelsPyramidApproximatedStrategy::compute
   )
 {
   cv::Size sz = img.size();
-  //cv::Mat imageUse = img;
 
   // GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
   getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
@@ -73,9 +72,18 @@ ChannelsPyramidApproximatedStrategy::compute
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
   //std::vector<cv::Mat> pChnsCompute;
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
-  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
-  //uint i;
-  for (const auto& i : isR) // Full computation for the real scales (ImResample+extractFeatures) 
+  ChannelsExtractorACF acfExtractor(m_padding,
+                                    m_shrink,
+                                    postprocess_acf_channels,
+                                    m_gradientMag_normRad,
+                                    m_gradientMag_normConst,
+                                    m_gradientHist_binSize,
+                                    m_gradientHist_nOrients,
+                                    m_gradientHist_softBin,
+                                    m_gradientHist_full);
+
+  // Full computation for the real scales (ImResample+extractFeatures)
+  for (const auto& i : isR)
   {
     double s = scales[i-1];
     cv::Size sz1;
@@ -101,8 +109,8 @@ ChannelsPyramidApproximatedStrategy::compute
   }
 
 
-  //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------  //printf("helloooo1\n");
-  for (const auto& i : isA)// for(int i=0; i< isA.size(); i++) // 
+  //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
+  for (const auto& i : isA)
   {
     int i1 = i - 1;
     int iR = isN[i1] - 1;
@@ -113,7 +121,7 @@ ChannelsPyramidApproximatedStrategy::compute
     for (int k = 0; k < acfExtractor.getNumChannels(); k++)
     {
       int type_of_channel_index=2;
-      if(k < 4)
+      if (k < 4)
         type_of_channel_index = (k/3) ? 1:0;
         /*int type_of_channel_index;
         if (k > 3)
@@ -132,12 +140,18 @@ ChannelsPyramidApproximatedStrategy::compute
 
 
   // Now we can filter the channels to get the LDCF ones.
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink,m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  ChannelsExtractorLDCF ldcfExtractor(filters,
+                                      m_padding,
+                                      m_shrink,
+                                      m_gradientMag_normRad,
+                                      m_gradientMag_normConst,
+                                      m_gradientHist_binSize,
+                                      m_gradientHist_nOrients,
+                                      m_gradientHist_softBin,
+                                      m_gradientHist_full);
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
 
-
-  uint i;
-  for (i=0; i < chnsPyramidDataACF.size(); i++)
+  for (uint i=0; i < chnsPyramidDataACF.size(); i++)
   {
     // Postprocess the non-postprocessed ACF channels
     std::vector<cv::Mat> acfChannels;

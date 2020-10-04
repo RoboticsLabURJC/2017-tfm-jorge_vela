@@ -11,6 +11,9 @@
 #undef DEBUG
 //#define DEBUG
 #include <chrono>
+//#include <functional>
+//#include <numeric>
+#include <random>
 
 ChannelsPyramidApproximatedParallelStrategy::ChannelsPyramidApproximatedParallelStrategy
   () {};
@@ -64,7 +67,6 @@ ChannelsPyramidApproximatedParallelStrategy::compute
     }
   }
 
-
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
   //std::vector<cv::Mat> pChnsCompute;
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
@@ -89,16 +91,29 @@ ChannelsPyramidApproximatedParallelStrategy::compute
         I1 = ImgResample(img, sz1.width , sz1.height);
       }
 
-      if ((s == 0.5) && (m_nApprox > 0 || m_nPerOct == 1))
-      {
-        img = I1;
-      }
+     // JM: Esto no tiene mucho sentido ... si se hace en paralelo
+     // ¡img es una variable compartida pero no se sabe en qué orden de iteraciones se ejecuta el bucle!
+//      if ((s == 0.5) && (m_nApprox > 0 || m_nPerOct == 1))
+//      {
+//        img = I1;
+//      }
 
       chnsPyramidDataACF[isR[i]-1] = acfExtractor.extractFeatures(I1);
-      }
+    }
   });
 
-  cv::parallel_for_(cv::Range( 0, isA.size() ), [&](const cv::Range& r)
+  // Idea From: https://github.com/elucideye/acf/blob/master/src/lib/acf/acf/chnsPyramid.cpp
+  // The per scale/type operations are easily parallelized, but with a parallel_for approach
+  // using simple uniform slicing will tend to starve some threads due to the nature of the
+  // pyramid layout.  Randomizing the scale indices should do better.  More optimal strategies
+  // may exist with further testing (work stealing, etc).
+  const auto scalesIndex = create_random_indices(nScales);
+
+  auto isAIndex = isA;
+  std::shuffle(isAIndex.begin(), isAIndex.end(), std::mt19937(std::random_device()()));
+
+//  cv::parallel_for_(cv::Range( 0, isA.size() ), [&](const cv::Range& r)
+  cv::parallel_for_(cv::Range( 0, int(isAIndex.size()) ), [&](const cv::Range& r)
   {
     for (int i = r.start; i < r.end; i++)
     {
@@ -111,41 +126,18 @@ ChannelsPyramidApproximatedParallelStrategy::compute
       for (int k = 0; k < acfExtractor.getNumChannels(); k++)
       {
         int type_of_channel_index=2;
-        if(k < 4)
+        if (k < 4)
+        {
           type_of_channel_index = (k/3) ? 1:0;
+        }
         
         float ratio = pow((scales[i1]/scales[iR]),-m_lambdas[type_of_channel_index]);
-        cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio); 
-        resampleVect[k] = resample;//.push_back(resample);
+        cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio);
+        resampleVect[k] = resample;
       }
       chnsPyramidDataACF[i1] = resampleVect;
     }
   });
-  //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------  //printf("helloooo1\n");
-  /*for (const auto& i : isA)// for(int i=0; i< isA.size(); i++) // 
-  {
-    int i1 = i - 1;
-    int iR = isN[i1] - 1;
-
-    cv::Size2f sz1(round(sz.width*scales[i1]/m_shrink),
-                   round(sz.height*scales[i1]/m_shrink));
-    std::vector<cv::Mat> resampleVect(acfExtractor.getNumChannels());
-
-    cv::parallel_for_(cv::Range( 0, acfExtractor.getNumChannels() ), [&](const cv::Range& r)
-      {
-        for (int k = r.start; k < r.end; k++)
-        {
-          int type_of_channel_index=2;
-          if(k < 4)
-            type_of_channel_index = (k/3) ? 1:0;
-          
-          float ratio = pow((scales[i1]/scales[iR]),-m_lambdas[type_of_channel_index]);
-          cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio); 
-          resampleVect[k] = resample;//.push_back(resample);
-        }
-      });
-    chnsPyramidDataACF[i1] = resampleVect;
-  }*/
 
   // Now we can filter the channels to get the LDCF ones.
   ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
@@ -153,14 +145,14 @@ ChannelsPyramidApproximatedParallelStrategy::compute
 
   cv::parallel_for_(cv::Range( 0, chnsPyramidDataACF.size()), [&](const cv::Range& r)
   {
-    for (uint i = r.start; i < r.end; i++)
+    for (int i = r.start; i < r.end; i++)
     {
       // Postprocess the non-postprocessed ACF channels
       std::vector<cv::Mat> acfChannels;
-      acfExtractor.postProcessChannels(chnsPyramidDataACF[i], acfChannels);
+      acfExtractor.postProcessChannels(chnsPyramidDataACF[scalesIndex[i]], acfChannels);
 
       // Compute LDCF from the postprocessed ACF channels
-      chnsPyramidData[i] = ldcfExtractor.extractFeaturesFromACF(acfChannels);
+      chnsPyramidData[scalesIndex[i]] = ldcfExtractor.extractFeaturesFromACF(acfChannels);
     }
   });
 

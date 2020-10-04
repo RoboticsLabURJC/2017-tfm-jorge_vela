@@ -26,6 +26,8 @@
  *  with a combination of ImgResample + extractChannels while most of them
  *  are approximated by doing ImgResample of the computed channels.
  *
+ *  In this case we perform the computation in a cv::parallel_loop_.
+ *
  *  ------------------------------------------------------------------------ */
 class ChannelsPyramidApproximatedParallelStrategy: public ChannelsPyramid
 {
