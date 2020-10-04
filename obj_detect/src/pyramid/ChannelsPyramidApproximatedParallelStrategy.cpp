@@ -12,11 +12,6 @@
 //#define DEBUG
 #include <chrono>
 
-#define USEOMP
-
-#ifdef USEOMP
-#include <omp.h>
-#endif
 ChannelsPyramidApproximatedParallelStrategy::ChannelsPyramidApproximatedParallelStrategy
   () {};
 
@@ -73,7 +68,7 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
   //std::vector<cv::Mat> pChnsCompute;
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
-  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels);
+  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels, m_gradientMag_normRad, m_gradientMag_normConst);
   //uint i;
   cv::parallel_for_(cv::Range( 0, isR.size() ), [&](const cv::Range& r)
   {
@@ -153,7 +148,7 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   }*/
 
   // Now we can filter the channels to get the LDCF ones.
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
+  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst);
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
 
   cv::parallel_for_(cv::Range( 0, chnsPyramidDataACF.size()), [&](const cv::Range& r)

@@ -58,7 +58,7 @@ ChannelsPyramidComputeAllParallelStrategy::compute
 
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink);
+  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst);
 
   // It is more efficient to compute the
   cv::parallel_for_(cv::Range( 0, nScales ), [&](const cv::Range& r)

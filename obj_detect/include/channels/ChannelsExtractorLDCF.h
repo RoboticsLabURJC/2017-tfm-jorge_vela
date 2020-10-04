@@ -34,7 +34,9 @@ public:
     (
       std::vector<cv::Mat> filters,
       cv::Size padding,
-      int shrink
+      int shrink,
+      int gradientMag_normRad = 0 ,
+      float gradientMag_normConst = 0.005
     );
 
   /**
@@ -70,6 +72,10 @@ private:
   cv::Size m_padding;
   std::vector<cv::Mat> m_filters;
   std::vector<cv::Mat> m_flipped_filters;
+
+  int m_gradientMag_normRad;
+  float m_gradientMag_normConst;
+
 };
 
 #endif

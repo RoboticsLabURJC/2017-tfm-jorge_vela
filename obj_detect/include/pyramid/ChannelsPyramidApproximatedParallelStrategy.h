@@ -31,7 +31,7 @@ class ChannelsPyramidApproximatedParallelStrategy: public ChannelsPyramid
 {
 public:
   ChannelsPyramidApproximatedParallelStrategy
-    ();
+   ();
 
   virtual ~ChannelsPyramidApproximatedParallelStrategy
     ();

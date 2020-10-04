@@ -58,9 +58,14 @@ protected:
   int m_nPerOct;
   int m_nApprox;
   int m_shrink;
+
+  int m_gradientMag_normRad;
+  float m_gradientMag_normConst;
+  
   std::vector<float> m_lambdas;
   cv::Size m_padding;
   cv::Size m_minDs;
+  
 };
 
 

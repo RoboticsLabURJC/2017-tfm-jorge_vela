@@ -69,8 +69,8 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
 
   // Extract ACF channels using paramenters from matlab.
   std::vector<cv::Mat> acf_channels;
-  ChannelsExtractorACF acfExtractor(padding, shrink);
-  acf_channels = acfExtractor.extractFeatures(image);
+  ChannelsExtractorACF acfExtractor(padding, shrink, true, 5, 0.005); //RECORDAR SI PARA EL TEST--> VALE CON ESTO O OBTENER CARACTERISTICAS DE FICHERO
+  acf_channels = acfExtractor.extractFeatures(image); 
 
   cv::Size acf_channel_sz = acf_channels[0].size();
   for (int i=0; i < 10; i++) // read and compare all the channels

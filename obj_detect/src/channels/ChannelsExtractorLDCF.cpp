@@ -16,12 +16,16 @@ ChannelsExtractorLDCF::ChannelsExtractorLDCF
   (
     std::vector<cv::Mat> filters,
     cv::Size padding,
-    int shrink
+    int shrink,
+    int gradientMag_normRad,
+    float gradientMag_normConst  
   )
 {
     m_padding = padding;
     m_shrink = shrink;
-    m_filters = filters;
+    m_filters = filters;  
+    m_gradientMag_normRad = gradientMag_normRad;
+    m_gradientMag_normConst = gradientMag_normConst;
 
     for (cv::Mat f: m_filters)
     {
@@ -40,7 +44,7 @@ std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
   )
 {
   // Extract the ACF channels
-  ChannelsExtractorACF acfExtractor(m_padding, m_shrink);
+  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, true, m_gradientMag_normRad, m_gradientMag_normConst);//,5, 0.005);
   std::vector<cv::Mat> acf_channels = acfExtractor.extractFeatures(img);
 
   if (m_filters.empty())
