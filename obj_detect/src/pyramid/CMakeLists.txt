@@ -16,6 +16,8 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedStrategy.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximated`Strategy.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedParallelStrategy.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedParallel`Strategy.h
   )
 
 # Set the sources for the main target

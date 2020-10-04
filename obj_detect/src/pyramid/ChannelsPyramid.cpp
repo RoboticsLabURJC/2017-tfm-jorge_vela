@@ -31,6 +31,15 @@ ChannelsPyramid::load(std::string opts)
     m_nApprox = 2; //pPyramid["nApprox"]["data"][0];
     m_shrink = pPyramid["pChns.shrink"]["data"];
 
+    m_gradientMag_normRad = 5;
+    m_gradientMag_normConst = 0.005;
+
+
+    m_gradientHist_binSize = 2;
+    m_gradientHist_nOrients = 6;
+    m_gradientHist_softBin = 1;
+    m_gradientHist_full = 0;
+
 
     int lambdasSize = pPyramid["lambdas"]["cols"];
     for(int i = 0; i < lambdasSize; i++)

@@ -33,12 +33,25 @@ public:
     (
       cv::Size padding,
       int shrink,
-      bool postprocess_channels = true
+      bool postprocess_channels = true,
+      int gradientMag_normRad=0,
+      float gradientMag_normConst = 0.005,
+      int gradientHist_binSize = 8, //2
+      int gradientHist_nOrients = 6, //6
+      int gradientHist_softBin = 1,
+      int gradientHist_full = 0
+
     ) 
     {
       m_padding = padding;
       m_shrink = shrink;
       m_postprocess_channels = postprocess_channels;
+      m_gradientMag_normRad = gradientMag_normRad;
+      m_gradientMag_normConst = gradientMag_normConst;
+      m_gradientHist_binSize = gradientHist_binSize;
+      m_gradientHist_nOrients = gradientHist_nOrients;
+      m_gradientHist_softBin = gradientHist_softBin;
+      m_gradientHist_full = gradientHist_full;
     };
 
   /**
@@ -62,6 +75,15 @@ public:
     std::vector<cv::Mat>& postprocessedChannels // output
     );
 
+  cv::Mat 
+  processChannels
+    (
+      cv::Mat img,
+      cv::BorderTypes,
+      int x,
+      int y
+    );
+
   int getNumChannels() { return 10; }
 
 private:
@@ -69,6 +91,14 @@ private:
   std::string m_color_space;
   cv::Size m_padding;
   bool m_postprocess_channels;
+
+  int m_gradientMag_normRad;
+  float m_gradientMag_normConst;
+
+  int m_gradientHist_binSize;
+  int m_gradientHist_nOrients;
+  int m_gradientHist_softBin;
+  int m_gradientHist_full;
 
   struct channel {
     cv::Mat image;

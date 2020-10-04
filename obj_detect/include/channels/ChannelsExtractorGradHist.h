@@ -51,8 +51,8 @@ private:
     (
       cv::Mat image,
       float* M,
-      float* O,
-      float* H
+      float* O
+      //float* H
     );
 
   void

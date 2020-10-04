@@ -311,31 +311,34 @@ GradHistExtractor::gradH
   (
   cv::Mat image,
   float *M,
-  float *O,
-  float *H
+  float *O
   )
 {
   int h = image.size().height;
   int w = image.size().width;
-
-  gradHist(M, O, H, h, w, m_binSize, m_nOrients, m_softBin, m_full);
+  int dChan = image.channels();
 
   int hConv = h/m_binSize;
   int wConv = w/m_binSize;
+  int size = hConv*wConv*dChan*m_nOrients;
+  // JM: Don't delete H, it seems that is used in channelsGradHist!!
+  float *H = new float[size]();
 
-  std::vector<cv::Mat> H2(m_nOrients);
+  gradHist(M, O, H, h, w, m_binSize, m_nOrients, m_softBin, m_full);
 
-  float *arr[m_nOrients];
+  std::vector<cv::Mat> H2;
+
+  //float *arr[m_nOrients];
   int pos = hConv*wConv;
   int i;
 
   
   for(i = 0; i < m_nOrients; i++)
   {
-    arr[i] = &H[i*pos];
-    cv::Mat gradH = cv::Mat(wConv, hConv, CV_32FC1, arr[i]);
+    //arr[i] = &H[i*pos];
+    cv::Mat gradH = cv::Mat(wConv, hConv, CV_32FC1, &H[i*pos]); //arr[i]
     transpose(gradH, gradH);
-    H2[i] = gradH;
+    H2.push_back(gradH);
   }
 
   return H2;
@@ -357,27 +360,27 @@ GradHistExtractor::extractFeatures
   std::vector<cv::Mat> gradMag
   )
 {
-  cv::Mat dstM;
-  gradMag[0].convertTo(dstM, CV_32FC1);
-  transpose(dstM, dstM);
-  float *dataM = dstM.ptr<float>();
+  //cv::Mat dstM;
+  //gradMag[0].convertTo(dstM, CV_32FC1);
+  transpose(gradMag[0], gradMag[0]);
+  float *dataM = gradMag[0].ptr<float>();
 
-  cv::Mat dstO;
-  gradMag[1].convertTo(dstO, CV_32FC1);
-  transpose(dstO, dstO);
-  float *dataO = dstO.ptr<float>();
+  //cv::Mat dstO;
+  //gradMag[1].convertTo(dstO, CV_32FC1);
+  transpose(gradMag[1], gradMag[1]);
+  float *dataO = gradMag[1].ptr<float>();
 
-  int dChan = img.channels();
+  /*int dChan = img.channels();
   int width = img.size().width;
   int height = img.size().height;
 
   int size = width/m_binSize*height/m_binSize*dChan*m_nOrients;
 
   // JM: Don't delete H, it seems that is used in channelsGradHist!!
-  float *H = new float[size]();
+  float *H = new float[size]();*/
 
   std::vector<cv::Mat> channelsGradHist;
-  channelsGradHist = gradH(img, dataM, dataO, H);
+  channelsGradHist = gradH(img, dataM, dataO);
 
   return channelsGradHist;
 }

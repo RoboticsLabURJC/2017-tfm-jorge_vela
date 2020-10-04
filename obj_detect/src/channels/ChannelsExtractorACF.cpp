@@ -14,6 +14,20 @@
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
 
+
+cv::Mat ChannelsExtractorACF::processChannels
+(
+  cv::Mat image,
+  cv::BorderTypes borderType,
+  int x,
+  int y
+)
+{
+  image = convTri(image, 1);
+  copyMakeBorder(image, image, y, y, x, x, borderType, 0 );
+  return image;
+}
+
 std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   (
   cv::Mat img
@@ -21,8 +35,8 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 {
   int smooth = 1;
   ChannelsLUVExtractor luvExtractor(true, smooth);
-  GradMagExtractor gradMagExtract(5);
-  GradHistExtractor gradHistExtract(2,6,1,0);  // <--- JM: Cuidado!! Estos parámetros dependerán del clasificador entrenado?
+  GradMagExtractor gradMagExtract( m_gradientMag_normRad, m_gradientMag_normConst); // 5
+  GradHistExtractor gradHistExtract(m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);  // <--- JM: Cuidado!! Estos parámetros dependerán del clasificador entrenado?
 
   //int dChan = img.channels();
   int h = img.size().height;
@@ -50,70 +64,69 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 //    split(luv_image, luvImage);
 //  }
   luv_image = convTri(luv_image, smooth);
-
+  int x = round(m_padding.width / m_shrink);
+  int y = round(m_padding.height / m_shrink);
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
   std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
 
+  int wResample = w/m_shrink;
+  int hResample = h/m_shrink;
   std::vector<cv::Mat> chnsCompute;
   //std::vector<ChannelsExtractorACF::channel> chnsCompute;
   for (cv::Mat luv_i: luvImage)
   {
-    cv::Mat resampleLuv = ImgResample(luv_i, w/m_shrink, h/m_shrink);
+    cv::Mat resampleLuv = ImgResample(luv_i, wResample, hResample);
+    if (m_postprocess_channels)
+      resampleLuv = processChannels(resampleLuv, cv::BORDER_REFLECT,x,y);
+
     chnsCompute.push_back(resampleLuv);
-//    channel ch1;
-//    ch1.image = resampleLuv;
-//    ch1.type = "LUV";
-//    chnsCompute.push_back(ch1);
+
   }
 
-  cv::Mat resampleMag = ImgResample(gMagOrient[0], w/m_shrink, h/m_shrink);
-  chnsCompute.push_back(resampleMag);
-//  channel ch2;
-//  ch2.image = resampleMag;
-//  ch2.type = "GMAG";
-//  chnsCompute.push_back(ch2);
+  cv::Mat resampleMag = ImgResample(gMagOrient[0], wResample, hResample);
+  if (m_postprocess_channels)
+      resampleMag = processChannels(resampleMag, cv::BORDER_CONSTANT,x,y);
 
+  chnsCompute.push_back(resampleMag);
 
   for(cv::Mat mh_c: gMagHist)
   {
-    cv::Mat resampleHist = ImgResample(mh_c, w/m_shrink, h/m_shrink);
+    cv::Mat resampleHist = ImgResample(mh_c, wResample, hResample);
+    if (m_postprocess_channels)
+      resampleHist = processChannels(resampleHist, cv::BORDER_CONSTANT,x,y);
+
     chnsCompute.push_back(resampleHist);
-//    channel ch3;
-//    ch3.image = resampleHist;
-//    ch3.type = "GHIST";
-//    chnsCompute.push_back(ch3);
   }
 
-  if (!m_postprocess_channels)
+  /*if (!m_postprocess_channels)
   {
     return chnsCompute;
   }
 
   // Postprocessing of the ACF channels
   std::vector<cv::Mat> postprocessedChannels;
-  int x = round(m_padding.width / m_shrink);
-  int y = round(m_padding.height / m_shrink);
-
-//  for (channel c: chnsCompute)
+  //for (channel c: chnsCompute)
   for (uint i=0; i < chnsCompute.size(); i++)
   {
     cv::Mat c_padded;
-    c_padded = convTri(chnsCompute[i], 1);
-//    c_padded = convTri(c.image, 1);
-//    if (c.type == "LUV")
-    if (i < 3) // LIV channels
+    
+    //c_padded = convTri(c.image, 1);
+    //if (c.type == "LUV")
+    if (i < 12) // LIV channels
     {
-      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
+      c_padded = chnsCompute[i];
+      //copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
     }
     else
     {
+      c_padded = convTri(chnsCompute[i], 1);
       copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
     }
      
     postprocessedChannels.push_back(c_padded);
-  }
+  }*/
 
-  return postprocessedChannels;
+  return chnsCompute;
 }
 
 void
