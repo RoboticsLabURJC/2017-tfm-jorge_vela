@@ -36,7 +36,7 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   int smooth = 1;
   ChannelsLUVExtractor luvExtractor(true, smooth);
   GradMagExtractor gradMagExtract( m_gradientMag_normRad, m_gradientMag_normConst); // 5
-  GradHistExtractor gradHistExtract(m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);  // <--- JM: Cuidado!! Estos parámetros dependerán del clasificador entrenado?
+  GradHistExtractor gradHistExtract(m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full); 
 
   //int dChan = img.channels();
   int h = img.size().height;
