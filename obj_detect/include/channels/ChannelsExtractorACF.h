@@ -34,8 +34,10 @@ public:
       cv::Size padding,
       int shrink,
       bool postprocess_channels = true,
+
       int gradientMag_normRad=0,
       float gradientMag_normConst = 0.005,
+
       int gradientHist_binSize = 8, //2
       int gradientHist_nOrients = 6, //6
       int gradientHist_softBin = 1,
@@ -45,9 +47,11 @@ public:
     {
       m_padding = padding;
       m_shrink = shrink;
+
       m_postprocess_channels = postprocess_channels;
       m_gradientMag_normRad = gradientMag_normRad;
       m_gradientMag_normConst = gradientMag_normConst;
+      
       m_gradientHist_binSize = gradientHist_binSize;
       m_gradientHist_nOrients = gradientHist_nOrients;
       m_gradientHist_softBin = gradientHist_softBin;
