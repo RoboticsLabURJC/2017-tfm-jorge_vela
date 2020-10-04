@@ -74,7 +74,7 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
     cv::flip(filterConver, filterConver, -1);
     filters.push_back(filterConver);
   }
-  ChannelsExtractorLDCF ldcfExtractor(filters, padding, shrink);
+  ChannelsExtractorLDCF ldcfExtractor(filters, padding, shrink,5,0.005,2,6,1,0);
   std::vector<cv::Mat> ldcfExtractFeatures = ldcfExtractor.extractFeatures(image);
 
   cv::Mat valFiltered;

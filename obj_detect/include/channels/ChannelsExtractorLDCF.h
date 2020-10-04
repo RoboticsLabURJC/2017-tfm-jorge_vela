@@ -36,7 +36,11 @@ public:
       cv::Size padding,
       int shrink,
       int gradientMag_normRad = 0 ,
-      float gradientMag_normConst = 0.005
+      float gradientMag_normConst = 0.005,
+      int gradientHist_binSize = 8, //2
+      int gradientHist_nOrients = 8, //6
+      int gradientHist_softBin = 1,
+      int gradientHist_full = 0
     );
 
   /**
@@ -75,6 +79,11 @@ private:
 
   int m_gradientMag_normRad;
   float m_gradientMag_normConst;
+
+  int m_gradientHist_binSize;
+  int m_gradientHist_nOrients;
+  int m_gradientHist_softBin;
+  int m_gradientHist_full;
 
 };
 

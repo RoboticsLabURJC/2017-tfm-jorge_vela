@@ -61,7 +61,13 @@ protected:
 
   int m_gradientMag_normRad;
   float m_gradientMag_normConst;
-  
+
+  int m_gradientHist_binSize;
+  int m_gradientHist_nOrients;
+  int m_gradientHist_softBin;
+  int m_gradientHist_full;
+
+
   std::vector<float> m_lambdas;
   cv::Size m_padding;
   cv::Size m_minDs;

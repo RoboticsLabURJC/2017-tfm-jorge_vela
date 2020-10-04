@@ -42,7 +42,7 @@ ChannelsPyramidComputeAllStrategy::compute
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst);
+  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
   for(int i=0; i< nScales; i++)
   {
     double s = scales[i];
