@@ -11,6 +11,8 @@
 #include <detectors/BadacostDetector.h>
 #include <pyramid/ChannelsPyramidApproximatedStrategy.h>
 #include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
+#include <pyramid/ChannelsPyramidApproximatedParallelStrategy.h>
+
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
 
@@ -189,7 +191,46 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 }
 
 
+TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategy){
 
+  std::string clfPath = "yaml/clf.yml";
+  std::string pyrPath = "yaml/pPyramid.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  ChannelsPyramid* pPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedParallelStrategy() );
+  BadacostDetector badacost(pPyramidStrategy);
+
+  bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
+  ASSERT_TRUE(loadVal);
+
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  std::vector<DetectionRectangle> detections = badacost.detect(image);
+
+#ifdef DEBUG
+  std::cout << detections;
+  badacost.showResults(image, detections);
+  cv::imshow("image", image);
+  cv::waitKey();
+#endif
+
+  // We declare the test is passed if all the gt detections have sufficient overlap
+  // with one detected rectangle.
+  for (const DetectionRectangle& gt_d: gt_detections)
+  {
+      bool oneOverlaps = false;
+      for (const DetectionRectangle& d: detections)
+      {
+        float overlap = gt_d.overlap(d);
+        oneOverlaps = ( overlap > 0.9);
+        if (oneOverlaps)
+        {
+          break;
+        }
+      }
+      ASSERT_TRUE(oneOverlaps);
+  }
+}
 
 
 
