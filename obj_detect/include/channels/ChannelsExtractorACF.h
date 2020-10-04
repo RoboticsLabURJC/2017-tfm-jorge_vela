@@ -62,6 +62,15 @@ public:
     std::vector<cv::Mat>& postprocessedChannels // output
     );
 
+  cv::Mat 
+  processChannels
+    (
+      cv::Mat img,
+      cv::BorderTypes,
+      int x,
+      int y
+    );
+
   int getNumChannels() { return 10; }
 
 private:
