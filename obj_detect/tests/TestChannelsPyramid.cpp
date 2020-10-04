@@ -3,6 +3,8 @@
 #include <pyramid/ChannelsPyramidComputeAllStrategy.h>
 #include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
 #include <pyramid/ChannelsPyramidApproximatedStrategy.h>
+#include <pyramid/ChannelsPyramidApproximatedParallelStrategy.h>
+
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include "gtest/gtest.h"
@@ -124,6 +126,31 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
   //ASSERT_TRUE(pyramid.size()==28);
 }
 
+TEST_F(TestChannelsPyramid, channelsPyramidApproximatedParallelStrategy)
+{
+  cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+
+  std::string nameOpts = "yaml/pPyramid.yml";
+
+  if (pChnsPyramid)
+  {
+    delete pChnsPyramid;
+  }
+  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedParallelStrategy() );
+
+  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
+  ASSERT_TRUE(loadOk);
+  std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
+  std::vector<double> scales;
+  std::vector<cv::Size2d> scaleshw;
+  auto start = std::chrono::system_clock::now(); 
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
+  //ASSERT_TRUE(pyramid.size()==28);
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> duration = end - start;
+  std::cout << duration.count() << "ms" << std::endl;
+}
+
 TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
@@ -148,3 +175,5 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
   std::chrono::duration<float,std::milli> duration = end - start;
   std::cout << duration.count() << "ms" << std::endl;
 }
+
+

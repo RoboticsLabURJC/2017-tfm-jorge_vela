@@ -33,7 +33,7 @@ ChannelsPyramidApproximatedStrategy::compute
   )
 {
   cv::Size sz = img.size();
-  cv::Mat imageUse = img;
+  //cv::Mat imageUse = img;
 
   // GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
   getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
@@ -75,13 +75,9 @@ ChannelsPyramidApproximatedStrategy::compute
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
   ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels);
   //uint i;
-  int nThreads = omp_get_max_threads();
-  #ifdef USEOMP
-  #pragma omp parallel for num_threads(nThreads)
-  #endif 
-  for(uint i = 0; i < isR.size(); i++)//for (const auto& i : isR) // Full computation for the real scales (ImResample+extractFeatures)
+  for (const auto& i : isR) // Full computation for the real scales (ImResample+extractFeatures) 
   {
-    double s = scales[isR[i]-1];
+    double s = scales[i-1];
     cv::Size sz1;
     sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
     sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
@@ -89,51 +85,47 @@ ChannelsPyramidApproximatedStrategy::compute
     cv::Mat I1;
     if (sz == sz1)
     {
-      I1 = imageUse;
+      I1 = img;
     }
     else
     {
-      I1 = ImgResample(imageUse, sz1.width , sz1.height);
+      I1 = ImgResample(img, sz1.width , sz1.height);
     }
 
     if ((s == 0.5) && (m_nApprox > 0 || m_nPerOct == 1))
     {
-      imageUse = I1;
+      img = I1;
     }
 
-    chnsPyramidDataACF[isR[i]-1] = acfExtractor.extractFeatures(I1);
+    chnsPyramidDataACF[i-1] = acfExtractor.extractFeatures(I1);
   }
 
 
-  #ifdef USEOMP
-  #pragma omp parallel for num_threads(nThreads)
-  #endif 
   //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------  //printf("helloooo1\n");
-  for(int i=0; i< isA.size(); i++) // for (const auto& i : isA)// 
+  for (const auto& i : isA)// for(int i=0; i< isA.size(); i++) // 
   {
-    //printf("%d %d \n",i,  val);
-    int i1 = isA[i]- 1; //i - 1
+    int i1 = i - 1;
     int iR = isN[i1] - 1;
 
     cv::Size2f sz1(round(sz.width*scales[i1]/m_shrink),
                    round(sz.height*scales[i1]/m_shrink));
-    std::vector<cv::Mat> resampleVect;
+    std::vector<cv::Mat> resampleVect(acfExtractor.getNumChannels());
     for (int k = 0; k < acfExtractor.getNumChannels(); k++)
     {
       int type_of_channel_index=2;
       if(k < 4)
         type_of_channel_index = (k/3) ? 1:0;
-      /*int type_of_channel_index;
-      if (k > 3)
-        type_of_channel_index = 2; // LUV channels
-      else if (k == 3)
-        type_of_channel_index = 1; // Magnitude of gradient channel
-      else //if (k > 3)
-        type_of_channel_index = 0; // HoG channels.*/
+        /*int type_of_channel_index;
+        if (k > 3)
+          type_of_channel_index = 2; // LUV channels
+        else if (k == 3)
+          type_of_channel_index = 1; // Magnitude of gradient channel
+        else //if (k > 3)
+          type_of_channel_index = 0; // HoG channels.*/
       
       float ratio = pow((scales[i1]/scales[iR]),-m_lambdas[type_of_channel_index]);
       cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio); 
-      resampleVect.push_back(resample);
+      resampleVect[k] = resample;//.push_back(resample);
     }
     chnsPyramidDataACF[i1] = resampleVect;
   }
@@ -145,9 +137,6 @@ ChannelsPyramidApproximatedStrategy::compute
 
 
   uint i;
-  #ifdef USEOMP
-  #pragma omp parallel for num_threads(nThreads)
-  #endif 
   for (i=0; i < chnsPyramidDataACF.size(); i++)
   {
     // Postprocess the non-postprocessed ACF channels
