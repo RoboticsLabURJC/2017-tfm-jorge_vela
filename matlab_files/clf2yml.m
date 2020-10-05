@@ -23,8 +23,13 @@ function[ ] = clf2yml(variable, fileName)
     matlab2opencv(variable.opts.pPyramid.smooth, fileName, "a", "smooth");
     matlab2opencv(variable.opts.pPyramid.concat, fileName, "a", "concat");
     matlab2opencv(variable.opts.pPyramid.complete, fileName, "a", "complete");      
+   
     
-    
+    matlab2opencv(variable.opts.modelDsPad, fileName, "a", "modelDsPad");      
+    matlab2opencv(variable.opts.modelDs, fileName, "a", "modelDs");      
+    matlab2opencv(variable.opts.cascThr, fileName, "a", "cascThr");      
+    matlab2opencv(variable.opts.stride, fileName, "a", "stride");      
+
     file = fopen( fileName, 'a');
     fprintf( file, '    %s: \n', "pChns.pColor");
     fprintf( file, '        enabled: %d\n', variable.opts.pPyramid.pChns.pColor.enabled);
