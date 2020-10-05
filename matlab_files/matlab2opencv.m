@@ -1,20 +1,14 @@
-%
-% From https://stackoverflow.com/questions/11550021/converting-a-mat-file-from-matlab-into-cvmat-matrix-in-opencv
-%
-% Usage:
-%   varA = rand( 3, 6);
-%   varB = rand( 7, 2);
-%
-%   matlab2opencv( varA, 'newStorageFile.yml');
-%   matlab2opencv( varB, 'newStorageFile.yml', 'a'); % append mode passed by 'a' flag
-%
-function matlab2opencv( variable, fileName, flag)
+function [ ] = matlab2opencv( variable, fileName, flag, name )
+%MATLAB2OPENCV Save `variable` to yml/xml file 
+% fileName: filename where the variable is stored
+% flag: `a` for append, `w` for writing.
+%   Detailed explanation goes here
 
-[rows, cols] = size(variable);
-
+[cols rows] = size(variable);
 % Beware of Matlab's linear indexing
+if (name == "Cprime")
 variable = variable';
-
+end
 % Write mode as default
 if ( ~exist('flag','var') )
     flag = 'w'; 
@@ -29,8 +23,10 @@ else
     file = fopen( fileName, 'a');
 end
 
+
+
 % Write variable header
-fprintf( file, '    %s: !!opencv-matrix\n', inputname(1));
+fprintf( file, '    %s: \n', name);
 fprintf( file, '        rows: %d\n', rows);
 fprintf( file, '        cols: %d\n', cols);
 fprintf( file, '        dt: f\n');
@@ -47,5 +43,5 @@ for i=1:rows*cols
 end
 
 fprintf( file, ']\n');
-
 fclose(file);
+end

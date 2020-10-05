@@ -24,21 +24,21 @@ ChannelsPyramid::load(std::string opts)
 
   if (existOpts)
   {
-    m_padding.width = 6; //pPyramid["pad"]["data"][1];
-    m_padding.height = 4; //pPyramid["pad"]["data"][0];
-    m_nOctUp = 0; //pPyramid["nOctUp"]["data"][0];
-    m_nPerOct = 3; //pPyramid["nPerOct"]["data"][0];
-    m_nApprox = 2; //pPyramid["nApprox"]["data"][0];
+    m_padding.width = pPyramid["pad"]["data"][1]; //6; //
+    m_padding.height = pPyramid["pad"]["data"][0]; //4; //
+    m_nOctUp = pPyramid["nOctUp"]["data"][0]; //0; //
+    m_nPerOct = pPyramid["nPerOct"]["data"][0]; //3; //
+    m_nApprox = pPyramid["nApprox"]["data"][0]; //2; //
     m_shrink = pPyramid["pChns.shrink"]["data"];
 
-    m_gradientMag_normRad = 5;
-    m_gradientMag_normConst = 0.005;
+    m_gradientMag_normRad = pPyramid["pChns.pGradMag"]["normRad"]; //5;
+    m_gradientMag_normConst = pPyramid["pChns.pGradMag"]["normConst"]; //0.005;
 
 
-    m_gradientHist_binSize = 2;
-    m_gradientHist_nOrients = 6;
-    m_gradientHist_softBin = 1;
-    m_gradientHist_full = 0;
+    m_gradientHist_binSize =  pPyramid["pChns.pGradHist"]["enabled"]; //2;
+    m_gradientHist_nOrients =  pPyramid["pChns.pGradHist"]["nOrients"]; //6;
+    m_gradientHist_softBin =  pPyramid["pChns.pGradHist"]["softBin"]; //1;
+    m_gradientHist_full =  false ; //pPyramid["pChns.pGradHist"]["full"]; //0;
 
 
     int lambdasSize = pPyramid["lambdas"]["cols"];
@@ -46,8 +46,8 @@ ChannelsPyramid::load(std::string opts)
       m_lambdas.push_back((float)pPyramid["lambdas"]["data"][i]);
 
     // TODO: Cargar del fichero!!
-    m_minDs.width = 84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-    m_minDs.height = 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
+    m_minDs.width = pPyramid["minDs"]["data"][1]; //84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
+    m_minDs.height = pPyramid["minDs"]["data"][0]; // 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
   }
   return existOpts;
 }

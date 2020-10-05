@@ -88,7 +88,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllStrategy)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
-  std::string nameOpts = "yaml/pPyramid.yml";
+  std::string nameOpts = "yaml/pPyramid_badacost.yml";
 
   if (pChnsPyramid)
   {
@@ -109,7 +109,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
-  std::string nameOpts = "yaml/pPyramid.yml";
+  std::string nameOpts = "yaml/pPyramid_badacost.yml";
 
   if (pChnsPyramid)
   {
@@ -130,7 +130,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedParallelStrategy)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
-  std::string nameOpts = "yaml/pPyramid.yml";
+  std::string nameOpts = "yaml/pPyramid_badacost.yml";
 
   if (pChnsPyramid)
   {
@@ -155,7 +155,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
 {
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
-  std::string nameOpts = "yaml/pPyramid.yml";
+  std::string nameOpts = "yaml/pPyramid_badacost.yml";
 
   if (pChnsPyramid)
   {

@@ -1,0 +1,66 @@
+%YAML:1.0
+    nPerOct: 
+        rows: 1
+        cols: 1
+        dt: f
+        data: [ 3.000000]
+    nOctUp: 
+        rows: 1
+        cols: 1
+        dt: f
+        data: [ 0.000000]
+    nApprox: 
+        rows: 1
+        cols: 1
+        dt: f
+        data: [ 2.000000]
+    lambdas: 
+        rows: 1
+        cols: 3
+        dt: f
+        data: [ 0.000000, 0.073930, 0.072470]
+    pad: 
+        rows: 1
+        cols: 2
+        dt: f
+        data: [ 4.000000, 6.000000]
+    minDs: 
+        rows: 1
+        cols: 2
+        dt: f
+        data: [ 48.000000, 84.000000]
+    smooth: 
+        rows: 1
+        cols: 1
+        dt: f
+        data: [ 1.000000]
+    concat: 
+        rows: 1
+        cols: 1
+        dt: f
+        data: [ 1.000000]
+    complete: 
+        rows: 1
+        cols: 1
+        dt: f
+        data: [ 1.000000]
+    pChns.pColor: 
+        enabled: 1
+        smooth: 0
+        colorSpace: luv
+    pChns.pGradMag: 
+        enabled: 1
+        colorChn: 0
+        normRad: 5
+        normConst: 5.000000e-03
+        full: 0
+    pChns.pGradHist: 
+        enabled: 2
+        nOrients: 6
+        softBin: 1
+        useHog: 0
+        clipHog: 2.000000e-01
+    pChns.shrink: 
+        data: 2
+    pChns.complete: 
+        data: 1

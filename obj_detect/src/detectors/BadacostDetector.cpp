@@ -76,8 +76,8 @@ bool BadacostDetector::load
     std::vector<float> p;
     for(int i = 0; i < 14; i++)
     {
-      int rows = static_cast<int>(classifier[clf_variable_labels[i]]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-      int cols = static_cast<int>(classifier[clf_variable_labels[i]]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+      int rows = static_cast<int>(classifier[clf_variable_labels[i]]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+      int cols = static_cast<int>(classifier[clf_variable_labels[i]]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
       cv::FileNode data = classifier[clf_variable_labels[i]]["data"];
       
       cv::Mat matrix= cv::Mat::zeros(rows, cols, CV_32F);
@@ -94,18 +94,18 @@ bool BadacostDetector::load
 
 
     // Read Cprime data
-    int rows = static_cast<int>(classifier["Cprime"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    int cols = static_cast<int>(classifier["Cprime"]["rows"]);
+    int rows = static_cast<int>(classifier["Cprime"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+    int cols = static_cast<int>(classifier["Cprime"]["cols"]);
     cv::FileNode data = classifier["Cprime"]["data"];
     m_Cprime = cv::Mat::zeros(rows, cols, CV_32F);
     p.clear();
     data >> p;
     memcpy(m_Cprime.data, p.data(), p.size()*sizeof(float));
-    transpose(m_Cprime, m_Cprime); // <-- We have transposed it!!
+    //transpose(m_Cprime, m_Cprime); // <-- We have transposed it!!
 
     // Read Y data
-    rows = static_cast<int>(classifier["Y"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    cols = static_cast<int>(classifier["Y"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+    rows = static_cast<int>(classifier["Y"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+    cols = static_cast<int>(classifier["Y"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
     data = classifier["Y"]["data"];
     m_Y = cv::Mat::zeros(rows, cols, CV_32F);
     p.clear();
@@ -113,8 +113,8 @@ bool BadacostDetector::load
     memcpy(m_Y.data, p.data(), p.size()*sizeof(float));
     
     // Read wl_weights data
-    rows = static_cast<int>(classifier["w1_weights"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    cols = static_cast<int>(classifier["w1_weights"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+    rows = static_cast<int>(classifier["w1_weights"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+    cols = static_cast<int>(classifier["w1_weights"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
     data = classifier["w1_weights"]["data"];
     m_wl_weights = cv::Mat::zeros(rows, cols, CV_32F);
     p.clear();
@@ -125,8 +125,8 @@ bool BadacostDetector::load
     // Read aRatio data
     if (!classifier["aRatio"].empty())
     {
-      rows = static_cast<int>(classifier["aRatio"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-      cols = static_cast<int>(classifier["aRatio"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+      rows = static_cast<int>(classifier["aRatio"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+      cols = static_cast<int>(classifier["aRatio"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
       data = classifier["aRatio"]["data"];
       m_aRatio = cv::Mat::zeros(rows, cols, CV_32F);
       p.clear();
