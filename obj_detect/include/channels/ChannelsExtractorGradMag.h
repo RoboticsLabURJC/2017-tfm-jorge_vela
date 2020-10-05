@@ -15,6 +15,8 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
+#define USE_OPENCV_IMPLEMENTATION
+
 class GradMagExtractor
 {
 public:
@@ -34,6 +36,19 @@ public:
     );
 
 private:
+
+#ifdef USE_OPENCV_IMPLEMENTATION
+  std::vector<cv::Mat> extractFeaturesOpenCV
+    (
+      cv::Mat img
+    );
+#else
+  std::vector<cv::Mat> extractFeaturesPDollar
+    (
+      cv::Mat img
+    );
+#endif
+
   int m_normRad;
   float m_normConst;
 };

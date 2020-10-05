@@ -40,6 +40,12 @@ readMatrixFromFileNode
   cv::FileNode fn
   );
 
+cv::Mat
+readMatrixFromFileNodeWrongBufferMatlab
+  (
+  cv::FileNode fn
+  );
+
 std::vector<int>
 create_random_indices
   (

@@ -159,16 +159,151 @@ gradMag
   delete [] M2;
 }
 
+void
+gradMagOpenCV
+  (
+  const cv::Mat I, // one channel
+  cv::Mat& M,
+  cv::Mat& O,
+  bool full = true
+  )
+{
+  // Compute always with full: [0,2*pi) (if (!full) -> [0,pi) )
+
+  // Compute [Gx,Gy]=gradient2(I); as in Matlab
+  cv::Mat kernel_horiz = (cv::Mat_<float>(1,3) << 0.5, 0, -0.5);
+  cv::Mat kernel_vert  = (cv::Mat_<float>(3,1) << 0.5, 0, -0.5);
+  cv::Mat Gx;
+  cv::Mat Gy;
+  cv::filter2D(I, Gx, -1, kernel_horiz);
+  cv::filter2D(I, Gy, -1, kernel_vert);
+
+  // Compute gradient mangitude (M)
+  cv::Mat Gx2, Gy2;
+  cv::multiply(Gx, Gx, Gx2);
+  cv::multiply(Gy, Gy, Gy2);
+  M = Gx2 + Gy2;
+  cv::sqrt(M, M);
+  M = cv::min(M, 1e10f);
+
+  // Compute gradient orientation (O)
+//  // Normalize Gx and Gy
+//  cv::Mat Gx_norm, Aux;
+//  cv::multiply(Gx, M, Gx_norm);
+//  cv::bitwise_and(Gy, -1.0*cv::Mat::zeros(Gy.size(), CV_32F), Aux);
+//  cv::bitwise_xor(Gx_norm, Aux, Gx_norm);
+
+//  cv::Mat Gy_norm;
+//  cv::multiply(Gy, M, Gy_norm);
+//  cv::bitwise_and(Gx, -1.0*cv::Mat::zeros(Gx.size(), CV_32F), Aux);
+//  cv::bitwise_xor(Gy_norm, Aux, Gy_norm);
+
+//  cv::phase(Gx_norm, Gy_norm, O, false); // Compute angle in radians in [0,2pi)
+
+  cv::phase(Gx, Gy, O, false); // Compute angle in radians in [0,2pi)
+
+  if (!full)
+  {
+    // Remove M_PI to orientations with Gy < 0 to get orientation in [0,pi)
+    cv::Mat isGyNegUint8 = (Gy < 0.0)/255.0; // divide by 255 to get a value of 1 when true
+    cv::Mat isGyNegFloat;
+    isGyNegUint8.convertTo(isGyNegFloat, CV_32F);
+    cv::Mat toSustract = isGyNegFloat*M_PI;
+    O -= toSustract;
+  }
+}
+
 /**
- * Función extractFeatures. 
- * Se le pasa una imagen y se encarga de calcular la magnitud del gradiente y la orientación del gradiente.
- * La orientación del graciente no la utiliza como parámetro final, pero sirve para calcular el histograma.
+ * This function implements the features extraction using OpenCV Mats.
  *
- * @param img: Contiene la imagen de la cual se quieren obtener las características
- * @return std::vector<cv::Mat>: Vector con la magnitud y el gradiente en formato cv::Mat
+ * @brief GradMagExtractor::extractFeaturesOpenCV
+ * @param img
+ * @return
  */
 std::vector<cv::Mat>
-GradMagExtractor::extractFeatures
+GradMagExtractor::extractFeaturesOpenCV
+  (
+  cv::Mat img
+  )
+{
+  int nChannels = img.channels();
+  if ((nChannels != 1) && (nChannels != 3))
+  {
+    throw std::domain_error("Only gray level or BGR (3 channels) images allowed");
+  }
+
+  cv::Size orig_sz = img.size();
+  cv::Mat M;
+  cv::Mat O;
+  if (nChannels == 1)
+  {
+    cv::Mat img_float;
+    img.convertTo(img_float, CV_32FC1);
+    M = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+    O = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+    gradMagOpenCV(img_float, M, O, false);
+  }
+  else if (nChannels == 3)
+  {
+    cv::Mat image_split[3];
+    split(img, image_split);
+
+    M = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+    O = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+
+    std::vector<cv::Mat> M_split(3);
+    std::vector<cv::Mat> O_split(3);
+    for (int i=0; i<3; i++)
+    {
+      image_split[i].convertTo(image_split[i], CV_32FC1); // important to have continuous memory in img_aux.ptr<float>
+      M_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+      O_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+      gradMagOpenCV(image_split[i], M_split[i], O_split[i], false);
+    }
+
+    int num_pixels = orig_sz.height * orig_sz.width;
+    float* pO = O.ptr<float>();
+    float* pM = M.ptr<float>();
+    float* pO_split[3];
+    float* pM_split[3];
+    for (int i=0; i < 3; i++)
+    {
+      pM_split[i] = M_split[i].ptr<float>();
+      pO_split[i] = O_split[i].ptr<float>();
+    }
+
+    for (int i=0; i < num_pixels; i++)
+    {
+      int max = ( pM_split[0][i] < pM_split[1][i] ) ? 1  : 0 ;
+      int max2 = ( pM_split[max][i] < pM_split[2][i] ) ? 2 : max;
+
+      pM[i] = pM_split[max2][i];
+      pO[i] = pO_split[max2][i];
+    }
+  }
+
+  if (m_normRad != 0)
+  {
+    cv::Mat S = convTri(M, m_normRad);
+    M = M / (S + m_normConst);
+  }
+
+#ifdef DEBUG
+  cv::imshow("M", M);
+  cv::imshow("O", O);
+  cv::waitKey();
+#endif
+
+  std::vector<cv::Mat> channelsGradMag(2);
+  channelsGradMag[0] = M;
+  channelsGradMag[1] = O;
+
+  return channelsGradMag;
+}
+
+#ifndef USE_OPENCV_IMPLEMENTATION
+std::vector<cv::Mat>
+GradMagExtractor::extractFeaturesPDollar
   (
   cv::Mat img
   )
@@ -199,6 +334,9 @@ GradMagExtractor::extractFeatures
     cv::Mat image_split[3];
     split(img, image_split);
 
+    M = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+    O = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
+
     std::vector<cv::Mat> M_split(3);
     std::vector<cv::Mat> O_split(3);
     for (int i=0; i<3; i++)
@@ -212,8 +350,6 @@ GradMagExtractor::extractFeatures
               orig_sz.height, orig_sz.width, 1,  false);
     }
 
-    M = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
-    O = cv::Mat::zeros(orig_sz.width, orig_sz.height, CV_32FC1);
     int num_pixels = orig_sz.height * orig_sz.width;
     float* pO = O.ptr<float>();
     float* pM = M.ptr<float>();
@@ -254,4 +390,26 @@ GradMagExtractor::extractFeatures
   channelsGradMag[1] = O;
 
   return channelsGradMag;
+}
+#endif
+
+/**
+ * Función extractFeatures.
+ * Se le pasa una imagen y se encarga de calcular la magnitud del gradiente y la orientación del gradiente.
+ * La orientación del graciente no la utiliza como parámetro final, pero sirve para calcular el histograma.
+ *
+ * @param img: Contiene la imagen de la cual se quieren obtener las características
+ * @return std::vector<cv::Mat>: Vector con la magnitud y el gradiente en formato cv::Mat
+ */
+std::vector<cv::Mat>
+GradMagExtractor::extractFeatures
+  (
+  cv::Mat img
+  )
+{
+#ifdef USE_OPENCV_IMPLEMENTATION
+  return extractFeaturesOpenCV(img);
+#else
+  return extractFeaturesPDollar(img);
+#endif
 }

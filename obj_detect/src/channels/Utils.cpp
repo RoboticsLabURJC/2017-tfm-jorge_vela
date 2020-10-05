@@ -139,3 +139,20 @@ readMatrixFromFileNode
 
   return matrix;
 }
+
+cv::Mat
+readMatrixFromFileNodeWrongBufferMatlab
+  (
+  cv::FileNode fn
+  )
+{
+  int rows = static_cast<int>(fn["cols"]);
+  int cols = static_cast<int>(fn["rows"]);
+  cv::Mat matrix = cv::Mat::zeros(rows, cols, CV_32F);
+  cv::FileNode data = fn["data"];
+  std::vector<float> p;
+  data >> p;
+  memcpy(matrix.data, p.data(), p.size()*sizeof(float));
+
+  return matrix;
+}
