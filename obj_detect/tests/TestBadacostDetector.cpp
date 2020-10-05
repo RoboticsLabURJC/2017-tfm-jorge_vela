@@ -72,7 +72,7 @@ public:
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 {
-  std::string clfPath = "yaml/detectorComplete.yml";
+  std::string clfPath = "yaml/detectorComplete_2.yml";
   std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
@@ -110,7 +110,7 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 
 TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
 
-  std::string clfPath = "yaml/detectorComplete.yml";
+  std::string clfPath = "yaml/detectorComplete_2.yml";
   std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
@@ -152,7 +152,7 @@ TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 
-  std::string clfPath = "yaml/detectorComplete.yml";
+  std::string clfPath = "yaml/detectorComplete_2.yml";
   //std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
@@ -194,7 +194,7 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategy){
 
-  std::string clfPath = "yaml/detectorComplete.yml";
+  std::string clfPath = "yaml/detectorComplete_2.yml";
   std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 

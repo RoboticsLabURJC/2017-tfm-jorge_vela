@@ -134,17 +134,29 @@ bool BadacostDetector::load
     loadedOK = true;
   }
 
-  // TODO: load everything here from the classifier yaml file:
-  m_modelDsPad.width = 96; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  m_modelDsPad.height = 54; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  m_modelDs.width = 84;    // JM: Esto debería venir del fichero con el clasificador entrenado.
-  m_modelDs.height = 48;  // JM: Esto debería venir del fichero con el clasificador entrenado.
+  ClassifierConfig clfData;
 
-  m_shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  m_stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  m_cascThr = -2.239887 * 0.1; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  m_padding.width = 6; //pPyramid["pad"]["data"][1];
-  m_padding.height = 4; //pPyramid["pad"]["data"][0];
+
+  clfData.modelDs.width = classifier["modelDs"]["data"][1];
+  clfData.modelDs.height = classifier["modelDs"]["data"][0];
+
+  clfData.modelDsPad.width = classifier["modelDsPad"]["data"][1];
+  clfData.modelDsPad.height = classifier["modelDsPad"]["data"][0];
+
+  clfData.stride = classifier["stride"]["data"][0];
+  clfData.cascThr = float(classifier["cascThr"]["data"][0])*0.1;
+
+  // TODO: load everything here from the classifier yaml file:
+  //m_modelDsPad.width = 96; // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //m_modelDsPad.height = 54; // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //m_modelDs.width = 84;    // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //m_modelDs.height = 48;  // JM: Esto debería venir del fichero con el clasificador entrenado.
+
+  //m_shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  //m_stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  //m_cascThr = -2.239887 * 0.1; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  //m_clfData.padding.width = 6; //pPyramid["pad"]["data"][1];
+  //m_clfData.padding.height = 4; //pPyramid["pad"]["data"][0];
   // <------ END TODO
 
   /*cv::FileStorage pyramid;
@@ -158,8 +170,6 @@ bool BadacostDetector::load
   }*/
 
 
-  ClassifierConfig clfData;
-
   clfData.luv.smooth = 1; //pyramid["pChns.pColor"]["smooth"];
   clfData.luv.smooth_kernel_size = 1;
 
@@ -169,6 +179,7 @@ bool BadacostDetector::load
   clfData.nPerOct = classifier["nPerOct"]["data"][0]; //3; //
   clfData.nApprox = classifier["nApprox"]["data"][0]; //2; //
   clfData.shrink = classifier["pChns.shrink"]["data"];
+  m_shrink = clfData.shrink*2; //  ??????????????????????????????????????????????????????? // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
 
   clfData.gradMag.normRad = classifier["pChns.pGradMag"]["normRad"]; 
   clfData.gradMag.normConst = classifier["pChns.pGradMag"]["normConst"]; 
@@ -177,6 +188,9 @@ bool BadacostDetector::load
   clfData.gradHist.nOrients = classifier["pChns.pGradHist"]["nOrients"];
   clfData.gradHist.softBin = classifier["pChns.pGradHist"]["softBin"];
   clfData.gradHist.full = false;
+
+
+
 
   int lambdasSize = classifier["lambdas"]["rows"];
   for(int i = 0; i < lambdasSize; i++)
@@ -295,15 +309,15 @@ BadacostDetector::detect(cv::Mat img)
   {
     std::vector<DetectionRectangle> detections_i = detectSingleScale(pyramid[i]);
 
-    int shift_x = round((m_modelDsPad.width - m_modelDs.width)/2.0) - m_padding.width;
-    int shift_y = round((m_modelDsPad.height - m_modelDs.height)/2.0) - m_padding.height;
+    int shift_x = round((m_clfData.modelDsPad.width - m_clfData.modelDs.width)/2.0) - m_clfData.padding.width;
+    int shift_y = round((m_clfData.modelDsPad.height - m_clfData.modelDs.height)/2.0) - m_clfData.padding.height;
     for (uint j = 0; j < detections_i.size(); j++)
     {
       DetectionRectangle d = detections_i[j];
       d.bbox.x = (d.bbox.x + shift_x) / scaleshw[i].width;
       d.bbox.y = (d.bbox.y + shift_y) / scaleshw[i].height;
-      d.bbox.width = m_modelDs.width / scales[i];
-      d.bbox.height = m_modelDs.height / scales[i];
+      d.bbox.width = m_clfData.modelDs.width / scales[i];
+      d.bbox.height = m_clfData.modelDs.height / scales[i];
 
       detections.push_back(d);
     }
@@ -368,8 +382,8 @@ BadacostDetector::detectSingleScale
 
   int nTreeNodes = m_classifier["fids"].size().width;
   int nTrees = m_classifier["fids"].size().height;
-  int height1 = ceil(float((height*m_shrink)-m_modelDsPad.height+1)/m_stride);
-  int width1 = ceil(float((width*m_shrink)-m_modelDsPad.width+1)/m_stride);
+  int height1 = ceil(float((height*m_shrink)-m_clfData.modelDsPad.height+1)/m_clfData.stride);
+  int width1 = ceil(float((width*m_shrink)-m_clfData.modelDsPad.width+1)/m_clfData.stride);
 
 #ifdef DEBUG
   std::cout << "nTrees = " << nTrees << std::endl;
@@ -411,8 +425,8 @@ BadacostDetector::detectSingleScale
       }
 */
 
-  int modelWd_s = m_modelDsPad.width/m_shrink;
-  int modelHt_s = m_modelDsPad.height/m_shrink;
+  int modelWd_s = m_clfData.modelDsPad.width/m_shrink;
+  int modelHt_s = m_clfData.modelDsPad.height/m_shrink;
   int modelWd_s_times_Ht_s = modelWd_s*modelHt_s;
 
   cv::parallel_for_(cv::Range(0, width1*height1), [&](const cv::Range& rang)
@@ -435,8 +449,8 @@ BadacostDetector::detectSingleScale
       int h;
 
       //float *chns1=chns+(r*stride/shrink) + (c*stride/shrink)*height;
-      int posHeight = (r*m_stride/m_shrink);
-      int posWidth = (c*m_stride/m_shrink);
+      int posHeight = (r*m_clfData.stride/m_shrink);
+      int posWidth = (c*m_clfData.stride/m_shrink);
 
       int t;
       for(t = 0; t < nTrees; t++ )
@@ -523,7 +537,7 @@ BadacostDetector::detectSingleScale
         // Get the trace for the current detection window
         trace = -(min_positive_cost - neg_cost);
 
-        if (trace <= m_cascThr) break;
+        if (trace <= m_clfData.cascThr) break;
       }
 
 #ifdef DEBUG
@@ -575,10 +589,10 @@ BadacostDetector::detectSingleScale
     if (hs1[i] > 1) // hs1[i]>1 are object windows, hs1[i]==1 are background windows.
     {
         DetectionRectangle det;
-        det.bbox.x = cs[i] * m_stride;
-        det.bbox.y = rs[i] * m_stride;
-        det.bbox.width = m_modelDsPad.width;
-        det.bbox.height = m_modelDsPad.height;
+        det.bbox.x = cs[i] * m_clfData.stride;
+        det.bbox.y = rs[i] * m_clfData.stride;
+        det.bbox.width = m_clfData.modelDsPad.width;
+        det.bbox.height = m_clfData.modelDsPad.height;
         det.score = scores[i];
         det.class_index = hs1[i];
         
@@ -713,7 +727,6 @@ BadacostDetector::showResults
 
   }
 }
-
 
 
 

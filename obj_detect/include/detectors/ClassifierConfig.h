@@ -41,7 +41,7 @@ struct ClassifierConfig
   int nPerOct;
   int nApprox;
   int shrink;
-
+  //int stride;
 
   channelsLUV luv;
   gradientMag gradMag;
@@ -49,6 +49,12 @@ struct ClassifierConfig
 
   std::vector<float> lambdas;
   cv::Size minDs;
+
+  cv::Size modelDsPad;
+  cv::Size modelDs;
+  float cascThr;
+
+  int stride;
 
 };
 #endif // DETECTION_HPP
