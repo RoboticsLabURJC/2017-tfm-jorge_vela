@@ -34,7 +34,7 @@ public:
   bool load
     (
     std::string clfPath,
-    std::string pyrPath,
+    //std::string pyrPath,
     std::string filtersPath
     );
 

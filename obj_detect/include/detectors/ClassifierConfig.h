@@ -14,7 +14,7 @@
 
   struct channelsLUV{
     int smooth_kernel_size;
-    bool smooth;
+    int smooth;
   };
 
   struct gradientMag{

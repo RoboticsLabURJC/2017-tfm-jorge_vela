@@ -52,7 +52,7 @@ BadacostDetector::~BadacostDetector
 bool BadacostDetector::load
   (
   std::string clfPath,
-  std::string pyrPath,
+  //std::string pyrPath,
   std::string filtersPath)
 {
   if (m_classifierIsLoaded)
@@ -65,7 +65,6 @@ bool BadacostDetector::load
   cv::FileStorage classifier;
   std::map<std::string, cv::Mat> clf;
   bool file_exists = classifier.open(clfPath, cv::FileStorage::READ);
-
   if (file_exists)
   {
     std::string clf_variable_labels[14] = {"fids", "thrs", "child", "hs", 
@@ -79,19 +78,17 @@ bool BadacostDetector::load
       int rows = static_cast<int>(classifier[clf_variable_labels[i]]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
       int cols = static_cast<int>(classifier[clf_variable_labels[i]]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
       cv::FileNode data = classifier[clf_variable_labels[i]]["data"];
-      
+
       cv::Mat matrix= cv::Mat::zeros(rows, cols, CV_32F);
       p.clear();
       data >> p;
       memcpy(matrix.data, p.data(), p.size()*sizeof(float));
 
       m_classifier.insert({clf_variable_labels[i].c_str(), matrix });    
-    }
-    
+    }  
     m_num_classes = static_cast<int>(readScalarFromFileNode(classifier["num_classes"]));
     m_treeDepth = static_cast<int>(readScalarFromFileNode(classifier["treeDepth"]));
     m_aRatioFixedWidth = static_cast<bool>(readScalarFromFileNode(classifier["aRatioFixedWidth"]));
-
 
     // Read Cprime data
     int rows = static_cast<int>(classifier["Cprime"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
@@ -150,7 +147,7 @@ bool BadacostDetector::load
   m_padding.height = 4; //pPyramid["pad"]["data"][0];
   // <------ END TODO
 
-  cv::FileStorage pyramid;
+  /*cv::FileStorage pyramid;
   file_exists = pyramid.open(pyrPath, cv::FileStorage::READ);
   bool loadedOKPyr = false;
   if (file_exists)
@@ -158,48 +155,47 @@ bool BadacostDetector::load
     // TODO: JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
     // no existe no se hace nada, si existe se pasan los filtros.
     loadedOKPyr = true; //m_pChnsPyramidStrategy->load(pyrPath.c_str());
-  }
+  }*/
 
 
   ClassifierConfig clfData;
 
-
-  clfData.padding.width = pyramid["pad"]["data"][1]; //6; //
-  clfData.padding.height = pyramid["pad"]["data"][0]; //4; //
-  clfData.nOctUp = pyramid["nOctUp"]["data"][0]; //0; //
-  clfData.nPerOct = pyramid["nPerOct"]["data"][0]; //3; //
-  clfData.nApprox = pyramid["nApprox"]["data"][0]; //2; //
-  clfData.shrink = pyramid["pChns.shrink"]["data"];
-
-  clfData.luv.smooth = false;
+  clfData.luv.smooth = 1; //pyramid["pChns.pColor"]["smooth"];
   clfData.luv.smooth_kernel_size = 1;
 
-  clfData.gradMag.normRad = pyramid["pChns.pGradMag"]["normRad"]; 
-  clfData.gradMag.normConst = pyramid["pChns.pGradMag"]["normConst"]; 
+  clfData.padding.width = classifier["pad"]["data"][1]; //6; //
+  clfData.padding.height = classifier["pad"]["data"][0]; //4; //
+  clfData.nOctUp = classifier["nOctUp"]["data"][0]; //0; //
+  clfData.nPerOct = classifier["nPerOct"]["data"][0]; //3; //
+  clfData.nApprox = classifier["nApprox"]["data"][0]; //2; //
+  clfData.shrink = classifier["pChns.shrink"]["data"];
 
-  clfData.gradHist.binSize = pyramid["pChns.pGradHist"]["enabled"];
-  clfData.gradHist.nOrients = pyramid["pChns.pGradHist"]["nOrients"];
-  clfData.gradHist.softBin = pyramid["pChns.pGradHist"]["softBin"];
+  clfData.gradMag.normRad = classifier["pChns.pGradMag"]["normRad"]; 
+  clfData.gradMag.normConst = classifier["pChns.pGradMag"]["normConst"]; 
+
+  clfData.gradHist.binSize = classifier["pChns.pGradHist"]["enabled"];
+  clfData.gradHist.nOrients = classifier["pChns.pGradHist"]["nOrients"];
+  clfData.gradHist.softBin = classifier["pChns.pGradHist"]["softBin"];
   clfData.gradHist.full = false;
 
-  int lambdasSize = pyramid["lambdas"]["cols"];
+  int lambdasSize = classifier["lambdas"]["rows"];
   for(int i = 0; i < lambdasSize; i++)
-    clfData.lambdas.push_back((float)pyramid["lambdas"]["data"][i]);
+    clfData.lambdas.push_back((float)classifier["lambdas"]["data"][i]);
 
   // TODO: Cargar del fichero!!
-  clfData.minDs.width = pyramid["minDs"]["data"][1]; 
-  clfData.minDs.height = pyramid["minDs"]["data"][0]; 
+  clfData.minDs.width = classifier["minDs"]["data"][1]; 
+  clfData.minDs.height = classifier["minDs"]["data"][0]; 
 
   m_clfData = clfData;
 
   cv::FileStorage filters;
-  file_exists = pyramid.open(filtersPath, cv::FileStorage::READ);
+  file_exists = filters.open(filtersPath, cv::FileStorage::READ);
   if (file_exists)
   {
     m_filters = loadFilters(filtersPath);
   }
 
-  m_classifierIsLoaded = loadedOK && loadedOKPyr;
+  m_classifierIsLoaded = loadedOK;// && loadedOKPyr;
   return loadedOK;
 }
 

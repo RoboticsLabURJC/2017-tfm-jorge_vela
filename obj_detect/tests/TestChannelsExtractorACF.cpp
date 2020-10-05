@@ -81,7 +81,10 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
   clf.gradHist.nOrients = 6;
   clf.gradHist.softBin = 1;
   clf.gradHist.full = 0;
+  clf.luv.smooth = 1; //pyramid["pChns.pColor"]["smooth"];
+  clf.luv.smooth_kernel_size = 1;
 
+  
   ChannelsExtractorACF acfExtractor(clf, true);//RECORDAR SI PARA EL TEST--> VALE CON ESTO O OBTENER CARACTERISTICAS DE FICHERO
   acf_channels = acfExtractor.extractFeatures(image); 
 

@@ -72,18 +72,17 @@ public:
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 {
-  std::string clfPath = "yaml/clf2.yml";
+  std::string clfPath = "yaml/detectorComplete.yml";
   std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
   BadacostDetector badacost;
-  bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
+  bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
   ASSERT_TRUE(loadVal);
 
   cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
 
   std::vector<DetectionRectangle> detections = badacost.detect(image);
-
 #ifdef DEBUG
   std::cout << detections;
   badacost.showResults(image, detections);
@@ -111,14 +110,14 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 
 TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
 
-  std::string clfPath = "yaml/clf2.yml";
+  std::string clfPath = "yaml/detectorComplete.yml";
   std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
   ChannelsPyramid* pPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParallelStrategy() );
   BadacostDetector badacost(pPyramidStrategy);
 
-  bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
+  bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
   ASSERT_TRUE(loadVal);
 
   cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
@@ -153,14 +152,14 @@ TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 
-  std::string clfPath = "yaml/clf2.yml";
-  std::string pyrPath = "yaml/pPyramid_badacost.yml";
+  std::string clfPath = "yaml/detectorComplete.yml";
+  //std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
   ChannelsPyramid* pPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedStrategy() );
   BadacostDetector badacost(pPyramidStrategy);
 
-  bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
+  bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
   ASSERT_TRUE(loadVal);
 
   cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
@@ -195,14 +194,14 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategy){
 
-  std::string clfPath = "yaml/clf2.yml";
+  std::string clfPath = "yaml/detectorComplete.yml";
   std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
   ChannelsPyramid* pPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedParallelStrategy() );
   BadacostDetector badacost(pPyramidStrategy);
 
-  bool loadVal = badacost.load(clfPath, pyrPath, filtersPath);
+  bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
   ASSERT_TRUE(loadVal);
 
   cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);

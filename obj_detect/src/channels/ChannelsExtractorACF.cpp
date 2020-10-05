@@ -33,8 +33,9 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   cv::Mat img
   )
 {
-  int smooth = 1;
-  ChannelsLUVExtractor luvExtractor(true, smooth);
+  //int smooth = 1;
+  ChannelsLUVExtractor luvExtractor( m_clf.luv.smooth, m_clf.luv.smooth_kernel_size);//(true, smooth);
+
   GradMagExtractor gradMagExtract( m_clf.gradMag.normRad, m_clf.gradMag.normConst); // 5
   GradHistExtractor gradHistExtract(m_clf.gradHist.binSize,m_clf.gradHist.nOrients,m_clf.gradHist.softBin,m_clf.gradHist.full); 
 
@@ -63,7 +64,7 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 //    luv_image = imageCropped;
 //    split(luv_image, luvImage);
 //  }
-  luv_image = convTri(luv_image, smooth);
+  luv_image = convTri(luv_image,  m_clf.luv.smooth_kernel_size);
   int x = round(m_clf.padding.width / m_clf.shrink);
   int y = round(m_clf.padding.height / m_clf.shrink);
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
