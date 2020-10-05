@@ -187,19 +187,6 @@ gradMagOpenCV
   M = cv::min(M, 1e10f);
 
   // Compute gradient orientation (O)
-//  // Normalize Gx and Gy
-//  cv::Mat Gx_norm, Aux;
-//  cv::multiply(Gx, M, Gx_norm);
-//  cv::bitwise_and(Gy, -1.0*cv::Mat::zeros(Gy.size(), CV_32F), Aux);
-//  cv::bitwise_xor(Gx_norm, Aux, Gx_norm);
-
-//  cv::Mat Gy_norm;
-//  cv::multiply(Gy, M, Gy_norm);
-//  cv::bitwise_and(Gx, -1.0*cv::Mat::zeros(Gx.size(), CV_32F), Aux);
-//  cv::bitwise_xor(Gy_norm, Aux, Gy_norm);
-
-//  cv::phase(Gx_norm, Gy_norm, O, false); // Compute angle in radians in [0,2pi)
-
   cv::phase(Gx, Gy, O, false); // Compute angle in radians in [0,2pi)
 
   if (!full)
@@ -213,95 +200,6 @@ gradMagOpenCV
   }
 }
 
-/**
- * This function implements the features extraction using OpenCV Mats.
- *
- * @brief GradMagExtractor::extractFeaturesOpenCV
- * @param img
- * @return
- */
-std::vector<cv::Mat>
-GradMagExtractor::extractFeaturesOpenCV
-  (
-  cv::Mat img
-  )
-{
-  int nChannels = img.channels();
-  if ((nChannels != 1) && (nChannels != 3))
-  {
-    throw std::domain_error("Only gray level or BGR (3 channels) images allowed");
-  }
-
-  cv::Size orig_sz = img.size();
-  cv::Mat M;
-  cv::Mat O;
-  if (nChannels == 1)
-  {
-    cv::Mat img_float;
-    img.convertTo(img_float, CV_32FC1);
-    M = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
-    O = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
-    gradMagOpenCV(img_float, M, O, false);
-  }
-  else if (nChannels == 3)
-  {
-    cv::Mat image_split[3];
-    split(img, image_split);
-
-    M = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
-    O = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
-
-    std::vector<cv::Mat> M_split(3);
-    std::vector<cv::Mat> O_split(3);
-    for (int i=0; i<3; i++)
-    {
-      image_split[i].convertTo(image_split[i], CV_32FC1); // important to have continuous memory in img_aux.ptr<float>
-      M_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
-      O_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
-      gradMagOpenCV(image_split[i], M_split[i], O_split[i], false);
-    }
-
-    int num_pixels = orig_sz.height * orig_sz.width;
-    float* pO = O.ptr<float>();
-    float* pM = M.ptr<float>();
-    float* pO_split[3];
-    float* pM_split[3];
-    for (int i=0; i < 3; i++)
-    {
-      pM_split[i] = M_split[i].ptr<float>();
-      pO_split[i] = O_split[i].ptr<float>();
-    }
-
-    for (int i=0; i < num_pixels; i++)
-    {
-      int max = ( pM_split[0][i] < pM_split[1][i] ) ? 1  : 0 ;
-      int max2 = ( pM_split[max][i] < pM_split[2][i] ) ? 2 : max;
-
-      pM[i] = pM_split[max2][i];
-      pO[i] = pO_split[max2][i];
-    }
-  }
-
-  if (m_normRad != 0)
-  {
-    cv::Mat S = convTri(M, m_normRad);
-    M = M / (S + m_normConst);
-  }
-
-#ifdef DEBUG
-  cv::imshow("M", M);
-  cv::imshow("O", O);
-  cv::waitKey();
-#endif
-
-  std::vector<cv::Mat> channelsGradMag(2);
-  channelsGradMag[0] = M;
-  channelsGradMag[1] = O;
-
-  return channelsGradMag;
-}
-
-#ifndef USE_OPENCV_IMPLEMENTATION
 std::vector<cv::Mat>
 GradMagExtractor::extractFeaturesPDollar
   (
@@ -391,7 +289,87 @@ GradMagExtractor::extractFeaturesPDollar
 
   return channelsGradMag;
 }
+
+std::vector<cv::Mat>
+GradMagExtractor::extractFeaturesOpenCV
+  (
+  cv::Mat img
+  )
+{
+  int nChannels = img.channels();
+  if ((nChannels != 1) && (nChannels != 3))
+  {
+    throw std::domain_error("Only gray level or BGR (3 channels) images allowed");
+  }
+
+  cv::Size orig_sz = img.size();
+  cv::Mat M;
+  cv::Mat O;
+  if (nChannels == 1)
+  {
+    cv::Mat img_float;
+    img.convertTo(img_float, CV_32FC1);
+    M = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+    O = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+    gradMagOpenCV(img_float, M, O, false);
+  }
+  else if (nChannels == 3)
+  {
+    cv::Mat image_split[3];
+    split(img, image_split);
+
+    M = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+    O = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+
+    std::vector<cv::Mat> M_split(3);
+    std::vector<cv::Mat> O_split(3);
+    for (int i=0; i<3; i++)
+    {
+      image_split[i].convertTo(image_split[i], CV_32FC1); // important to have continuous memory in img_aux.ptr<float>
+      M_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+      O_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
+      gradMagOpenCV(image_split[i], M_split[i], O_split[i], false);
+    }
+
+    int num_pixels = orig_sz.height * orig_sz.width;
+    float* pO = O.ptr<float>();
+    float* pM = M.ptr<float>();
+    float* pO_split[3];
+    float* pM_split[3];
+    for (int i=0; i < 3; i++)
+    {
+      pM_split[i] = M_split[i].ptr<float>();
+      pO_split[i] = O_split[i].ptr<float>();
+    }
+
+    for (int i=0; i < num_pixels; i++)
+    {
+      int max = ( pM_split[0][i] < pM_split[1][i] ) ? 1  : 0 ;
+      int max2 = ( pM_split[max][i] < pM_split[2][i] ) ? 2 : max;
+
+      pM[i] = pM_split[max2][i];
+      pO[i] = pO_split[max2][i];
+    }
+  }
+
+  if (m_normRad != 0)
+  {
+    cv::Mat S = convTri(M, m_normRad);
+    M = M / (S + m_normConst);
+  }
+
+#ifdef DEBUG
+  cv::imshow("M", M);
+  cv::imshow("O", O);
+  cv::waitKey();
 #endif
+
+  std::vector<cv::Mat> channelsGradMag(2);
+  channelsGradMag[0] = M;
+  channelsGradMag[1] = O;
+
+  return channelsGradMag;
+}
 
 /**
  * Función extractFeatures.
@@ -407,9 +385,12 @@ GradMagExtractor::extractFeatures
   cv::Mat img
   )
 {
-#ifdef USE_OPENCV_IMPLEMENTATION
-  return extractFeaturesOpenCV(img);
-#else
-  return extractFeaturesPDollar(img);
-#endif
+  if (m_use_opencv_impl)
+  {
+    return extractFeaturesOpenCV(img);
+  }
+  else
+  {
+    return extractFeaturesPDollar(img);
+  }
 }

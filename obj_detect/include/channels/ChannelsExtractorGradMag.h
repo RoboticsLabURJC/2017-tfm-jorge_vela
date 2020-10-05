@@ -15,19 +15,19 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-#define USE_OPENCV_IMPLEMENTATION
-
 class GradMagExtractor
 {
 public:
   GradMagExtractor
     (
       int normRad = 0,
-      float normConst = 0.005
+      float normConst = 0.005,
+      bool use_opencv_impl = true
     )
   {
     m_normRad = normRad;
     m_normConst = normConst;
+    m_use_opencv_impl = true;
   };
     
   std::vector<cv::Mat> extractFeatures
@@ -37,20 +37,19 @@ public:
 
 private:
 
-#ifdef USE_OPENCV_IMPLEMENTATION
   std::vector<cv::Mat> extractFeaturesOpenCV
     (
       cv::Mat img
     );
-#else
+
   std::vector<cv::Mat> extractFeaturesPDollar
     (
       cv::Mat img
     );
-#endif
 
   int m_normRad;
   float m_normConst;
+  bool m_use_opencv_impl;
 };
 
 #endif
