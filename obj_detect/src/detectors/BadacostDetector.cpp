@@ -157,7 +157,7 @@ bool BadacostDetector::load
   {
     // TODO: JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
     // no existe no se hace nada, si existe se pasan los filtros.
-    loadedOKPyr = m_pChnsPyramidStrategy->load(pyrPath.c_str());
+    loadedOKPyr = true; //m_pChnsPyramidStrategy->load(pyrPath.c_str());
   }
 
 

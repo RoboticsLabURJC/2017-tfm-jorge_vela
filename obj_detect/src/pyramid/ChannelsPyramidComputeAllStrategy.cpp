@@ -29,7 +29,7 @@ ChannelsPyramidComputeAllStrategy::compute
   cv::Size sz = img.size();
   cv::Mat imageUse = img;
 
-  getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
+  getScales(clf.nPerOct, clf.nOctUp, clf.minDs, clf.shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
   std::cout << "--> scales = ";
@@ -48,8 +48,8 @@ ChannelsPyramidComputeAllStrategy::compute
   {
     double s = scales[i];
     cv::Size sz1;
-    sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
-    sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
+    sz1.width = round((sz.width * s) / clf.shrink) * clf.shrink;
+    sz1.height = round((sz.height * s) / clf.shrink) * clf.shrink;
 
     cv::Mat I1;
     if (sz == sz1)
@@ -61,7 +61,7 @@ ChannelsPyramidComputeAllStrategy::compute
       I1 = ImgResample(imageUse, sz1.width , sz1.height);
     }
 
-    if ((s == 0.5) && (m_nApprox > 0 || m_nPerOct == 1))
+    if ((s == 0.5) && (clf.nApprox > 0 || clf.nPerOct == 1))
     {
       imageUse = I1;
     }

@@ -30,10 +30,10 @@ public:
   virtual ~ChannelsPyramid
     ();
 
-  virtual bool load
+  /*virtual bool load
     (
     std::string opts
-    );
+    );*/
 
   virtual std::vector<std::vector<cv::Mat>> compute
     (
