@@ -9,6 +9,7 @@
 
 
 #include <iostream>
+#include <detectors/ClassifierConfig.h>
 #include <detectors/BadacostDetector.h>
 #include <channels/ChannelsExtractorACF.h>
 #include <channels/ChannelsExtractorLDCF.h>
@@ -32,7 +33,7 @@ public:
     }
 };
 
-/*
+
 TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
 {
   cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
@@ -74,7 +75,18 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
     cv::flip(filterConver, filterConver, -1);
     filters.push_back(filterConver);
   }
-  ChannelsExtractorLDCF ldcfExtractor(filters, padding, shrink,5,0.005,2,6,1,0);
+
+  ClassifierConfig clf;
+  clf.padding = padding;
+  clf.shrink = shrink;
+  clf.gradMag.normRad = 5;
+  clf.gradMag.normConst = 0.005;
+  clf.gradHist.binSize = 2;
+  clf.gradHist.nOrients = 6;
+  clf.gradHist.softBin = 1;
+  clf.gradHist.full = 0;
+
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf); //padding, shrink,5,0.005,2,6,1,0);
   std::vector<cv::Mat> ldcfExtractFeatures = ldcfExtractor.extractFeatures(image);
 
   cv::Mat valFiltered;
@@ -104,7 +116,7 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
   ASSERT_TRUE(difference < 40);
 }
 
-*/
+
 
 TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCFSintetic)
 {

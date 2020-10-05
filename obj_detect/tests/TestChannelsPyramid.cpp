@@ -27,7 +27,7 @@ public:
     }
 };
 
-/*
+
 TEST_F(TestChannelsPyramid, TestGetScales)
 {
   int nPerOct = 8;
@@ -95,16 +95,45 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllStrategy)
   {
     delete pChnsPyramid;
   }
+
+  ClassifierConfig clfData;
+
+  clfData.padding.width = 6; //
+  clfData.padding.height = 4; //
+  clfData.nOctUp = 0; //
+  clfData.nPerOct = 3; //
+  clfData.nApprox = 2; //
+  clfData.shrink = 4;
+
+  clfData.luv.smooth = false;
+  clfData.luv.smooth_kernel_size = 1;
+
+  clfData.gradMag.normRad = 5; 
+  clfData.gradMag.normConst = 0.005; 
+
+  clfData.gradHist.binSize = 2;
+  clfData.gradHist.nOrients = 6;
+  clfData.gradHist.softBin = 1;
+  clfData.gradHist.full = false;
+
+  float lmbds[3] = { 0.000000, 0.073930, 0.072470};
+  for(int i = 0; i < 3; i++)
+    clfData.lambdas.push_back(lmbds[i]);
+  clfData.minDs.width = 48; 
+  clfData.minDs.height = 84; 
+
+
   pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
 
-  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
-  ASSERT_TRUE(loadOk);
+  //bool loadOk = pChnsPyramid->load(nameOpts.c_str());
+  //ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
-  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw, clfData);
   //ASSERT_TRUE(pyramid.size()==28);
 }
+
 
 TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
 {
@@ -118,12 +147,38 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
   }
   pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParallelStrategy() );
 
-  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
-  ASSERT_TRUE(loadOk);
+  ClassifierConfig clfData;
+
+  clfData.padding.width = 6; //
+  clfData.padding.height = 4; //
+  clfData.nOctUp = 0; //
+  clfData.nPerOct = 3; //
+  clfData.nApprox = 2; //
+  clfData.shrink = 4;
+
+  clfData.luv.smooth = false;
+  clfData.luv.smooth_kernel_size = 1;
+
+  clfData.gradMag.normRad = 5; 
+  clfData.gradMag.normConst = 0.005; 
+
+  clfData.gradHist.binSize = 2;
+  clfData.gradHist.nOrients = 6;
+  clfData.gradHist.softBin = 1;
+  clfData.gradHist.full = false;
+
+  float lmbds[3] = { 0.000000, 0.073930, 0.072470};
+  for(int i = 0; i < 3; i++)
+    clfData.lambdas.push_back(lmbds[i]);
+  clfData.minDs.width = 48; 
+  clfData.minDs.height = 84; 
+
+  //bool loadOk = pChnsPyramid->load(nameOpts.c_str());
+  //ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
-  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw, clfData);
   //ASSERT_TRUE(pyramid.size()==28);
 }
 
@@ -139,13 +194,39 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedParallelStrategy)
   }
   pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedParallelStrategy() );
 
-  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
-  ASSERT_TRUE(loadOk);
+  ClassifierConfig clfData;
+
+  clfData.padding.width = 6; //
+  clfData.padding.height = 4; //
+  clfData.nOctUp = 0; //
+  clfData.nPerOct = 3; //
+  clfData.nApprox = 2; //
+  clfData.shrink = 4;
+
+  clfData.luv.smooth = false;
+  clfData.luv.smooth_kernel_size = 1;
+
+  clfData.gradMag.normRad = 5; 
+  clfData.gradMag.normConst = 0.005; 
+
+  clfData.gradHist.binSize = 2;
+  clfData.gradHist.nOrients = 6;
+  clfData.gradHist.softBin = 1;
+  clfData.gradHist.full = false;
+
+  float lmbds[3] = { 0.000000, 0.073930, 0.072470};
+  for(int i = 0; i < 3; i++)
+    clfData.lambdas.push_back(lmbds[i]);
+  clfData.minDs.width = 48; 
+  clfData.minDs.height = 84; 
+
+  //bool loadOk = pChnsPyramid->load(nameOpts.c_str());
+  //ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
   auto start = std::chrono::system_clock::now(); 
-  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw, clfData);
   //ASSERT_TRUE(pyramid.size()==28);
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<float,std::milli> duration = end - start;
@@ -164,17 +245,42 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
   }
   pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedStrategy() );
 
-  bool loadOk = pChnsPyramid->load(nameOpts.c_str());
-  ASSERT_TRUE(loadOk);
+  ClassifierConfig clfData;
+
+  clfData.padding.width = 6; //
+  clfData.padding.height = 4; //
+  clfData.nOctUp = 0; //
+  clfData.nPerOct = 3; //
+  clfData.nApprox = 2; //
+  clfData.shrink = 4;
+
+  clfData.luv.smooth = false;
+  clfData.luv.smooth_kernel_size = 1;
+
+  clfData.gradMag.normRad = 5; 
+  clfData.gradMag.normConst = 0.005; 
+
+  clfData.gradHist.binSize = 2;
+  clfData.gradHist.nOrients = 6;
+  clfData.gradHist.softBin = 1;
+  clfData.gradHist.full = false;
+
+  float lmbds[3] = { 0.000000, 0.073930, 0.072470};
+  for(int i = 0; i < 3; i++)
+    clfData.lambdas.push_back(lmbds[i]);
+  clfData.minDs.width = 48; 
+  clfData.minDs.height = 84; 
+
+  //bool loadOk = pChnsPyramid->load(nameOpts.c_str());
+  //ASSERT_TRUE(loadOk);
   std::vector<cv::Mat> filters; // empty filters is ACF pyramid.
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
   auto start = std::chrono::system_clock::now(); 
-  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw);
+  std::vector<std::vector<cv::Mat>> pyramid = pChnsPyramid->compute(image, filters, scales, scaleshw,clfData);
   //ASSERT_TRUE(pyramid.size()==28);
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<float,std::milli> duration = end - start;
   std::cout << duration.count() << "ms" << std::endl;
 }
 
-*/
