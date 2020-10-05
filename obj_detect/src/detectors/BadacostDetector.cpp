@@ -160,6 +160,38 @@ bool BadacostDetector::load
     loadedOKPyr = m_pChnsPyramidStrategy->load(pyrPath.c_str());
   }
 
+
+  ClassifierConfig clfData;
+
+
+  clfData.padding.width = pyramid["pad"]["data"][1]; //6; //
+  clfData.padding.height = pyramid["pad"]["data"][0]; //4; //
+  clfData.nOctUp = pyramid["nOctUp"]["data"][0]; //0; //
+  clfData.nPerOct = pyramid["nPerOct"]["data"][0]; //3; //
+  clfData.nApprox = pyramid["nApprox"]["data"][0]; //2; //
+  clfData.shrink = pyramid["pChns.shrink"]["data"];
+
+  clfData.luv.smooth = false;
+  clfData.luv.smooth_kernel_size = 1;
+
+  clfData.gradMag.normRad = pyramid["pChns.pGradMag"]["normRad"]; 
+  clfData.gradMag.normConst = pyramid["pChns.pGradMag"]["normConst"]; 
+
+  clfData.gradHist.binSize = pyramid["pChns.pGradHist"]["enabled"];
+  clfData.gradHist.nOrients = pyramid["pChns.pGradHist"]["nOrients"];
+  clfData.gradHist.softBin = pyramid["pChns.pGradHist"]["softBin"];
+  clfData.gradHist.full = false;
+
+  int lambdasSize = pyramid["lambdas"]["cols"];
+  for(int i = 0; i < lambdasSize; i++)
+    clfData.lambdas.push_back((float)pyramid["lambdas"]["data"][i]);
+
+  // TODO: Cargar del fichero!!
+  clfData.minDs.width = pyramid["minDs"]["data"][1]; 
+  clfData.minDs.height = pyramid["minDs"]["data"][0]; 
+
+  m_clfData = clfData;
+
   cv::FileStorage filters;
   file_exists = pyramid.open(filtersPath, cv::FileStorage::READ);
   if (file_exists)
@@ -259,7 +291,7 @@ BadacostDetector::detect(cv::Mat img)
   std::vector<std::vector<cv::Mat>> pyramid;
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
-  pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw);
+  pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw,m_clfData);
 
   // Execute the detector over all the scales
   std::vector<DetectionRectangle> detections;

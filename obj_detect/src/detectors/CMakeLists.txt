@@ -10,6 +10,8 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/DetectionRectangle.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DetectionRectangle.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ClassifierConfig.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ClassifierConfig.h
   )
 
 # Set the sources for the main target

@@ -41,7 +41,8 @@ public:
     cv::Mat img,
     std::vector<cv::Mat> filters,
     std::vector<double>& scales,
-    std::vector<cv::Size2d>& scaleshw
+    std::vector<cv::Size2d>& scaleshw,
+    ClassifierConfig clf
     );
 };
 

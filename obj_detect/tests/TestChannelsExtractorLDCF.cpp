@@ -32,7 +32,7 @@ public:
     }
 };
 
-
+/*
 TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
 {
   cv::Mat image = cv::imread("images/coche_solo1.png", cv::IMREAD_COLOR);
@@ -104,7 +104,7 @@ TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCF)
   ASSERT_TRUE(difference < 40);
 }
 
-
+*/
 
 TEST_F(TestChannelsExtractorLDCF, TestChannelsExtractorEstractFeaturesFromLDCFSintetic)
 {

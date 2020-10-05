@@ -35,15 +35,15 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 {
   int smooth = 1;
   ChannelsLUVExtractor luvExtractor(true, smooth);
-  GradMagExtractor gradMagExtract( m_gradientMag_normRad, m_gradientMag_normConst); // 5
-  GradHistExtractor gradHistExtract(m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full); 
+  GradMagExtractor gradMagExtract( m_clf.gradMag.normRad, m_clf.gradMag.normConst); // 5
+  GradHistExtractor gradHistExtract(m_clf.gradHist.binSize,m_clf.gradHist.nOrients,m_clf.gradHist.softBin,m_clf.gradHist.full); 
 
   //int dChan = img.channels();
   int h = img.size().height;
   int w = img.size().width;
 
-  int crop_h = h % m_shrink;
-  int crop_w = w % m_shrink;
+  int crop_h = h % m_clf.shrink;
+  int crop_w = w % m_clf.shrink;
 
   h = h - crop_h;
   w = w - crop_w;
@@ -64,13 +64,13 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 //    split(luv_image, luvImage);
 //  }
   luv_image = convTri(luv_image, smooth);
-  int x = round(m_padding.width / m_shrink);
-  int y = round(m_padding.height / m_shrink);
+  int x = round(m_clf.padding.width / m_clf.shrink);
+  int y = round(m_clf.padding.height / m_clf.shrink);
   std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
   std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
 
-  int wResample = w/m_shrink;
-  int hResample = h/m_shrink;
+  int wResample = w/m_clf.shrink;
+  int hResample = h/m_clf.shrink;
   std::vector<cv::Mat> chnsCompute;
   //std::vector<ChannelsExtractorACF::channel> chnsCompute;
   for (cv::Mat luv_i: luvImage)
@@ -137,8 +137,8 @@ ChannelsExtractorACF::postProcessChannels
   )
 {
     // Postprocessing of the ACF channels
-    int x = round(m_padding.width / m_shrink);
-    int y = round(m_padding.height / m_shrink);
+    int x = round(m_clf.padding.width / m_clf.shrink);
+    int y = round(m_clf.padding.height / m_clf.shrink);
 
     for (uint i=0; i < acf_channels_no_postprocessed.size(); i++)
     {

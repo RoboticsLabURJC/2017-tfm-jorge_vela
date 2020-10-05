@@ -11,6 +11,7 @@
 #define CHANNELS_PYRAMID
 
 #include <opencv2/opencv.hpp>
+#include <detectors/ClassifierConfig.h>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -39,7 +40,8 @@ public:
     cv::Mat img,
     std::vector<cv::Mat> filters,
     std::vector<double>& scales,
-    std::vector<cv::Size2d>& scaleshw
+    std::vector<cv::Size2d>& scaleshw,
+    ClassifierConfig clf
     ) = 0;
 
   virtual int getScales

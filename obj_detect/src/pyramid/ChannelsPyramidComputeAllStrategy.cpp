@@ -22,7 +22,8 @@ ChannelsPyramidComputeAllStrategy::compute
   cv::Mat img,
   std::vector<cv::Mat> filters,
   std::vector<double>& scales,
-  std::vector<cv::Size2d>& scaleshw
+  std::vector<cv::Size2d>& scaleshw,
+  ClassifierConfig clf
   )
 {
   cv::Size sz = img.size();
@@ -42,7 +43,7 @@ ChannelsPyramidComputeAllStrategy::compute
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf);// clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full);
   for(int i=0; i< nScales; i++)
   {
     double s = scales[i];

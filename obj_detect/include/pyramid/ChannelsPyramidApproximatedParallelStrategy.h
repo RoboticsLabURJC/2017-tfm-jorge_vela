@@ -11,6 +11,7 @@
 #define CHANNELS_PYRAMID_APPROXIMATED_PARALLEL_STRATEGY
 
 #include <pyramid/ChannelsPyramid.h>
+#include <detectors/ClassifierConfig.h>
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
@@ -43,7 +44,8 @@ public:
     cv::Mat img,
     std::vector<cv::Mat> filters,
     std::vector<double>& scales,
-    std::vector<cv::Size2d>& scaleshw
+    std::vector<cv::Size2d>& scaleshw,
+    ClassifierConfig clf
     );
 };
 

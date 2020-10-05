@@ -27,6 +27,7 @@ public:
     }
 };
 
+/*
 TEST_F(TestChannelsPyramid, TestGetScales)
 {
   int nPerOct = 8;
@@ -176,4 +177,4 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
   std::cout << duration.count() << "ms" << std::endl;
 }
 
-
+*/

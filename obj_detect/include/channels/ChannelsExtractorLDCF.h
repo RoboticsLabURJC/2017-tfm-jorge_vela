@@ -10,6 +10,7 @@
 #define CHANNELS_EXTRACTOR_LDCF
 
 #include <opencv2/opencv.hpp>
+#include <detectors/ClassifierConfig.h>
 #include <vector>
 #include <string>
 
@@ -33,6 +34,8 @@ public:
   ChannelsExtractorLDCF
     (
       std::vector<cv::Mat> filters,
+      ClassifierConfig clf
+      /*
       cv::Size padding,
       int shrink,
       int gradientMag_normRad = 0 ,
@@ -40,7 +43,7 @@ public:
       int gradientHist_binSize = 8, //2
       int gradientHist_nOrients = 8, //6
       int gradientHist_softBin = 1,
-      int gradientHist_full = 0
+      int gradientHist_full = 0*/
     );
 
   /**
@@ -84,6 +87,8 @@ private:
   int m_gradientHist_nOrients;
   int m_gradientHist_softBin;
   int m_gradientHist_full;
+
+  ClassifierConfig m_clf;
 
 };
 

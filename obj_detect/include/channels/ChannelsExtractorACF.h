@@ -10,6 +10,7 @@
 #define CHANNELS_EXTRACTOR_ACF
 
 #include <opencv2/opencv.hpp>
+#include <detectors/ClassifierConfig.h>
 #include <vector>
 #include <string>
 
@@ -31,6 +32,9 @@ public:
     */
   ChannelsExtractorACF
     (
+      ClassifierConfig clf,
+      bool postprocess_channels = true
+      /*
       cv::Size padding,
       int shrink,
       bool postprocess_channels = true,
@@ -41,11 +45,13 @@ public:
       int gradientHist_binSize = 8, //2
       int gradientHist_nOrients = 6, //6
       int gradientHist_softBin = 1,
-      int gradientHist_full = 0
+      int gradientHist_full = 0*/
 
     ) 
     {
-      m_padding = padding;
+      m_clf = clf;
+      m_postprocess_channels = postprocess_channels;
+      /*m_padding = padding;
       m_shrink = shrink;
 
       m_postprocess_channels = postprocess_channels;
@@ -55,7 +61,7 @@ public:
       m_gradientHist_binSize = gradientHist_binSize;
       m_gradientHist_nOrients = gradientHist_nOrients;
       m_gradientHist_softBin = gradientHist_softBin;
-      m_gradientHist_full = gradientHist_full;
+      m_gradientHist_full = gradientHist_full;*/
     };
 
   /**
@@ -108,6 +114,7 @@ private:
     cv::Mat image;
     std::string type;
   };
+  ClassifierConfig m_clf;
 
 
 };
