@@ -34,17 +34,17 @@ public:
       cv::Size padding,
       int shrink,
       bool postprocess_channels = true,
-
       int gradientMag_normRad=0,
       float gradientMag_normConst = 0.005,
-
       int gradientHist_binSize = 8, //2
       int gradientHist_nOrients = 6, //6
       int gradientHist_softBin = 1,
-      int gradientHist_full = 0
-
+      int gradientHist_full = 0,
+      bool impl_type = "opencv"
     ) 
-    {
+  {
+      m_impl_type = impl_type;
+
       m_padding = padding;
       m_shrink = shrink;
 
@@ -56,7 +56,7 @@ public:
       m_gradientHist_nOrients = gradientHist_nOrients;
       m_gradientHist_softBin = gradientHist_softBin;
       m_gradientHist_full = gradientHist_full;
-    };
+  };
 
   /**
    * This method computes all the Piotr Dollar's Aggregated Channels Features as cv::Mat from an input image:
@@ -91,6 +91,8 @@ public:
   int getNumChannels() { return 10; }
 
 private:
+  std::string m_impl_type;
+
   int m_shrink;
   std::string m_color_space;
   cv::Size m_padding;
@@ -103,13 +105,6 @@ private:
   int m_gradientHist_nOrients;
   int m_gradientHist_softBin;
   int m_gradientHist_full;
-
-  struct channel {
-    cv::Mat image;
-    std::string type;
-  };
-
-
 };
 
 #endif

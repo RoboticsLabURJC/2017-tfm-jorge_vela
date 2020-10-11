@@ -8,104 +8,16 @@
  *  ------------------------------------------------------------------------ */
 
 #include <iostream>
-#include <channels/ChannelsExtractorGradHist.h>
+#include <channels/ChannelsExtractorGradHistPDollar.h>
 #include <opencv2/opencv.hpp>
 #include "sse.hpp"
 
 
 #define PI 3.14159265f
 
-
-float*
-hogNormMatrix
-  (
-  float *H,
-  int nOrients,
-  int hb,
-  int wb,
-  int bin
-  )
-{
-  float *N, *N1, *n; int o, x, y, dx, dy, hb1=hb+1, wb1=wb+1;
-  float eps = 1e-4f/4/bin/bin/bin/bin; // precise backward equality
-  N = new float[hb1*wb1*sizeof(float)]();N1=N+hb1+1;
-  for( o=0; o<nOrients; o++ ) for( x=0; x<wb; x++ ) for( y=0; y<hb; y++ )
-    N1[x*hb1+y] += H[o*wb*hb+x*hb+y]*H[o*wb*hb+x*hb+y];
-  for( x=0; x<wb-1; x++ ) for( y=0; y<hb-1; y++ ) {
-    n=N1+x*hb1+y; *n=1/float(sqrt(n[0]+n[1]+n[hb1]+n[hb1+1]+eps)); }
-  x=0;     dx= 1; dy= 1; y=0;                  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-  x=0;     dx= 1; dy= 0; for(y=0; y<hb1; y++)  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-  x=0;     dx= 1; dy=-1; y=hb1-1;              N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-  x=wb1-1; dx=-1; dy= 1; y=0;                  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-  x=wb1-1; dx=-1; dy= 0; for( y=0; y<hb1; y++) N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-  x=wb1-1; dx=-1; dy=-1; y=hb1-1;              N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-  y=0;     dx= 0; dy= 1; for(x=0; x<wb1; x++)  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-  y=hb1-1; dx= 0; dy=-1; for(x=0; x<wb1; x++)  N[x*hb1+y]=N[(x+dx)*hb1+y+dy];
-
-  return N;
-}
-
-void hogChannels( float *H, const float *R, const float *N,
-  int hb, int wb, int nOrients, float clip, int type )
-{
-  #define GETT(blk) t=R1[y]*N1[y-(blk)]; if(t>clip) t=clip; c++;
-  const float r=.2357f; int o, x, y, c; float t;
-  const int nb=wb*hb, nbo=nOrients*nb, hb1=hb+1;
-  for( o=0; o<nOrients; o++ ) for( x=0; x<wb; x++ ) {
-    const float *R1=R+o*nb+x*hb, *N1=N+x*hb1+hb1+1;
-    float *H1 = (type<=1) ? (H+o*nb+x*hb) : (H+x*hb);
-    if( type==0) for( y=0; y<hb; y++ ) {
-      // store each orientation and normalization (nOrients*4 channels)
-      c=-1; GETT(0); H1[c*nbo+y]=t; GETT(1); H1[c*nbo+y]=t;
-      GETT(hb1); H1[c*nbo+y]=t; GETT(hb1+1); H1[c*nbo+y]=t;
-    } else if( type==1 ) for( y=0; y<hb; y++ ) {
-      // sum across all normalizations (nOrients channels)
-      c=-1; GETT(0); H1[y]+=t*.5f; GETT(1); H1[y]+=t*.5f;
-      GETT(hb1); H1[y]+=t*.5f; GETT(hb1+1); H1[y]+=t*.5f;
-    } else if( type==2 ) for( y=0; y<hb; y++ ) {
-      // sum across all orientations (4 channels)
-      c=-1; GETT(0); H1[c*nb+y]+=t*r; GETT(1); H1[c*nb+y]+=t*r;
-      GETT(hb1); H1[c*nb+y]+=t*r; GETT(hb1+1); H1[c*nb+y]+=t*r;
-    }
-  }
-  #undef GETT
-}
-
-void
-GradHistExtractor::hog
-  (
-  float *M,
-  float *O,
-  float *H,
-  int h,
-  int w,
-  int binSize,
-  int nOrients,
-  int softBin,
-  bool full,
-  float clip
-)
-{
-  float *N, *R;
-  const int hb=h/binSize;
-  const int wb=w/binSize;
-  //const int nb=hb*wb;
-
-  // compute unnormalized gradient histograms
-  R = new float[wb*hb*nOrients*sizeof(int)]();
-  gradHist( M, O, R, h, w, binSize, nOrients, softBin, full );
-  // compute block normalization values
-  N = hogNormMatrix( R, nOrients, hb, wb, binSize );
-  // perform four normalizations per spatial block
-  hogChannels( H, R, N, hb, wb, nOrients, clip, 0 );
-
-  delete[] N;
-  delete[] R;
-}
-
 // helper for gradHist, quantize O and M into O0, O1 and M0, M1 (uses sse)
 void
-GradHistExtractor::gradQuantize
+ChannelsExtractorGradHistPDollar::gradQuantize
   (
   float *O,
   float *M,
@@ -126,33 +38,82 @@ GradHistExtractor::gradQuantize
   __m128i _o0, _o1, *_O0, *_O1; __m128 _o, _od, _m, *_M0, *_M1;
 
   // define useful constants
-  const float oMult=(float)nOrients/(full?2*PI:PI); const int oMax=nOrients*nb;
+  const float oMult=(float)nOrients/(full?2*PI:PI);
+  const int oMax=nOrients*nb; // Total number of elements in all histograms
   const __m128 _norm=SET(norm), _oMult=SET(oMult), _nbf=SET((float)nb);
   const __m128i _oMax=SET(oMax), _nb=SET(nb);
 
   // perform the majority of the work with sse
-  _O0=(__m128i*) O0; _O1=(__m128i*) O1; _M0=(__m128*) M0; _M1=(__m128*) M1;
-  if( interpolate ) for( i=0; i<=n-4; i+=4 ) {
-    _o=MUL(LDu(O[i]),_oMult); _o0=CVT(_o); _od=SUB(_o,CVT(_o0));
-    _o0=CVT(MUL(CVT(_o0),_nbf)); _o0=AND(CMPGT(_oMax,_o0),_o0); *_O0++=_o0;
-    _o1=ADD(_o0,_nb); _o1=AND(CMPGT(_oMax,_o1),_o1); *_O1++=_o1;
-    _m=MUL(LDu(M[i]),_norm); *_M1=MUL(_od,_m); *_M0++=SUB(_m,*_M1); _M1++;
-  } else for( i=0; i<=n-4; i+=4 ) {
-    _o=MUL(LDu(O[i]),_oMult); _o0=CVT(ADD(_o,SET(.5f)));
-    _o0=CVT(MUL(CVT(_o0),_nbf)); _o0=AND(CMPGT(_oMax,_o0),_o0); *_O0++=_o0;
-    *_M0++=MUL(LDu(M[i]),_norm); *_M1++=SET(0.f); *_O1++=SET(0);
+  _O0=(__m128i*) O0;
+  _O1=(__m128i*) O1;
+  _M0=(__m128*) M0;
+  _M1=(__m128*) M1;
+  if  ( interpolate )
+  {
+    for( i=0; i<=n-4; i+=4 )         // Doint it for 4 values at a time with SSE
+    {
+      _o=MUL(LDu(O[i]),_oMult);      // o = O[i] * oMult
+      _o0=CVT(_o);                   // o0 = floor(o) (truncation)
+      _od=SUB(_o,CVT(_o0));          // od = o - o0 // Decimals in o0
+      _o0=CVT(MUL(CVT(_o0),_nbf));   // o0 = floor(floor(o0) * nbf)
+      _o0=AND(CMPGT(_oMax,_o0),_o0); // if (oMax <= o0) o0 = 0.0
+      *_O0++=_o0;                    // O0[i] = o0
+      _o1=ADD(_o0,_nb);              // o1 = o0 + nb
+      _o1=AND(CMPGT(_oMax,_o1),_o1); // if (oMax <= o1) o1 = 0.0
+      *_O1++=_o1;                    // O1[i] = o1
+      _m=MUL(LDu(M[i]),_norm);       // m = M[i] * norm // norm is 1/bin_size
+      *_M1=MUL(_od,_m);              // M1[i] = od * m
+      *_M0++=SUB(_m,*_M1);           // M0[i] = m - M1[i]
+      _M1++;
+    }
+  }
+  else
+  {
+    for( i=0; i<=n-4; i+=4 )         // Doint it for 4 values at a time with SSE
+    {
+      _o=MUL(LDu(O[i]),_oMult);      // o = O[i] * oMult
+      _o0=CVT(ADD(_o,SET(.5f)));     // o0 = o + 0.5
+      _o0=CVT(MUL(CVT(_o0),_nbf));   // o0 *= nbf
+      _o0=AND(CMPGT(_oMax,_o0),_o0); // if(o0>=oMax) o0 = 0.0;
+      *_O0++=_o0;                    // O0[i] = o0
+      *_M0++=MUL(LDu(M[i]),_norm);   // M0[i] = M[i] * norm // norm is 1/bin_size
+      *_M1++=SET(0.f);               // M1[i] = 0.0
+      *_O1++=SET(0);                 // O1[i] = 0
+    }
   }
 
   // compute trailing locations without sse
-  if( interpolate ) for(; i<n; i++ ) {
-    o=O[i]*oMult; o0=(int) o; od=o-o0;
-    o0*=nb; if(o0>=oMax) o0=0; O0[i]=o0;
-    o1=o0+nb; if(o1==oMax) o1=0; O1[i]=o1;
-    m=M[i]*norm; M1[i]=od*m; M0[i]=m-M1[i];
-  } else for(; i<n; i++ ) {
-    o=O[i]*oMult; o0=(int) (o+.5f);
-    o0*=nb; if(o0>=oMax) o0=0; O0[i]=o0;
-    M0[i]=M[i]*norm; M1[i]=0; O1[i]=0;
+  if ( interpolate )
+  {
+    for(; i<n; i++ )
+    {
+      o=O[i]*oMult;
+      o0=(int) o;
+      od=o-o0;
+      o0*=nb;
+      if(o0>=oMax) o0=0;
+      O0[i]=o0;
+      o1=o0+nb;
+      if(o1==oMax) o1=0;
+      O1[i]=o1;
+      m=M[i]*norm;
+      M1[i]=od*m;
+      M0[i]=m-M1[i];
+    }
+  }
+  else
+  {
+    for(; i<n; i++ )
+    {
+      o=O[i]*oMult;
+      o0=(int) (o+.5f);
+      o0*=nb;
+      if(o0>=oMax) o0=0;
+      O0[i]=o0;
+      M0[i]=M[i]*norm;
+      M1[i]=0;
+      O1[i]=0;
+    }
   }
 }
 
@@ -163,7 +124,7 @@ GradHistExtractor::gradQuantize
  * en bloques de binxbin pixeles
  *
  * @param M: Magnitud del gradiente
- * @pamar O: Orientacion del gradiente
+ * @paramr O: Orientacion del gradiente
  * @param H: Dirección de memoria donde se guarda el histograma del gradiente
  * @param h: Altura de la imagen de la que se calcula el histograma
  * @param w: Ancho de la imagen de la que se calcula el histograma
@@ -174,7 +135,7 @@ GradHistExtractor::gradQuantize
  *
  */
 void
-GradHistExtractor::gradHist
+ChannelsExtractorGradHistPDollar::gradHist
   (
   float *M,
   float *O,
@@ -232,7 +193,6 @@ GradHistExtractor::gradHist
     else
     {
       //------------------------------------------------------------------------------
-      //  printf("1 --> x: %d w0: %d \n", x, w0);
       // interpolate using trilinear interpolation
       float ms[4], xyd, yb, xd, yd; __m128 _m, _m0, _m1;
       bool hasLf, hasRt; int xb0, yb0;
@@ -279,7 +239,7 @@ GradHistExtractor::gradHist
 
   delete[] O0;
   delete[] O1;
-  delete [] M0;
+  delete[] M0;
   delete[] M1;
 
   // normalize boundary bins which only get 7/8 of weight of interior bins
@@ -307,7 +267,7 @@ GradHistExtractor::gradHist
  * @retunr std::vector<cv::Mat>: Vector con los histogramas del gradiente como cv::Mat
  */
 std::vector<cv::Mat>
-GradHistExtractor::gradH
+ChannelsExtractorGradHistPDollar::gradH
   (
   cv::Mat image,
   float *M,
@@ -347,41 +307,28 @@ GradHistExtractor::gradH
 
 /**
  * Función extractFeatures. 
- * Se le pasa una imagen, junto a la magnitud y orientación del gradiente y se encarga de calcular el histograma del gradiente.
+ * Se le pasa una imagen, junto a la magnitud y orientación del gradiente y se encarga de calcular
+ * el histograma del gradiente.
  *
  * @param img: Contiene la imagen de la cual se quieren obtener las características
  * @param gradMag: Vector con los cv::Mat correspondientes a la magnitud y orientacion del gradiente.
  * @return std::vector<cv::Mat>: Vector los distintos cv::Mat correspondientes a los histogramas del gradiente
  */
 std::vector<cv::Mat>
-GradHistExtractor::extractFeatures
+ChannelsExtractorGradHistPDollar::extractFeatures
   (
   cv::Mat img,
   std::vector<cv::Mat> gradMag
   )
 {
-  //cv::Mat dstM;
-  //gradMag[0].convertTo(dstM, CV_32FC1);
   transpose(gradMag[0], gradMag[0]);
   float *dataM = gradMag[0].ptr<float>();
 
-  //cv::Mat dstO;
-  //gradMag[1].convertTo(dstO, CV_32FC1);
   transpose(gradMag[1], gradMag[1]);
   float *dataO = gradMag[1].ptr<float>();
-
-  /*int dChan = img.channels();
-  int width = img.size().width;
-  int height = img.size().height;
-
-  int size = width/m_binSize*height/m_binSize*dChan*m_nOrients;
-
-  // JM: Don't delete H, it seems that is used in channelsGradHist!!
-  float *H = new float[size]();*/
 
   std::vector<cv::Mat> channelsGradHist;
   channelsGradHist = gradH(img, dataM, dataO);
 
   return channelsGradHist;
 }
-

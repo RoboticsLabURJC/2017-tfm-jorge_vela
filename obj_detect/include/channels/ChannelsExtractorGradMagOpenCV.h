@@ -7,39 +7,30 @@
  *
  *  ------------------------------------------------------------------------ */
 
-#ifndef CHANNELS_EXTRACTOR_GRAD_MAG
-#define CHANNELS_EXTRACTOR_GRAD_MAG
+#ifndef CHANNELS_EXTRACTOR_GRAD_MAG_OPENCV
+#define CHANNELS_EXTRACTOR_GRAD_MAG_OPENCV
 
+#include <channels/ChannelsExtractorGradMag.h>
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-class ChannelsExtractorGradMag
+class ChannelsExtractorGradMagOpenCV: public ChannelsExtractorGradMag
 {
 public:
-  ChannelsExtractorGradMag
+  ChannelsExtractorGradMagOpenCV
     (
       int normRad = 0,
       float normConst = 0.005,
       bool use_opencv_impl = true
-    )
-  {
-    m_normRad = normRad;
-    m_normConst = normConst;
-    m_use_opencv_impl = use_opencv_impl;
-  };
+    ): ChannelsExtractorGradMag(normRad, normConst, use_opencv_impl)
+  {};
 
-  virtual ~ChannelsExtractorGradMag
-    () {}
+  virtual ~ChannelsExtractorGradMagOpenCV() {};
     
   virtual std::vector<cv::Mat> extractFeatures
     (
       cv::Mat img 
-    ) = 0;
-
-protected:
-  int m_normRad;
-  float m_normConst;
-  bool m_use_opencv_impl;
+    );
 };
 
 #endif

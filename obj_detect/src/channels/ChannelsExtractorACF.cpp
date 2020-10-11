@@ -9,7 +9,10 @@
 #include <iostream>
 #include <channels/ChannelsExtractorACF.h>
 #include <channels/ChannelsExtractorLUV.h>
-#include <channels/ChannelsExtractorGradMag.h>
+#include <channels/ChannelsExtractorGradMagOpenCV.h>
+#include <channels/ChannelsExtractorGradMagPDollar.h>
+#include <channels/ChannelsExtractorGradHistOpenCV.h>
+#include <channels/ChannelsExtractorGradHistPDollar.h>
 #include <channels/ChannelsExtractorGradHist.h>
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
@@ -21,7 +24,7 @@ cv::Mat ChannelsExtractorACF::processChannels
   cv::BorderTypes borderType,
   int x,
   int y
-)
+  )
 {
   image = convTri(image, 1);
   copyMakeBorder(image, image, y, y, x, x, borderType, 0 );
@@ -34,9 +37,27 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   )
 {
   int smooth = 1;
-  ChannelsLUVExtractor luvExtractor(true, smooth);
-  GradMagExtractor gradMagExtract( m_gradientMag_normRad, m_gradientMag_normConst); // 5
-  GradHistExtractor gradHistExtract(m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full); 
+  ChannelsExtractorLUV luvExtractor(true, smooth);
+
+  ChannelsExtractorGradMag* pGradMagExtractor;
+  if (m_impl_type == "opencv")
+  {
+    pGradMagExtractor = dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagOpenCV(m_gradientMag_normRad, m_gradientMag_normConst));
+  }
+  else
+  {
+    pGradMagExtractor = dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagPDollar(m_gradientMag_normRad, m_gradientMag_normConst));
+  }
+
+  ChannelsExtractorGradHist* pGradHistExtractor;
+//  if (m_impl_type == "opencv")
+//  {
+//    pGradHistExtractor = dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistOpenCV(m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full));
+//  }
+//  else
+//  {
+    pGradHistExtractor = dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistPDollar(m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full));
+//  }
 
   //int dChan = img.channels();
   int h = img.size().height;
@@ -66,13 +87,12 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   luv_image = convTri(luv_image, smooth);
   int x = round(m_padding.width / m_shrink);
   int y = round(m_padding.height / m_shrink);
-  std::vector<cv::Mat> gMagOrient = gradMagExtract.extractFeatures(luv_image);
-  std::vector<cv::Mat> gMagHist = gradHistExtract.extractFeatures(luv_image, gMagOrient);
+  std::vector<cv::Mat> gMagOrient = pGradMagExtractor->extractFeatures(luv_image);
+  std::vector<cv::Mat> gMagHist = pGradHistExtractor->extractFeatures(luv_image, gMagOrient);
 
   int wResample = w/m_shrink;
   int hResample = h/m_shrink;
   std::vector<cv::Mat> chnsCompute;
-  //std::vector<ChannelsExtractorACF::channel> chnsCompute;
   for (cv::Mat luv_i: luvImage)
   {
     cv::Mat resampleLuv = ImgResample(luv_i, wResample, hResample);
@@ -98,33 +118,9 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
     chnsCompute.push_back(resampleHist);
   }
 
-  /*if (!m_postprocess_channels)
-  {
-    return chnsCompute;
-  }
-
-  // Postprocessing of the ACF channels
-  std::vector<cv::Mat> postprocessedChannels;
-  //for (channel c: chnsCompute)
-  for (uint i=0; i < chnsCompute.size(); i++)
-  {
-    cv::Mat c_padded;
-    
-    //c_padded = convTri(c.image, 1);
-    //if (c.type == "LUV")
-    if (i < 12) // LIV channels
-    {
-      c_padded = chnsCompute[i];
-      //copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
-    }
-    else
-    {
-      c_padded = convTri(chnsCompute[i], 1);
-      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
-    }
-     
-    postprocessedChannels.push_back(c_padded);
-  }*/
+  // Remove allocated extractors in dynamic memory:
+  delete pGradMagExtractor;
+  delete pGradHistExtractor;
 
   return chnsCompute;
 }

@@ -14,7 +14,7 @@
 
 // ------------------- Adapted from Piotr Dollar Matlab Toolbox --------------------
 
-ChannelsLUVExtractor::ChannelsLUVExtractor
+ChannelsExtractorLUV::ChannelsExtractorLUV
   (
     float smooth,
     int smooth_kernel_size
@@ -32,7 +32,7 @@ ChannelsLUVExtractor::ChannelsLUVExtractor
 
 // Constants for rgb2luv conversion and lookup table for y-> l conversion
 void
-ChannelsLUVExtractor::bgr2luvSetup
+ChannelsExtractorLUV::bgr2luvSetup
   (
     float scaling_factor, // if image values uint8 -> 1.0/255.0, if float -> 1.0.
     float* mr,
@@ -82,7 +82,7 @@ ChannelsLUVExtractor::bgr2luvSetup
 }
 
 // Convert from rgb to luv
-std::vector<cv::Mat> ChannelsLUVExtractor::bgr2luv
+std::vector<cv::Mat> ChannelsExtractorLUV::bgr2luv
   (
   cv::Mat bgr_img
   )
@@ -179,7 +179,7 @@ std::vector<cv::Mat> ChannelsLUVExtractor::bgr2luv
   return luv;
 }
 
-std::vector<cv::Mat> ChannelsLUVExtractor::smoothImage
+std::vector<cv::Mat> ChannelsExtractorLUV::smoothImage
 (
   std::vector<cv::Mat> inputImg
 )
@@ -192,7 +192,7 @@ std::vector<cv::Mat> ChannelsLUVExtractor::smoothImage
     return channelsLUV_output;
 }
 
-std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
+std::vector<cv::Mat> ChannelsExtractorLUV::extractFeatures
   (
   cv::Mat img
   )
@@ -214,7 +214,7 @@ std::vector<cv::Mat> ChannelsLUVExtractor::extractFeatures
 }
 
 // Not equivalent at all to the P. Dollar's one :-(.
-//std::vector<cv::Mat> ChannelsLUVExtractor::extractFeaturesOpenCV
+//std::vector<cv::Mat> ChannelsExtractorLUV::extractFeaturesOpenCV
 //  (
 //  cv::Mat img
 //  )

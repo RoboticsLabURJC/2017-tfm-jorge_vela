@@ -14,10 +14,10 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-class ChannelsLUVExtractor
+class ChannelsExtractorLUV
 {
 public:
-  ChannelsLUVExtractor
+  ChannelsExtractorLUV
     (
       float smooth = true,
       int smooth_kernel_size = 1

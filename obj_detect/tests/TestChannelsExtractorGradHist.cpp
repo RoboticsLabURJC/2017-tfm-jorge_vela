@@ -6,8 +6,8 @@
  *
  *  ------------------------------------------------------------------------ */
 
-#include <channels/ChannelsExtractorGradHist.h>
-#include <channels/ChannelsExtractorGradMag.h>
+#include <channels/ChannelsExtractorGradHistPDollar.h>
+#include <channels/ChannelsExtractorGradMagPDollar.h>
 #include <channels/Utils.h>
 
 #include "gtest/gtest.h"
@@ -28,31 +28,39 @@ class TestChannelsExtractorGradHist: public testing::Test
 
   const int ROWS = 2;
   const int COLS = 4;
-  GradMagExtractor gradMagExtract;
-
-  GradHistExtractor gradHistExtract;
-  GradHistExtractor gradHistExtractBinSizeOrients{6,9,1,0};
+  ChannelsExtractorGradMag* pGradMagExtract;
+  ChannelsExtractorGradHist* pGradHistExtract;
+  ChannelsExtractorGradHist* pGradHistExtractBinSizeOrients;
 
   virtual void SetUp()
   {
+    pGradMagExtract =
+              dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagPDollar());
+    pGradHistExtract =
+              dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistPDollar());
+    pGradHistExtractBinSizeOrients =
+              dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistPDollar(6,9,1,0));
   }
 
   virtual void TearDown()
   {
+    delete pGradMagExtract;
+    delete pGradHistExtract;
+    delete pGradHistExtractBinSizeOrients;
   }
 };
 
-TEST_F(TestChannelsExtractorGradHist, TestColorImage){
+TEST_F(TestChannelsExtractorGradHist, TestColorImagePDollar){
   cv::Mat image;
   image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); 
 
   std::vector<cv::Mat> gradMagExtractVector(2);
-  gradMagExtractVector = gradMagExtract.extractFeatures(image);
+  gradMagExtractVector = pGradMagExtract->extractFeatures(image);
 
 
 //  auto start = std::chrono::high_resolution_clock::now();
   std::vector<cv::Mat> gradHistExtractVector;
-  gradHistExtractVector = gradHistExtract.extractFeatures(image,gradMagExtractVector );
+  gradHistExtractVector = pGradHistExtract->extractFeatures(image,gradMagExtractVector );
 //  auto stop = std::chrono::high_resolution_clock::now();
 //  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
   //std::cout << "time ms: " << duration.count() << std::endl;
@@ -105,15 +113,15 @@ TEST_F(TestChannelsExtractorGradHist, TestColorImage){
 }
 
 
-TEST_F(TestChannelsExtractorGradHist, TestColorImageBinSizeOrients){
+TEST_F(TestChannelsExtractorGradHist, TestColorImageBinSizeOrientsPDollar){
   cv::Mat image;
   image = cv::imread("images/index3.jpeg", cv::IMREAD_COLOR); 
 
   std::vector<cv::Mat> gradMagExtractVector(2);
-  gradMagExtractVector = gradMagExtract.extractFeatures(image);
+  gradMagExtractVector = pGradMagExtract->extractFeatures(image);
 
   std::vector<cv::Mat> gradHistExtractVector;
-  gradHistExtractVector = gradHistExtractBinSizeOrients.extractFeatures(image,gradMagExtractVector);
+  gradHistExtractVector = pGradHistExtractBinSizeOrients->extractFeatures(image,gradMagExtractVector);
 
   int height = gradHistExtractVector[0].size().height;
   int width = gradHistExtractVector[0].size().width;

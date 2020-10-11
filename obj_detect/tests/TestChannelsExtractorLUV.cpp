@@ -18,8 +18,8 @@ class TestChannelsExtractorLUV: public testing::Test
 
   const int ROWS = 2;
   const int COLS = 4;
-  ChannelsLUVExtractor channExtract{false, 1};
-  ChannelsLUVExtractor channExtractSmooth{true, 5};
+  ChannelsExtractorLUV channExtract{false, 1};
+  ChannelsExtractorLUV channExtractSmooth{true, 5};
 
   virtual void SetUp()
   {

@@ -6,7 +6,8 @@
  *
  *  ------------------------------------------------------------------------ */
 
-#include <channels/ChannelsExtractorGradMag.h>
+#include <channels/ChannelsExtractorGradMagPDollar.h>
+#include <channels/ChannelsExtractorGradMagOpenCV.h>
 #include <channels/Utils.h>
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
@@ -37,7 +38,8 @@ public:
     (
     cv::Mat img,
     std::string matlab_grad_mag_yaml_filename,
-    std::string matlab_grad_orient_yaml_filename
+    std::string matlab_grad_orient_yaml_filename,
+    std::string impl_type = "pdollar"
     );
 };
 
@@ -46,7 +48,8 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   (
   cv::Mat img,
   std::string matlab_grad_mag_yaml_filename,
-  std::string matlab_grad_orient_yaml_filename
+  std::string matlab_grad_orient_yaml_filename,
+  std::string impl_type
   )
 {
   cv::FileStorage fs;
@@ -57,11 +60,19 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   float normConst = readScalarFromFileNode(fs["normConst"]);
   float normRad = readScalarFromFileNode(fs["normRad"]);
 
-  GradMagExtractor extractor(normRad, normConst);
+  ChannelsExtractorGradMag* pExtractor;
+  if (impl_type == "opencv")
+  {
+    pExtractor = dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagOpenCV(normRad, normConst));
+  }
+  else // "pdollar"
+  {
+    pExtractor = dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagPDollar(normRad, normConst));
+  }
 
   // Extract the gradient magnitude and orientation channels
   std::vector<cv::Mat> gradMagExtractVector;
-  gradMagExtractVector = extractor.extractFeatures(img);
+  gradMagExtractVector = pExtractor->extractFeatures(img);
 
   // Get the matlab magnitude matrix from disk
   cv::Mat MatlabMag = readMatrixFromFileNode(fs["M"]);
@@ -113,7 +124,7 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
 }
 
-TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1)
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1PDollar)
 {
   cv::Mat image;
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
@@ -124,7 +135,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1)
 }
 
 
-TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGray)
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGrayPDollar)
 {
   cv::Mat image;
   image = cv::imread("images/index.jpeg", cv::IMREAD_GRAYSCALE);
@@ -134,7 +145,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGray)
                                          "yaml/index_jpeg_gray_GradientChannels.yaml");
 }
 
-TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormConst0_07)
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormConst0_07PDollar)
 {
   cv::Mat image;
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
@@ -144,7 +155,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormConst0_07)
                                          "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml");
 }
 
-TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0)
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0PDollar)
 {
   cv::Mat image;
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
@@ -152,4 +163,49 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0)
   compareGradientMagnitudeAndOrientation(image,
                                          "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml",
                                          "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml");
+}
+
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1OpenCV)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_GradientChannels.yaml",
+                                         "yaml/index_jpeg_GradientChannels.yaml",
+                                         "opencv");
+}
+
+
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGrayOpenCV)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_GRAYSCALE);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_gray_GradientChannels.yaml",
+                                         "yaml/index_jpeg_gray_GradientChannels.yaml",
+                                         "opencv");
+}
+
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormConst0_07OpenCV)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml",
+                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml",
+                                         "opencv");
+}
+
+TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0OpenCV)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  compareGradientMagnitudeAndOrientation(image,
+                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml",
+                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml",
+                                         "opencv");
 }
