@@ -16,6 +16,7 @@ ChannelsPyramid::ChannelsPyramid
 ChannelsPyramid::~ChannelsPyramid
   () {};
 
+/*
 bool
 ChannelsPyramid::load(std::string opts)
 {
@@ -50,7 +51,7 @@ ChannelsPyramid::load(std::string opts)
     m_minDs.height = pPyramid["minDs"]["data"][0]; // 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
   }
   return existOpts;
-}
+}*/
 
 /**
  * Funcion getScales. En funcion de los parámetros de entrada retorna un vector con los distintos valores

@@ -9,6 +9,7 @@
 #include <channels/ChannelsExtractorACF.h>
 #include <channels/ChannelsExtractorLUV.h>
 
+#include <detectors/ClassifierConfig.h>
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -34,6 +35,7 @@ public:
     {
     }
 };
+
 
 TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
 {
@@ -69,7 +71,21 @@ TEST_F(TestChannelsExtractorACF, TestExtractChannelsACFColorImage)
 
   // Extract ACF channels using paramenters from matlab.
   std::vector<cv::Mat> acf_channels;
-  ChannelsExtractorACF acfExtractor(padding, shrink, true, 5, 0.005,2,6,1,0);//RECORDAR SI PARA EL TEST--> VALE CON ESTO O OBTENER CARACTERISTICAS DE FICHERO
+
+  ClassifierConfig clf;
+  clf.padding = padding;
+  clf.shrink = shrink;
+  clf.gradMag.normRad = 5;
+  clf.gradMag.normConst = 0.005;
+  clf.gradHist.binSize = 2;
+  clf.gradHist.nOrients = 6;
+  clf.gradHist.softBin = 1;
+  clf.gradHist.full = 0;
+  clf.luv.smooth = 1; //pyramid["pChns.pColor"]["smooth"];
+  clf.luv.smooth_kernel_size = 1;
+
+  
+  ChannelsExtractorACF acfExtractor(clf, true);//RECORDAR SI PARA EL TEST--> VALE CON ESTO O OBTENER CARACTERISTICAS DE FICHERO
   acf_channels = acfExtractor.extractFeatures(image); 
 
   cv::Size acf_channel_sz = acf_channels[0].size();

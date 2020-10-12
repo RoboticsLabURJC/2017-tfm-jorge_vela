@@ -52,7 +52,7 @@ BadacostDetector::~BadacostDetector
 bool BadacostDetector::load
   (
   std::string clfPath,
-  std::string pyrPath,
+  //std::string pyrPath,
   std::string filtersPath)
 {
   if (m_classifierIsLoaded)
@@ -65,7 +65,6 @@ bool BadacostDetector::load
   cv::FileStorage classifier;
   std::map<std::string, cv::Mat> clf;
   bool file_exists = classifier.open(clfPath, cv::FileStorage::READ);
-
   if (file_exists)
   {
     std::string clf_variable_labels[14] = {"fids", "thrs", "child", "hs", 
@@ -79,19 +78,17 @@ bool BadacostDetector::load
       int rows = static_cast<int>(classifier[clf_variable_labels[i]]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
       int cols = static_cast<int>(classifier[clf_variable_labels[i]]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
       cv::FileNode data = classifier[clf_variable_labels[i]]["data"];
-      
+
       cv::Mat matrix= cv::Mat::zeros(rows, cols, CV_32F);
       p.clear();
       data >> p;
       memcpy(matrix.data, p.data(), p.size()*sizeof(float));
 
       m_classifier.insert({clf_variable_labels[i].c_str(), matrix });    
-    }
-    
+    }  
     m_num_classes = static_cast<int>(readScalarFromFileNode(classifier["num_classes"]));
     m_treeDepth = static_cast<int>(readScalarFromFileNode(classifier["treeDepth"]));
     m_aRatioFixedWidth = static_cast<bool>(readScalarFromFileNode(classifier["aRatioFixedWidth"]));
-
 
     // Read Cprime data
     int rows = static_cast<int>(classifier["Cprime"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
@@ -137,37 +134,82 @@ bool BadacostDetector::load
     loadedOK = true;
   }
 
-  // TODO: load everything here from the classifier yaml file:
-  m_modelDsPad.width = 96; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  m_modelDsPad.height = 54; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  m_modelDs.width = 84;    // JM: Esto debería venir del fichero con el clasificador entrenado.
-  m_modelDs.height = 48;  // JM: Esto debería venir del fichero con el clasificador entrenado.
+  ClassifierConfig clfData;
 
-  m_shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  m_stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  m_cascThr = -2.239887 * 0.1; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  m_padding.width = 6; //pPyramid["pad"]["data"][1];
-  m_padding.height = 4; //pPyramid["pad"]["data"][0];
+
+  clfData.modelDs.width = classifier["modelDs"]["data"][1];
+  clfData.modelDs.height = classifier["modelDs"]["data"][0];
+
+  clfData.modelDsPad.width = classifier["modelDsPad"]["data"][1];
+  clfData.modelDsPad.height = classifier["modelDsPad"]["data"][0];
+
+  clfData.stride = classifier["stride"]["data"][0];
+  clfData.cascThr = float(classifier["cascThr"]["data"][0])*0.1;
+
+  // TODO: load everything here from the classifier yaml file:
+  //m_modelDsPad.width = 96; // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //m_modelDsPad.height = 54; // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //m_modelDs.width = 84;    // JM: Esto debería venir del fichero con el clasificador entrenado.
+  //m_modelDs.height = 48;  // JM: Esto debería venir del fichero con el clasificador entrenado.
+
+  //m_shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  //m_stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  //m_cascThr = -2.239887 * 0.1; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  //m_clfData.padding.width = 6; //pPyramid["pad"]["data"][1];
+  //m_clfData.padding.height = 4; //pPyramid["pad"]["data"][0];
   // <------ END TODO
 
-  cv::FileStorage pyramid;
+  /*cv::FileStorage pyramid;
   file_exists = pyramid.open(pyrPath, cv::FileStorage::READ);
   bool loadedOKPyr = false;
   if (file_exists)
   {
     // TODO: JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
     // no existe no se hace nada, si existe se pasan los filtros.
-    loadedOKPyr = m_pChnsPyramidStrategy->load(pyrPath.c_str());
-  }
+    loadedOKPyr = true; //m_pChnsPyramidStrategy->load(pyrPath.c_str());
+  }*/
+
+
+  clfData.luv.smooth = 1; //pyramid["pChns.pColor"]["smooth"];
+  clfData.luv.smooth_kernel_size = 1;
+
+  clfData.padding.width = classifier["pad"]["data"][1]; //6; //
+  clfData.padding.height = classifier["pad"]["data"][0]; //4; //
+  clfData.nOctUp = classifier["nOctUp"]["data"][0]; //0; //
+  clfData.nPerOct = classifier["nPerOct"]["data"][0]; //3; //
+  clfData.nApprox = classifier["nApprox"]["data"][0]; //2; //
+  clfData.shrink = classifier["pChns.shrink"]["data"];
+  m_shrink = clfData.shrink*2; //  ??????????????????????????????????????????????????????? // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+
+  clfData.gradMag.normRad = classifier["pChns.pGradMag"]["normRad"]; 
+  clfData.gradMag.normConst = classifier["pChns.pGradMag"]["normConst"]; 
+
+  clfData.gradHist.binSize = classifier["pChns.pGradHist"]["enabled"];
+  clfData.gradHist.nOrients = classifier["pChns.pGradHist"]["nOrients"];
+  clfData.gradHist.softBin = classifier["pChns.pGradHist"]["softBin"];
+  clfData.gradHist.full = false;
+
+
+
+
+  int lambdasSize = classifier["lambdas"]["rows"];
+  for(int i = 0; i < lambdasSize; i++)
+    clfData.lambdas.push_back((float)classifier["lambdas"]["data"][i]);
+
+  // TODO: Cargar del fichero!!
+  clfData.minDs.width = classifier["minDs"]["data"][1]; 
+  clfData.minDs.height = classifier["minDs"]["data"][0]; 
+
+  m_clfData = clfData;
 
   cv::FileStorage filters;
-  file_exists = pyramid.open(filtersPath, cv::FileStorage::READ);
+  file_exists = filters.open(filtersPath, cv::FileStorage::READ);
   if (file_exists)
   {
     m_filters = loadFilters(filtersPath);
   }
 
-  m_classifierIsLoaded = loadedOK && loadedOKPyr;
+  m_classifierIsLoaded = loadedOK;// && loadedOKPyr;
   return loadedOK;
 }
 
@@ -259,7 +301,7 @@ BadacostDetector::detect(cv::Mat img)
   std::vector<std::vector<cv::Mat>> pyramid;
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
-  pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw);
+  pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw,m_clfData);
 
   // Execute the detector over all the scales
   std::vector<DetectionRectangle> detections;
@@ -267,15 +309,15 @@ BadacostDetector::detect(cv::Mat img)
   {
     std::vector<DetectionRectangle> detections_i = detectSingleScale(pyramid[i]);
 
-    int shift_x = round((m_modelDsPad.width - m_modelDs.width)/2.0) - m_padding.width;
-    int shift_y = round((m_modelDsPad.height - m_modelDs.height)/2.0) - m_padding.height;
+    int shift_x = round((m_clfData.modelDsPad.width - m_clfData.modelDs.width)/2.0) - m_clfData.padding.width;
+    int shift_y = round((m_clfData.modelDsPad.height - m_clfData.modelDs.height)/2.0) - m_clfData.padding.height;
     for (uint j = 0; j < detections_i.size(); j++)
     {
       DetectionRectangle d = detections_i[j];
       d.bbox.x = (d.bbox.x + shift_x) / scaleshw[i].width;
       d.bbox.y = (d.bbox.y + shift_y) / scaleshw[i].height;
-      d.bbox.width = m_modelDs.width / scales[i];
-      d.bbox.height = m_modelDs.height / scales[i];
+      d.bbox.width = m_clfData.modelDs.width / scales[i];
+      d.bbox.height = m_clfData.modelDs.height / scales[i];
 
       detections.push_back(d);
     }
@@ -340,8 +382,8 @@ BadacostDetector::detectSingleScale
 
   int nTreeNodes = m_classifier["fids"].size().width;
   int nTrees = m_classifier["fids"].size().height;
-  int height1 = ceil(float((height*m_shrink)-m_modelDsPad.height+1)/m_stride);
-  int width1 = ceil(float((width*m_shrink)-m_modelDsPad.width+1)/m_stride);
+  int height1 = ceil(float((height*m_shrink)-m_clfData.modelDsPad.height+1)/m_clfData.stride);
+  int width1 = ceil(float((width*m_shrink)-m_clfData.modelDsPad.width+1)/m_clfData.stride);
 
 #ifdef DEBUG
   std::cout << "nTrees = " << nTrees << std::endl;
@@ -383,8 +425,8 @@ BadacostDetector::detectSingleScale
       }
 */
 
-  int modelWd_s = m_modelDsPad.width/m_shrink;
-  int modelHt_s = m_modelDsPad.height/m_shrink;
+  int modelWd_s = m_clfData.modelDsPad.width/m_shrink;
+  int modelHt_s = m_clfData.modelDsPad.height/m_shrink;
   int modelWd_s_times_Ht_s = modelWd_s*modelHt_s;
 
   cv::parallel_for_(cv::Range(0, width1*height1), [&](const cv::Range& rang)
@@ -407,8 +449,8 @@ BadacostDetector::detectSingleScale
       int h;
 
       //float *chns1=chns+(r*stride/shrink) + (c*stride/shrink)*height;
-      int posHeight = (r*m_stride/m_shrink);
-      int posWidth = (c*m_stride/m_shrink);
+      int posHeight = (r*m_clfData.stride/m_shrink);
+      int posWidth = (c*m_clfData.stride/m_shrink);
 
       int t;
       for(t = 0; t < nTrees; t++ )
@@ -495,7 +537,7 @@ BadacostDetector::detectSingleScale
         // Get the trace for the current detection window
         trace = -(min_positive_cost - neg_cost);
 
-        if (trace <= m_cascThr) break;
+        if (trace <= m_clfData.cascThr) break;
       }
 
 #ifdef DEBUG
@@ -547,10 +589,10 @@ BadacostDetector::detectSingleScale
     if (hs1[i] > 1) // hs1[i]>1 are object windows, hs1[i]==1 are background windows.
     {
         DetectionRectangle det;
-        det.bbox.x = cs[i] * m_stride;
-        det.bbox.y = rs[i] * m_stride;
-        det.bbox.width = m_modelDsPad.width;
-        det.bbox.height = m_modelDsPad.height;
+        det.bbox.x = cs[i] * m_clfData.stride;
+        det.bbox.y = rs[i] * m_clfData.stride;
+        det.bbox.width = m_clfData.modelDsPad.width;
+        det.bbox.height = m_clfData.modelDsPad.height;
         det.score = scores[i];
         det.class_index = hs1[i];
         
@@ -685,7 +727,6 @@ BadacostDetector::showResults
 
   }
 }
-
 
 
 

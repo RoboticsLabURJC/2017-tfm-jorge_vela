@@ -39,6 +39,22 @@ public:
     );
 
 private:
+
+  void
+  gradQuantize
+    (
+    cv::Mat O,
+    cv::Mat M,
+    int nb,
+    float norm,
+    int nOrients,
+    bool full,
+    bool interpolate,
+    cv::Mat& O0,
+    cv::Mat& O1,
+    cv::Mat& M0,
+    cv::Mat& M1
+    );
 /*
   std::vector<cv::Mat>
   gradH

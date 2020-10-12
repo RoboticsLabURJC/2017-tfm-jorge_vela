@@ -27,14 +27,15 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   cv::Mat img,
   std::vector<cv::Mat> filters,
   std::vector<double>& scales,
-  std::vector<cv::Size2d>& scaleshw
+  std::vector<cv::Size2d>& scaleshw,
+  ClassifierConfig clf
   )
 {
   cv::Size sz = img.size();
   //cv::Mat imageUse = img;
 
   // GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
-  getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
+  getScales(clf.nPerOct, clf.nOctUp, clf.minDs, clf.shrink, sz, scales, scaleshw);//getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
   std::cout << "--> scales = ";
@@ -48,7 +49,7 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   std::vector<int> isR, isA, isN(nScales, 0), *isRA[2] = { &isR, &isA };
   for (int i = 0; i < nScales; i++)
   {
-    isRA[(i % (m_nApprox + 1)) > 0]->push_back(i + 1);
+    isRA[(i % (clf.nApprox + 1)) > 0]->push_back(i + 1);
   }
 
   
@@ -70,7 +71,9 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
   //std::vector<cv::Mat> pChnsCompute;
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
-  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, postprocess_acf_channels, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  ChannelsExtractorACF acfExtractor(clf, postprocess_acf_channels);//clf.padding, clf.shrink, postprocess_acf_channels, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  //ChannelsExtractorACF acfExtractor(clf.padding, clf.shrink, postprocess_acf_channels, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full);  
+
   //uint i;
   cv::parallel_for_(cv::Range( 0, isR.size() ), [&](const cv::Range& r)
   {
@@ -78,8 +81,8 @@ ChannelsPyramidApproximatedParallelStrategy::compute
     {
       double s = scales[isR[i] - 1];      
       cv::Size sz1;
-      sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
-      sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
+      sz1.width = round((sz.width * s) / clf.shrink) * clf.shrink;
+      sz1.height = round((sz.height * s) / clf.shrink) * clf.shrink;
 
       cv::Mat I1;
       if (sz == sz1)
@@ -120,8 +123,8 @@ ChannelsPyramidApproximatedParallelStrategy::compute
       int i1 = isA[i] - 1;
       int iR = isN[i1] - 1;
 
-      cv::Size2f sz1(round(sz.width*scales[i1]/m_shrink),
-                     round(sz.height*scales[i1]/m_shrink));
+      cv::Size2f sz1(round(sz.width*scales[i1]/clf.shrink),
+                     round(sz.height*scales[i1]/clf.shrink));
       std::vector<cv::Mat> resampleVect(acfExtractor.getNumChannels());
       for (int k = 0; k < acfExtractor.getNumChannels(); k++)
       {
@@ -131,7 +134,7 @@ ChannelsPyramidApproximatedParallelStrategy::compute
           type_of_channel_index = (k/3) ? 1:0;
         }
         
-        float ratio = pow((scales[i1]/scales[iR]),-m_lambdas[type_of_channel_index]);
+        float ratio = pow((scales[i1]/scales[iR]),-clf.lambdas[type_of_channel_index]);
         cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio);
         resampleVect[k] = resample;
       }
@@ -140,7 +143,7 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   });
 
   // Now we can filter the channels to get the LDCF ones.
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf);//, clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full); //clf.padding, clf.shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
 
   cv::parallel_for_(cv::Range( 0, chnsPyramidDataACF.size()), [&](const cv::Range& r)

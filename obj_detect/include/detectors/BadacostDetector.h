@@ -10,6 +10,7 @@
 #ifndef BADACOST_DETECTOR
 #define BADACOST_DETECTOR
 
+#include <detectors/ClassifierConfig.h>
 #include <detectors/DetectionRectangle.h>
 #include <pyramid/ChannelsPyramid.h>
 #include <pyramid/ChannelsPyramidComputeAllStrategy.h>
@@ -33,7 +34,7 @@ public:
   bool load
     (
     std::string clfPath,
-    std::string pyrPath,
+    //std::string pyrPath,
     std::string filtersPath
     );
 
@@ -114,6 +115,7 @@ protected:
   // After load it contains the variables for build the pyramid of channel features
   // "fids", "thrs", "child", "hs", "weights", "depth"
   ChannelsPyramid* m_pChnsPyramidStrategy;
+  ClassifierConfig m_clfData;
 
   std::vector<cv::Mat> m_filters;
 };

@@ -22,13 +22,14 @@ ChannelsPyramidComputeAllStrategy::compute
   cv::Mat img,
   std::vector<cv::Mat> filters,
   std::vector<double>& scales,
-  std::vector<cv::Size2d>& scaleshw
+  std::vector<cv::Size2d>& scaleshw,
+  ClassifierConfig clf
   )
 {
   cv::Size sz = img.size();
   cv::Mat imageUse = img;
 
-  getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
+  getScales(clf.nPerOct, clf.nOctUp, clf.minDs, clf.shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
   std::cout << "--> scales = ";
@@ -42,13 +43,13 @@ ChannelsPyramidComputeAllStrategy::compute
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, m_padding, m_shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf);// clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full);
   for(int i=0; i< nScales; i++)
   {
     double s = scales[i];
     cv::Size sz1;
-    sz1.width = round((sz.width * s) / m_shrink) * m_shrink;
-    sz1.height = round((sz.height * s) / m_shrink) * m_shrink;
+    sz1.width = round((sz.width * s) / clf.shrink) * clf.shrink;
+    sz1.height = round((sz.height * s) / clf.shrink) * clf.shrink;
 
     cv::Mat I1;
     if (sz == sz1)
@@ -60,7 +61,7 @@ ChannelsPyramidComputeAllStrategy::compute
       I1 = ImgResample(imageUse, sz1.width , sz1.height);
     }
 
-    if ((s == 0.5) && (m_nApprox > 0 || m_nPerOct == 1))
+    if ((s == 0.5) && (clf.nApprox > 0 || clf.nPerOct == 1))
     {
       imageUse = I1;
     }

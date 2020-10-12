@@ -16,113 +16,6 @@
 #define PI 3.14159265f
 
 
-// ----------------------------------------------------
-// ----------------------------------------------------
-// ----------------------------------------------------
-// ------ OpenCV implementation:
-
-/*
-void
-GradHistExtractor::gradQuantizeOpenCV
-  (
-  float *O,
-  float *M,
-  int *O0,
-  int *O1,
-  float *M0,
-  float *M1,
-  int nb,
-  int n,
-  float norm,
-  int nOrients,
-  bool full,
-  bool interpolate
-  )
-{
-  // assumes all *OUTPUT* matrices are 4-byte aligned
-  int i, o0, o1; float o, od, m;
-  __m128i _o0, _o1, *_O0, *_O1; __m128 _o, _od, _m, *_M0, *_M1;
-
-  // define useful constants
-  const float oMult=(float)nOrients/(full?2*PI:PI);
-  const int oMax=nOrients*nb; // Total number of elements in all histograms
-  const __m128 _norm=SET(norm), _oMult=SET(oMult), _nbf=SET((float)nb);
-  const __m128i _oMax=SET(oMax), _nb=SET(nb);
-
-  // perform the majority of the work with sse
-  _O0=(__m128i*) O0;
-  _O1=(__m128i*) O1;
-  _M0=(__m128*) M0;
-  _M1=(__m128*) M1;
-  if  ( interpolate )
-  {
-    for( i=0; i<=n-4; i+=4 )         // Doint it for 4 values at a time with SSE
-    {
-      _o=MUL(LDu(O[i]),_oMult);      // o = O[i] * oMult
-      _o0=CVT(_o);                   // o0 = floor(o) (truncation)
-      _od=SUB(_o,CVT(_o0));          // od = o - o0 // Decimals in o0
-      _o0=CVT(MUL(CVT(_o0),_nbf));   // o0 = floor(floor(o0) * nbf)
-      _o0=AND(CMPGT(_oMax,_o0),_o0); // if (oMax <= o0) o0 = 0.0
-      *_O0++=_o0;                    // O0[i] = o0
-      _o1=ADD(_o0,_nb);              // o1 = o0 + nb
-      _o1=AND(CMPGT(_oMax,_o1),_o1); // if (oMax <= o1) o1 = 0.0
-      *_O1++=_o1;                    // O1[i] = o1
-      _m=MUL(LDu(M[i]),_norm);       // m = M[i] * norm // norm is 1/bin_size
-      *_M1=MUL(_od,_m);              // M1[i] = od * m
-      *_M0++=SUB(_m,*_M1);           // M0[i] = m - M1[i]
-      _M1++;
-    }
-  }
-  else
-  {
-    for( i=0; i<=n-4; i+=4 )         // Doint it for 4 values at a time with SSE
-    {
-      _o=MUL(LDu(O[i]),_oMult);      // o = O[i] * oMult
-      _o0=CVT(ADD(_o,SET(.5f)));     // o0 = o + 0.5
-      _o0=CVT(MUL(CVT(_o0),_nbf));   // o0 *= nbf
-      _o0=AND(CMPGT(_oMax,_o0),_o0); // if(o0>=oMax) o0 = 0.0;
-      *_O0++=_o0;                    // O0[i] = o0
-      *_M0++=MUL(LDu(M[i]),_norm);   // M0[i] = M[i] * norm // norm is 1/bin_size
-      *_M1++=SET(0.f);               // M1[i] = 0.0
-      *_O1++=SET(0);                 // O1[i] = 0
-    }
-  }
-
-  // compute trailing locations without sse
-  if ( interpolate )
-  {
-    for(; i<n; i++ )
-    {
-      o=O[i]*oMult;
-      o0=(int) o;
-      od=o-o0;
-      o0*=nb;
-      if(o0>=oMax) o0=0;
-      O0[i]=o0;
-      o1=o0+nb;
-      if(o1==oMax) o1=0;
-      O1[i]=o1;
-      m=M[i]*norm;
-      M1[i]=od*m;
-      M0[i]=m-M1[i];
-    }
-  }
-  else
-  {
-    for(; i<n; i++ )
-    {
-      o=O[i]*oMult;
-      o0=(int) (o+.5f);
-      o0*=nb;
-      if(o0>=oMax) o0=0;
-      O0[i]=o0;
-      M0[i]=M[i]*norm;
-      M1[i]=0;
-      O1[i]=0;
-    }
-  }
-}
-*/
 
 /*
 void
@@ -251,6 +144,66 @@ gradHist
   }
 }
 */
+
+void
+ChannelsExtractorGradHistOpenCV::gradQuantize
+  (
+  cv::Mat O,
+  cv::Mat M,
+  int nb,
+  float norm,
+  int nOrients,
+  bool full,
+  bool interpolate,
+  cv::Mat& O0,
+  cv::Mat& O1,
+  cv::Mat& M0,
+  cv::Mat& M1
+  )
+{
+  cv::Mat o;
+  cv::Mat m;
+  cv::Mat od;
+  cv::Mat o0;
+  cv::Mat O0_float;
+
+  // define useful constants
+  const float oMult = static_cast<float>(nOrients/(full?2*M_PI:M_PI));
+  const int oMax = nOrients*nb; // Total number of elements in all histograms
+
+  // compute trailing locations without sse
+  if ( interpolate )
+  {
+    o = O*oMult;
+    o.convertTo(O0, CV_32S); // Convert to int (trunc).
+    O0.convertTo(O0_float, CV_32F); // Back to float
+    od = o - O0_float;
+    // O0
+    O0 *= nb;
+    O0.setTo(0, O0 >= oMax);
+    // O1
+    O1 = O0 + nb;
+    O1.setTo(0.0, O1 == oMax);
+    // M1
+    m = M*norm;
+    cv::multiply(m, od, M1);
+    // M0
+    M0 = m - M1;
+  }
+  else
+  {
+    // O0
+    o = O*oMult + 0.5;
+    o.convertTo(O0, CV_32S); // Convert to int (trunc).
+    O0 *= nb;
+    O0.setTo(0, O0 >= oMax);
+    // M1
+    M0 = M*norm;
+    M1 = cv::Mat::zeros(M0.rows, M0.cols, CV_32F);
+    O1 = cv::Mat::zeros(M0.rows, M0.cols, CV_32F);
+  }
+}
+
 
 std::vector<cv::Mat>
 ChannelsExtractorGradHistOpenCV::extractFeatures

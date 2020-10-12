@@ -15,17 +15,20 @@
 ChannelsExtractorLDCF::ChannelsExtractorLDCF
   (
     std::vector<cv::Mat> filters,
-    cv::Size padding,
+    ClassifierConfig clf
+    /*cv::Size padding,
     int shrink,
     int gradientMag_normRad,
     float gradientMag_normConst ,
     int gradientHist_binSize,
     int gradientHist_nOrients,
     int gradientHist_softBin, 
-    int gradientHist_full 
+    int gradientHist_full */
   )
-{
-    m_padding = padding;
+{ 
+    m_filters = filters;  
+    m_clf = clf;
+    /*m_padding = padding;
     m_shrink = shrink;
     m_filters = filters;  
 
@@ -35,7 +38,7 @@ ChannelsExtractorLDCF::ChannelsExtractorLDCF
     m_gradientHist_binSize = gradientHist_binSize;
     m_gradientHist_nOrients = gradientHist_nOrients;
     m_gradientHist_softBin = gradientHist_softBin;
-    m_gradientHist_full = gradientHist_full;
+    m_gradientHist_full = gradientHist_full;*/
     for (cv::Mat f: m_filters)
     {
       // NOTE: filter2D is a correlation and to do convolution as in Matlab's conv2
@@ -53,7 +56,7 @@ std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
   )
 {
   // Extract the ACF channels
-  ChannelsExtractorACF acfExtractor(m_padding, m_shrink, true, m_gradientMag_normRad, m_gradientMag_normConst,m_gradientHist_binSize,m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  ChannelsExtractorACF acfExtractor(m_clf, true);//(m_clf.padding, m_clf.shrink, true, m_clf.gradMag.normRad, m_clf.gradMag.normConst,m_clf.gradHist.binSize,m_clf.gradHist.nOrients,m_clf.gradHist.softBin,m_clf.gradHist.full);
   std::vector<cv::Mat> acf_channels = acfExtractor.extractFeatures(img);
 
   if (m_filters.empty())
