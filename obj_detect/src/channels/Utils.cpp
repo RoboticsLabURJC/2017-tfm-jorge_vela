@@ -33,10 +33,10 @@
  */
 cv::Mat ImgResample(cv::Mat src, int width, int height, std::string method, float norm)
 {
-  cv::Mat dst; //(width, height, CV_32F, cv::Scalar(0, 0, 0)); // JM: The image creation is not needed ... increases the time?
+  cv::Mat dst;
   if (method == "antialiasing")
   {
-    resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA); //DICE QUE EN ALGUNOS CASOS NO UTILIZA ANTIALIASING OFF, POR LO QUE SERÍA INTER_AREA, EL CASO NORMAL ES INTER_LINEAR
+    resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
   }
   else
   {
@@ -59,7 +59,7 @@ cv::Mat ImgResample(cv::Mat src, int width, int height, std::string method, floa
 cv::Mat convTri(cv::Mat input_image, int kernel_size)
 {
   cv::Mat dst;
-  cv::copyMakeBorder(input_image, dst, kernel_size,kernel_size,kernel_size,kernel_size, cv::BORDER_REFLECT, 0);
+  cv::copyMakeBorder(input_image, dst, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_REFLECT, 0);
 
   //FUNCION CONVTRI
   int widthSize = input_image.size().width;
@@ -83,15 +83,11 @@ cv::Mat convTri(cv::Mat input_image, int kernel_size)
   cv::Mat help_image;
   filter2D(dst, help_image, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
 
-//  int widthHelp = help_image.size().width;
   int heightHelp = help_image.size().height;
-//  int widthCrop = widthSize - kernel_size;
   cv::Rect myRoi(kernel_size, 0, widthSize, heightHelp);
   help_image = help_image(myRoi);
 
-  cv::Mat kernel_t;
-  transpose(kernel, kernel_t);
-  filter2D(help_image, output_image, CV_32FC1 , kernel_t, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  filter2D(help_image, output_image, CV_32FC1 , kernel.t(), cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
   cv::Rect myRoi2(0, kernel_size, widthSize, heightSize);
   output_image = output_image(myRoi2);
   return output_image;

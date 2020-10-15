@@ -47,11 +47,13 @@ gradMagOpenCV
   M = cv::min(M, 1e10f);
 
   // Compute gradient orientation (O)
-  cv::phase(Gx, Gy, O, false); // Compute angle in radians in [0,2pi)
+  cv::multiply(Gx, M, Gx); // Normalize by the gradient magnitude
+  cv::multiply(Gy, M, Gy); // Normalize by the gradient magnitude
+  cv::phase(Gx, Gy, O, false); // Compute angle in radians in [0, 2pi)
 
   if (!full)
   {
-    // Remove M_PI to orientations with Gy < 0 to get orientation in [0,pi)
+    // Remove M_PI to orientations with Gy < 0 to get orientation in [0, pi)
     cv::Mat isGyNegUint8 = (Gy < 0.0)/255.0; // divide by 255 to get a value of 1 when true
     cv::Mat isGyNegFloat;
     isGyNegUint8.convertTo(isGyNegFloat, CV_32F);

@@ -34,8 +34,8 @@ public:
 
   virtual std::vector<cv::Mat> extractFeatures
     (
-      cv::Mat img, 
-      std::vector<cv::Mat> gradMag
+    cv::Mat img,
+    std::vector<cv::Mat> gradMag
     );
 
 private:
@@ -45,7 +45,6 @@ private:
     (
     cv::Mat O,
     cv::Mat M,
-    int nb,
     float norm,
     int nOrients,
     bool full,
@@ -55,47 +54,18 @@ private:
     cv::Mat& M0,
     cv::Mat& M1
     );
-/*
-  std::vector<cv::Mat>
-  gradH
-    (
-      cv::Mat image,
-      float* M,
-      float* O //,
-//      float* H
-    );
 
   void
   gradHist
     (
-    float *M,
-    float *O,
-    float *H,
-    int h,
-    int w,
+    cv::Mat M,
+    cv::Mat O,
+    std::vector<cv::Mat>& H,
     int bin,
     int nOrients,
     int softBin,
     bool full
     );
-
-  void
-  gradQuantize
-    (
-    float *O,
-    float *M,
-    int *O0,
-    int *O1,
-    float *M0,
-    float *M1,
-    int nb,
-    int n,
-    float norm,
-    int nOrients,
-    bool full,
-    bool interpolate
-    );
-*/
 };
 
 #endif

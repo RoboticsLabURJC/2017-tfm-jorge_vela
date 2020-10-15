@@ -21,6 +21,8 @@
 #undef DEBUG
 //#define DEBUG
 
+#define OVERLAP_THRESHOLD 0.9
+
 class TestBadacostDetector: public testing::Test
 {
 public:
@@ -98,7 +100,7 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
       for (const DetectionRectangle& d: detections)
       {
         float overlap = gt_d.overlap(d);
-        oneOverlaps = ( overlap > 0.9);
+        oneOverlaps = ( overlap >= OVERLAP_THRESHOLD);
         if (oneOverlaps)
         {
           break;
@@ -138,7 +140,7 @@ TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
       for (const DetectionRectangle& d: detections)
       {
         float overlap = gt_d.overlap(d);
-        oneOverlaps = ( overlap > 0.9);
+        oneOverlaps = ( overlap >= OVERLAP_THRESHOLD);
         if (oneOverlaps)
         {
           break;
@@ -181,7 +183,7 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
       for (const DetectionRectangle& d: detections)
       {
         float overlap = gt_d.overlap(d);
-        oneOverlaps = ( overlap > 0.9);
+        oneOverlaps = ( overlap >= OVERLAP_THRESHOLD);
         if (oneOverlaps)
         {
           break;
@@ -223,7 +225,7 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategy){
       for (const DetectionRectangle& d: detections)
       {
         float overlap = gt_d.overlap(d);
-        oneOverlaps = ( overlap > 0.9);
+        oneOverlaps = ( overlap >= OVERLAP_THRESHOLD);
         if (oneOverlaps)
         {
           break;

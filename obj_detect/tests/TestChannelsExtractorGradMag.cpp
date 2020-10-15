@@ -22,9 +22,6 @@
 class TestChannelsExtractorGradMag: public testing::Test
 {
 public:
-  const int ROWS = 2;
-  const int COLS = 4;
-
   virtual void SetUp()
     {
     }
@@ -37,8 +34,7 @@ public:
   compareGradientMagnitudeAndOrientation
     (
     cv::Mat img,
-    std::string matlab_grad_mag_yaml_filename,
-    std::string matlab_grad_orient_yaml_filename,
+    std::string matlab_grad_yaml_filename,
     std::string impl_type = "pdollar"
     );
 };
@@ -47,13 +43,12 @@ void
 TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   (
   cv::Mat img,
-  std::string matlab_grad_mag_yaml_filename,
-  std::string matlab_grad_orient_yaml_filename,
+  std::string matlab_grad_yaml_filename,
   std::string impl_type
   )
 {
   cv::FileStorage fs;
-  bool file_exists = fs.open(matlab_grad_mag_yaml_filename, cv::FileStorage::READ);
+  bool file_exists = fs.open(matlab_grad_yaml_filename, cv::FileStorage::READ);
   ASSERT_TRUE(file_exists);
 
   // Read matlab gradient magnitude parameters from yaml file
@@ -73,6 +68,7 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   // Extract the gradient magnitude and orientation channels
   std::vector<cv::Mat> gradMagExtractVector;
   gradMagExtractVector = pExtractor->extractFeatures(img);
+  delete pExtractor;
 
   // Get the matlab magnitude matrix from disk
   cv::Mat MatlabMag = readMatrixFromFileNode(fs["M"]);
@@ -97,11 +93,6 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   int num_pixels_ok = cv::sum(lessThanThr)[0];
 //  std::cout << "num_pixels_ok = " << num_pixels_ok << std::endl;
   ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
-  fs.release();
-
-  // Read matlab gradient orientation from yaml file.
-  file_exists = fs.open(matlab_grad_orient_yaml_filename, cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
 
   // Get the matlab magnitude matrix from disk
   cv::Mat MatlabO = readMatrixFromFileNode(fs["O"]);
@@ -120,8 +111,8 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
 #endif
 
   num_pixels_ok = cv::sum(lessThanThr)[0];
-//  std::cout << "num_pixels_ok = " << num_pixels_ok << std::endl;
   ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
+
 }
 
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1PDollar)
@@ -130,7 +121,6 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1PDollar)
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_GradientChannels.yaml",
                                          "yaml/index_jpeg_GradientChannels.yaml");
 }
 
@@ -141,7 +131,6 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGrayPDollar)
   image = cv::imread("images/index.jpeg", cv::IMREAD_GRAYSCALE);
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_gray_GradientChannels.yaml",
                                          "yaml/index_jpeg_gray_GradientChannels.yaml");
 }
 
@@ -151,8 +140,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormConst0_07PDollar)
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml",
-                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml");
+                                         "yaml/index_jpeg_GradientChannels_normConst_0_07.yaml");
 }
 
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0PDollar)
@@ -161,8 +149,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0PDollar)
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml",
-                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml");
+                                         "yaml/index_jpeg_GradientChannels_normRad_0.yaml");
 }
 
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1OpenCV)
@@ -171,7 +158,6 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1OpenCV)
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_GradientChannels.yaml",
                                          "yaml/index_jpeg_GradientChannels.yaml",
                                          "opencv");
 }
@@ -184,7 +170,6 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGrayOpenCV)
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
                                          "yaml/index_jpeg_gray_GradientChannels.yaml",
-                                         "yaml/index_jpeg_gray_GradientChannels.yaml",
                                          "opencv");
 }
 
@@ -194,8 +179,7 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormConst0_07OpenCV)
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml",
-                                         "yaml/index_jpeg_gray_GradientChannels_normConst_0_07.yaml",
+                                         "yaml/index_jpeg_GradientChannels_normConst_0_07.yaml",
                                          "opencv");
 }
 
@@ -205,7 +189,6 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0OpenCV)
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   ASSERT_TRUE(image.data);
   compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml",
-                                         "yaml/index_jpeg_gray_GradientChannels_normRad_0.yaml",
+                                         "yaml/index_jpeg_GradientChannels_normRad_0.yaml",
                                          "opencv");
 }

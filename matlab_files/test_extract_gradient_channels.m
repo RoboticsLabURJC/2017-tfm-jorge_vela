@@ -36,7 +36,7 @@ Igray = rgb2gray(I);
 p_gm = det.detector.opts.pPyramid.pChns.pGradMag; 
 full=0;
 if (isfield(p_gm,'full'))
-  full=p.full; 
+  full=p_gm.full; 
 end
 [M,O] = gradientMag(single(I), p_gm.colorChn, p_gm.normRad, p_gm.normConst, full);
 
@@ -49,7 +49,9 @@ end
 H = gradientHist(M, O, binSize, p_gh.nOrients, p_gh.softBin, p_gh.useHog, p_gh.clipHog, full);
 normRad = p_gm.normRad;
 normConst = p_gm.normConst;
-save_gradient_channels(M, O, H, normRad, normConst, 'index_jpeg_GradientChannels.yaml');
+nOrients = p_gh.nOrients;
+softBin = p_gh.softBin;
+save_gradient_channels(M, O, H, normRad, normConst, binSize, nOrients, softBin, full, 'index_jpeg_GradientChannels.yaml');
 
 %--------------------------
 % ---- Test gray
@@ -62,9 +64,7 @@ save_gradient_channels(M, O, H, normRad, normConst, 'index_jpeg_GradientChannels
 
 % compute gradient histgoram channels
 H = gradientHist(M, O, binSize, p_gh.nOrients, p_gh.softBin, p_gh.useHog, p_gh.clipHog, full);
-normRad = p_gm.normRad;
-normConst = p_gm.normConst;
-save_gradient_channels(M, O, H, normRad, normConst, 'index_jpeg_gray_GradientChannels.yaml');
+save_gradient_channels(M, O, H, p_gm.normRad, p_gm.normConst,  binSize, p_gh.nOrients, p_gh.softBin, full, 'index_jpeg_gray_GradientChannels.yaml');
 
 %--------------------------
 % ---- Test color
@@ -76,11 +76,58 @@ save_gradient_channels(M, O, H, normRad, normConst, 'index_jpeg_gray_GradientCha
 p_gm.normRad = 0;
 [M,O] = gradientMag(single(I), p_gm.colorChn, p_gm.normRad, p_gm.normConst, full);
 
-% compute gradient histgoram channels
+% compute gradient histgram channels
+binSize = 5;
 H = gradientHist(M, O, binSize, p_gh.nOrients, p_gh.softBin, p_gh.useHog, p_gh.clipHog, full);
-normRad = p_gm.normRad;
-normConst = p_gm.normConst;
-save_gradient_channels(M, O, H, normRad, normConst, 'index_jpeg_gray_GradientChannels_normRad_0.yaml');
+save_gradient_channels(M, O, H, p_gm.normRad, p_gm.normConst,  binSize, p_gh.nOrients, p_gh.softBin, full, 'index_jpeg_GradientChannels_binSize_5.yaml');
+
+%--------------------------
+% ---- Test color
+%--------------------------
+
+% Test for real image: 
+
+% compute gradient magnitude channel
+p_gm.normRad = 0;
+[M,O] = gradientMag(single(I), p_gm.colorChn, p_gm.normRad, p_gm.normConst, full);
+
+% compute gradient histgram channels
+binSize = det.detector.opts.pPyramid.pChns.shrink; 
+p_gh.softBin = -4;
+H = gradientHist(M, O, binSize, p_gh.nOrients, p_gh.softBin, p_gh.useHog, p_gh.clipHog, full);
+save_gradient_channels(M, O, H, p_gm.normRad, p_gm.normConst,  binSize, p_gh.nOrients, p_gh.softBin, full, 'index_jpeg_GradientChannels_softBin_negative_4.yaml');
+
+%--------------------------
+% ---- Test color
+%--------------------------
+
+% Test for real image: 
+
+% compute gradient magnitude channel
+p_gm.normRad = 0;
+[M,O] = gradientMag(single(I), p_gm.colorChn, p_gm.normRad, p_gm.normConst, full);
+
+% compute gradient histgram channels
+binSize = 1; 
+p_gh.softBin = 2;
+H = gradientHist(M, O, binSize, p_gh.nOrients, p_gh.softBin, p_gh.useHog, p_gh.clipHog, full);
+save_gradient_channels(M, O, H, p_gm.normRad, p_gm.normConst,  binSize, p_gh.nOrients, p_gh.softBin, full, 'index_jpeg_GradientChannels_binSize_1_softBin_2.yaml');
+
+
+%--------------------------
+% ---- Test color
+%--------------------------
+
+% Test for real image: 
+
+% compute gradient magnitude channel
+p_gm.normRad = 0;
+[M,O] = gradientMag(single(I), p_gm.colorChn, p_gm.normRad, p_gm.normConst, full);
+
+% compute gradient histgram channels
+binSize = det.detector.opts.pPyramid.pChns.shrink; 
+H = gradientHist(M, O, binSize, p_gh.nOrients, p_gh.softBin, p_gh.useHog, p_gh.clipHog, full);
+save_gradient_channels(M, O, H, p_gm.normRad, p_gm.normConst,  binSize, p_gh.nOrients, p_gh.softBin,  full, 'index_jpeg_GradientChannels_normRad_0.yaml');
 
 %--------------------------
 % ---- Test color
@@ -94,9 +141,8 @@ p_gm.normConst = 0.07;
 [M,O] = gradientMag(single(I), p_gm.colorChn, p_gm.normRad, p_gm.normConst, full);
 
 % compute gradient histgoram channels
+binSize = det.detector.opts.pPyramid.pChns.shrink; 
 H = gradientHist(M, O, binSize, p_gh.nOrients, p_gh.softBin, p_gh.useHog, p_gh.clipHog, full);
-normRad = p_gm.normRad;
-normConst = p_gm.normConst;
-save_gradient_channels(M, O, H, normRad, normConst, 'index_jpeg_gray_GradientChannels_normConst_0_07.yaml');
+save_gradient_channels(M, O, H, p_gm.normRad, p_gm.normConst,  binSize, p_gh.nOrients, p_gh.softBin, full, 'index_jpeg_GradientChannels_normConst_0_07.yaml');
 
-    
+

@@ -22,10 +22,10 @@ class ChannelsExtractorGradHistPDollar: public ChannelsExtractorGradHist
 public:
   ChannelsExtractorGradHistPDollar
     (
-      int binSize = 8,
-      int nOrients = 8,
-      int softBin = 1,
-      int full = 0
+    int binSize = 8,
+    int nOrients = 8,
+    int softBin = 1,
+    int full = 0
     ): ChannelsExtractorGradHist(binSize,
                                  nOrients,
                                  softBin,
@@ -35,8 +35,8 @@ public:
 
   virtual std::vector<cv::Mat> extractFeatures
     (
-      cv::Mat img, 
-      std::vector<cv::Mat> gradMag
+    cv::Mat img,
+    std::vector<cv::Mat> gradMag
     );
 
 private:

@@ -34,8 +34,9 @@ public:
     (
     ClassifierConfig clf,
     bool postprocess_channels = true,
-    bool impl_type = "opencv"
-    ) 
+//    std::string impl_type = "opencv"
+    std::string impl_type = "pdollar"
+    )
   {
     m_impl_type = impl_type;
     m_clf = clf;

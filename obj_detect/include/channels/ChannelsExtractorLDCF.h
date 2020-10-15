@@ -35,15 +35,6 @@ public:
     (
       std::vector<cv::Mat> filters,
       ClassifierConfig clf
-      /*
-      cv::Size padding,
-      int shrink,
-      int gradientMag_normRad = 0 ,
-      float gradientMag_normConst = 0.005,
-      int gradientHist_binSize = 8, //2
-      int gradientHist_nOrients = 8, //6
-      int gradientHist_softBin = 1,
-      int gradientHist_full = 0*/
     );
 
   /**

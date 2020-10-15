@@ -53,22 +53,22 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   }
 
   ChannelsExtractorGradHist* pGradHistExtractor;
-//  if (m_impl_type == "opencv")
-//  {
-//    pGradHistExtractor = dynamic_cast<ChannelsExtractorGradHist*>(
-//                   new ChannelsExtractorGradHistOpenCV(m_clf.gradHist.binSize,
-//                                                       m_clf.gradHist.nOrients,
-//                                                       m_clf.gradHist.softBin,
-//                                                       m_clf.gradHist.full));
-//  }
-//  else
-//  {
+  if (m_impl_type == "opencv")
+  {
+    pGradHistExtractor = dynamic_cast<ChannelsExtractorGradHist*>(
+                   new ChannelsExtractorGradHistOpenCV(m_clf.gradHist.binSize,
+                                                       m_clf.gradHist.nOrients,
+                                                       m_clf.gradHist.softBin,
+                                                       m_clf.gradHist.full));
+  }
+  else
+  {
     pGradHistExtractor = dynamic_cast<ChannelsExtractorGradHist*>(
                 new ChannelsExtractorGradHistPDollar(m_clf.gradHist.binSize,
                                                      m_clf.gradHist.nOrients,
                                                      m_clf.gradHist.softBin,
                                                      m_clf.gradHist.full));;
-//  }
+  }
 
   //int dChan = img.channels();
   int h = img.size().height;
