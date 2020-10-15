@@ -1,0 +1,52 @@
+\chapter{Algoritmo BAdaCost en C++}\label{cap.algoritmo} 
+En este capítulo se describe el algoritmo a través del cual se ha llegado a la solución de lo planteado en los objetivos.
+
+Este algoritmo tiene que permitir la detección de distintos elementos utilizando el clasificador BAdaCost. Para ello, en este capítulo primero se explica el diseño y organización del código. Tras ello, se explica como se ha desarrollado cada clase y función y los resultados obtenidos por cada una. Finalmente explicar el detector obtenido, el cual utiliza todo lo desarrollado previamente, retornando si en la imagen de entrada se encuentra el elemento de interés y donde está situado.
+
+\section{Estructura del código.}
+
+Para la realización de este algoritmo, se ha seguido un a estructura que, siguiendo una estructura de lo mas general a lo mas específico, se puede resumir de la siguiente forma:
+
+\begin{itemize}
+
+\item \textbf{BadacostDetector: } Clase del detector que se utiliza en este proyecto. Para su funcionamiento, contiene una función la cual requiere como parámetro una imagen de entrada y un fichero que contenga los parámetros del clasificador. Como salida retorna un vector con las distintas detecciones en un formato especifico.
+
+\item \textbf{ChannelsPyramid: } Encargada de calcular la pirámide de características a partir de la imagen de entrada. Para ello, calcula los distintos tamaños que tiene que tener la imagen en función de los parámetros de entrada y llama al calculo de estas características para los distintos tamaños.
+
+\item \textbf{ChannelsExtractorLDCF: } A partir de una imagen de entrada, extrae las características de la imagen, obteniendo imágenes (cv::Mat) como resultados, y realiza una convolución con filtros cargados en el detector.
+
+\item \textbf{ChannelsExtarctorACF: } Calcula las características de la imagen de entrada (canales de color en LUV, magnitud del gradiente y características HOG) retornando cada característica en un cv::Mat.
+
+\item \textbf{ChannelsExtractorGradMag: } Calcula la magnitud del gradiente y la orientación por cada píxel de la imagen.
+
+\item \textbf{ChannelsExtractorGradHist: } Calcula el histograma de gradiente orientado. Para cada región de tamaño determinado, calcula un histograma de gradientes, con cada gradiente cuantificado por su ángulo y ponderado por su magnitud.
+
+\item \textbf{ChannelsExtractorGradLUV: } Dada una imagen de entrada RGB retorna un vector con los canales de color L, U, V. 
+
+\item \textbf{Utils: } Contiene diferentes funciones que utilizan las clases previamente explicadas.
+
+\end{itemize}
+
+Una vez hecha una introducción al algoritmo, habiendo definido cada una de las partes, se pasa a redactar cada una de las clases y funciones desarrolladas:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
