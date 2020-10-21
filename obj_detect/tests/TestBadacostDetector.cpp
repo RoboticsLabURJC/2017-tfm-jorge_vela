@@ -18,10 +18,10 @@
 
 #include <iostream>
 
-#undef DEBUG
-//#define DEBUG
+//#undef DEBUG
+#define DEBUG
 
-#define OVERLAP_THRESHOLD 0.9
+#define OVERLAP_THRESHOLD 0.67
 
 class TestBadacostDetector: public testing::Test
 {
@@ -86,7 +86,10 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 
   std::vector<DetectionRectangle> detections = badacost.detect(image);
 #ifdef DEBUG
+  std::cout << "detections = " << std::endl;
   std::cout << detections;
+  std::cout << "gt_detections = " << std::endl;
+  std::cout << gt_detections << std::endl;
   badacost.showResults(image, detections);
   cv::imshow("image", image);
   cv::waitKey();
@@ -126,7 +129,10 @@ TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
   std::vector<DetectionRectangle> detections = badacost.detect(image);
 
 #ifdef DEBUG
+  std::cout << "detections = " << std::endl;
   std::cout << detections;
+  std::cout << "gt_detections = " << std::endl;
+  std::cout << gt_detections << std::endl;
   badacost.showResults(image, detections);
   cv::imshow("image", image);
   cv::waitKey();
@@ -148,7 +154,6 @@ TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
       }
       ASSERT_TRUE(oneOverlaps);
   }
-
 }
 
 
@@ -169,7 +174,10 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
   std::vector<DetectionRectangle> detections = badacost.detect(image);
 
 #ifdef DEBUG
+  std::cout << "detections = " << std::endl;
   std::cout << detections;
+  std::cout << "gt_detections = " << std::endl;
+  std::cout << gt_detections << std::endl;
   badacost.showResults(image, detections);
   cv::imshow("image", image);
   cv::waitKey();
@@ -211,7 +219,10 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategy){
   std::vector<DetectionRectangle> detections = badacost.detect(image);
 
 #ifdef DEBUG
+  std::cout << "detections = " << std::endl;
   std::cout << detections;
+  std::cout << "gt_detections = " << std::endl;
+  std::cout << gt_detections << std::endl;
   badacost.showResults(image, detections);
   cv::imshow("image", image);
   cv::waitKey();

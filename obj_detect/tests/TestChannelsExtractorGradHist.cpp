@@ -43,6 +43,16 @@ class TestChannelsExtractorGradHist: public testing::Test
     std::string matlab_grad_yaml_filename,
     std::string impl_type = "pdollar"
     );
+
+  void compareGradHistSyntheticImgOpenCvPDollar
+    (
+    cv::Mat gradMag,
+    cv::Mat gradQuantizedOrient,
+    float softBin,
+    float binSize,
+    int nOrients,
+    float full
+    );
 };
 
 void
@@ -113,15 +123,23 @@ TestChannelsExtractorGradHist::compareGradientOrientationHistogram
     float threshold = 0.05*channel_range; // Asume a 5% of the channel's range is an acceptable error.
     cv::Mat absDiff = cv::abs(gradHistExtractVector[i] - MatlabMat);
     cv::Mat lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
+    int num_pixels_ok = cv::sum(lessThanThr)[0];
 
 #ifdef DEBUG
-    cv::imshow("cpp-Mat", gradHistExtractVector[i]);
-    cv::imshow("matlab-Mat", MatlabMat);
-    cv::waitKey();
+//    std::cout << "MatlabMat(cv::Range(0,8), cv::Range(0,8)) = " << std::endl;
+//    std::cout << MatlabMat(cv::Range(0,8), cv::Range(0,8)) << std::endl;
+//    std::cout << "gradHistExtractVector[i](cv::Range(0,8), cv::Range(0,8)) = " << std::endl;
+//    std::cout << gradHistExtractVector[i](cv::Range(0,8), cv::Range(0,8))  << std::endl;
+
+    std::cout << "num_pixels_ok = " << num_pixels_ok;
+    std::cout << " of " << absDiff.rows * absDiff.cols << std::endl;
+//    cv::imshow("absDiff", absDiff);
+//    cv::imshow("cpp-Mat", gradHistExtractVector[i]);
+//    cv::imshow("matlab-Mat", MatlabMat);
+//    cv::waitKey();
 #endif
 
-    int num_pixels_ok = cv::sum(lessThanThr)[0];
-    ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
+    ASSERT_TRUE(num_pixels_ok > 0.8 * absDiff.rows * absDiff.cols);
   }
   fs.release();
 }
@@ -264,9 +282,185 @@ TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColorNormRad0OpenCV)
 }
 
 
+void
+TestChannelsExtractorGradHist::compareGradHistSyntheticImgOpenCvPDollar
+  (
+  cv::Mat M,
+  cv::Mat O,
+  float softBin,
+  float binSize,
+  int nOrients,
+  float full
+  )
+{
+  ChannelsExtractorGradHist* pExtractorHistOpenCV;
+  ChannelsExtractorGradHist* pExtractorHistPDollar;
+  pExtractorHistOpenCV = dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistOpenCV(binSize, nOrients, softBin, full));
+  pExtractorHistPDollar = dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistPDollar(binSize, nOrients, softBin, full));
 
+  // Extract the gradient histogram channels
+  std::vector<cv::Mat> gradMagExtractVector(2);
+  gradMagExtractVector[0] = M;
+  gradMagExtractVector[1] = O;
+  cv::Mat img = cv::Mat::ones(M.rows, M.cols, CV_32F);
+  std::vector<cv::Mat> gradHistExtractVectorOpenCV;
+  std::vector<cv::Mat> gradHistExtractVectorPDollar;
+  gradHistExtractVectorOpenCV = pExtractorHistOpenCV->extractFeatures(img, gradMagExtractVector);
+  gradHistExtractVectorPDollar = pExtractorHistPDollar->extractFeatures(img, gradMagExtractVector);
+  delete pExtractorHistOpenCV;
+  delete pExtractorHistPDollar;
 
+  // Compare OpenCV gradient histograms with PDollar implementation
+  for (uint i=0; i < 1; i++) //gradHistExtractVectorOpenCV.size(); i++)
+  {
+    double min_val;
+    double max_val;
+    int min_ind[2];
+    int max_ind[2];
+    cv::minMaxIdx(gradHistExtractVectorPDollar[i], &min_val, &max_val, min_ind, max_ind, cv::Mat());
+    float channel_range = max_val - min_val;    
+    float threshold = 0.05*channel_range; // Asume a 5% of the channel's range is an acceptable error.
+    if (threshold == 0.0)
+    {
+      threshold = 0.05;
+    }
+    cv::Mat absDiff = cv::abs(gradHistExtractVectorOpenCV[i] - gradHistExtractVectorPDollar[i]);
+    cv::Mat lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
+    int num_pixels_ok = cv::sum(lessThanThr)[0];
 
+#ifdef DEBUG
+//    std::cout << "M = " << std::endl;
+//    std::cout << M << std::endl;
+    std::cout << "gradHistExtractVectorPDollar[i] = " << std::endl;
+    std::cout << gradHistExtractVectorPDollar[i] << std::endl;
+    std::cout << "gradHistExtractVectorOpenCV[i] = " << std::endl;
+    std::cout << gradHistExtractVectorOpenCV[i]  << std::endl;
+
+    std::cout << "num_pixels_ok = " << num_pixels_ok;
+    std::cout << " of " << absDiff.rows * absDiff.cols << std::endl;
+    cv::imshow("absDiff", absDiff);
+    cv::imshow("opencv-Mat", gradHistExtractVectorOpenCV[i]);
+    cv::imshow("pdollar-Mat", gradHistExtractVectorPDollar[i]);
+    cv::waitKey();
+#endif
+
+    ASSERT_TRUE(num_pixels_ok > 0.8 * absDiff.rows * absDiff.cols);
+  }
+}
+
+TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistSequentialMagSoftBin1binSize2)
+{
+  cv::Mat gradMag = cv::Mat::ones(20, 30, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(20, 30, CV_32F);
+
+  for (int i=0; i < gradMag.rows; i++)
+  {
+    float k = 0.0;
+    for (int j=0; j < gradMag.cols; j++)
+    {
+      gradMag.at<float>(i,j) = k;
+      k += 1.0;
+    }
+  }
+
+  compareGradHistSyntheticImgOpenCvPDollar(
+    gradMag,
+    gradQuantizedOrient,
+    1, //softBin,
+    2,  // binSize,
+    6,  // nOrients,
+    0.0); // full
+}
+
+TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistSequentialMagSoftBin1binSize3)
+{
+  cv::Mat gradMag = cv::Mat::ones(23, 31, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(23, 31, CV_32F);
+
+  for (int i=0; i < gradMag.rows; i++)
+  {
+    float k = 0.0;
+    for (int j=0; j < gradMag.cols; j++)
+    {
+      gradMag.at<float>(i,j) = k;
+      k += 1.0;
+    }
+  }
+
+  compareGradHistSyntheticImgOpenCvPDollar(
+    gradMag,
+    gradQuantizedOrient,
+    1, //softBin,
+    3,  // binSize,
+    6,  // nOrients,
+    0.0); // full
+}
+
+TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistSequentialMagSoftBin1binSize5)
+{
+  cv::Mat gradMag = cv::Mat::ones(23, 31, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(23, 31, CV_32F);
+
+  for (int i=0; i < gradMag.rows; i++)
+  {
+    float k = 0.0;
+    for (int j=0; j < gradMag.cols; j++)
+    {
+      gradMag.at<float>(i,j) = k;
+      k += 1.0;
+    }
+  }
+
+  compareGradHistSyntheticImgOpenCvPDollar(
+    gradMag,
+    gradQuantizedOrient,
+    1, //softBin,
+    5,  // binSize,
+    6,  // nOrients,
+    0.0); // full
+}
+
+TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistOnesSoftBin1binSize2)
+{
+  cv::Mat gradMag = cv::Mat::ones(20, 30, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(20, 30, CV_32F);
+
+  compareGradHistSyntheticImgOpenCvPDollar(
+    gradMag,
+    gradQuantizedOrient,
+    1, //softBin,
+    2,  // binSize,
+    6,  // nOrients,
+    0.0); // full
+}
+
+TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistOnesSoftBinMinus4binSize5)
+{
+  cv::Mat gradMag = cv::Mat::ones(20, 30, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(20, 30, CV_32F);
+
+  compareGradHistSyntheticImgOpenCvPDollar(
+    gradMag,
+    gradQuantizedOrient,
+    -2, //softBin,
+    5,  // binSize,
+    6,  // nOrients,
+    0.0); // full
+}
+
+TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistOnesSoftBin2binSize1)
+{
+  cv::Mat gradMag = cv::Mat::ones(20, 30, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(20, 30, CV_32F);
+
+  compareGradHistSyntheticImgOpenCvPDollar(
+    gradMag,
+    gradQuantizedOrient,
+    2, //softBin,
+    1,  // binSize,
+    6,  // nOrients,
+    0.0); // full
+}
 
 
 

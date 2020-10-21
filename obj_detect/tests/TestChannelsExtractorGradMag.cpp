@@ -83,14 +83,17 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   float threshold = 0.05*channel_range; // Asume a 5% of the maximum value is an acceptable error.
   cv::Mat absDiff = cv::abs(gradMagExtractVector[0] - MatlabMag);
   cv::Mat lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
+  int num_pixels_ok = cv::sum(lessThanThr)[0];
 
 #ifdef DEBUG
+  std::cout << "num_pixels_ok = " << num_pixels_ok;
+  std::cout << " of " << absDiff.rows * absDiff.cols << std::endl;
+  cv::imshow("absDiff", absDiff);
   cv::imshow("cpp-Mag", gradMagExtractVector[0]);
   cv::imshow("matlab-Mag", MatlabMag);
   cv::waitKey();
 #endif
 
-  int num_pixels_ok = cv::sum(lessThanThr)[0];
 //  std::cout << "num_pixels_ok = " << num_pixels_ok << std::endl;
   ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
 
@@ -103,15 +106,18 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
   threshold = 0.05*channel_range; // Asume a 5% of the maximum value is an acceptable error.
   absDiff = cv::abs(gradMagExtractVector[1] - MatlabO);
   lessThanThr = (absDiff < threshold)/255.0; // Boolean matrix has 255 for true and 0 for false.
+  num_pixels_ok = cv::sum(lessThanThr)[0];
 
 #ifdef DEBUG
+  std::cout << "num_pixels_ok = " << num_pixels_ok;
+  std::cout << " of " << absDiff.rows * absDiff.cols << std::endl;
+  cv::imshow("absDiff", absDiff);
   cv::imshow("cpp-O", gradMagExtractVector[1]);
   cv::imshow("matlab-O", MatlabO);
   cv::waitKey();
 #endif
 
-  num_pixels_ok = cv::sum(lessThanThr)[0];
-  ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.size().height * absDiff.size().height);
+  ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.rows * absDiff.cols);
 
 }
 
