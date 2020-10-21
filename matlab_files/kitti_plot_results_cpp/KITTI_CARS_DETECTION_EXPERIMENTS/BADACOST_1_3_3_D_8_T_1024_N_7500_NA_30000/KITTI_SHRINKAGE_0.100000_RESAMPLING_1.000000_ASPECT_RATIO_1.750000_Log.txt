@@ -1,0 +1,1780 @@
+---------------------------------------------------------------------------
+Training stage 0
+Sampled 29044 windows from 13464 images.
+Done sampling windows (time=469s).
+Extracting features... done (time=53s).
+Computing correlations... done (time=101s).
+Computing lambdas... done (time=946s).
+Extracting features... done (time=212s).
+Sampled 7500 windows from 384 images.
+Done sampling windows (time=45s).
+Extracting features... done (time=55s).
+Training BAdaCost: nWeak= 32 shrinkage=0.100000 resampling=1.000000 fracFtrs=0.062500
+Training BadaCost: nWeak= 32 nFtrs=12480
+ i=   1 alpha=0.034 depth=8 w.l.cost=0.606 s.l.cost=6.06e-01
+ i=   2 alpha=0.034 depth=8 w.l.cost=0.586 s.l.cost=6.08e-01
+ i=   3 alpha=0.032 depth=8 w.l.cost=0.633 s.l.cost=4.68e-01
+ i=   4 alpha=0.030 depth=8 w.l.cost=0.648 s.l.cost=4.09e-01
+ i=   5 alpha=0.031 depth=8 w.l.cost=0.608 s.l.cost=3.56e-01
+ i=   6 alpha=0.029 depth=8 w.l.cost=0.648 s.l.cost=3.21e-01
+ i=   7 alpha=0.028 depth=8 w.l.cost=0.688 s.l.cost=2.94e-01
+ i=   8 alpha=0.028 depth=8 w.l.cost=0.679 s.l.cost=2.72e-01
+ i=   9 alpha=0.028 depth=8 w.l.cost=0.687 s.l.cost=2.49e-01
+ i=  10 alpha=0.028 depth=8 w.l.cost=0.671 s.l.cost=2.32e-01
+ i=  11 alpha=0.027 depth=8 w.l.cost=0.715 s.l.cost=2.13e-01
+ i=  12 alpha=0.027 depth=8 w.l.cost=0.707 s.l.cost=1.95e-01
+ i=  13 alpha=0.025 depth=8 w.l.cost=0.783 s.l.cost=1.84e-01
+ i=  14 alpha=0.026 depth=8 w.l.cost=0.713 s.l.cost=1.68e-01
+ i=  15 alpha=0.025 depth=8 w.l.cost=0.785 s.l.cost=1.58e-01
+ i=  16 alpha=0.025 depth=8 w.l.cost=0.761 s.l.cost=1.48e-01
+ i=  17 alpha=0.025 depth=8 w.l.cost=0.780 s.l.cost=1.39e-01
+ i=  18 alpha=0.025 depth=8 w.l.cost=0.788 s.l.cost=1.31e-01
+ i=  19 alpha=0.024 depth=8 w.l.cost=0.808 s.l.cost=1.23e-01
+ i=  20 alpha=0.024 depth=8 w.l.cost=0.829 s.l.cost=1.15e-01
+ i=  21 alpha=0.024 depth=8 w.l.cost=0.785 s.l.cost=1.11e-01
+ i=  22 alpha=0.024 depth=8 w.l.cost=0.817 s.l.cost=1.03e-01
+ i=  23 alpha=0.023 depth=8 w.l.cost=0.839 s.l.cost=9.88e-02
+ i=  24 alpha=0.023 depth=8 w.l.cost=0.804 s.l.cost=9.33e-02
+ i=  25 alpha=0.023 depth=8 w.l.cost=0.913 s.l.cost=8.73e-02
+ i=  26 alpha=0.023 depth=8 w.l.cost=0.811 s.l.cost=8.23e-02
+ i=  27 alpha=0.022 depth=8 w.l.cost=0.860 s.l.cost=7.93e-02
+ i=  28 alpha=0.023 depth=8 w.l.cost=0.851 s.l.cost=7.64e-02
+ i=  29 alpha=0.023 depth=8 w.l.cost=0.840 s.l.cost=7.15e-02
+ i=  30 alpha=0.023 depth=8 w.l.cost=0.880 s.l.cost=6.61e-02
+ i=  31 alpha=0.022 depth=8 w.l.cost=0.944 s.l.cost=6.17e-02
+ i=  32 alpha=0.023 depth=8 w.l.cost=0.897 s.l.cost=5.77e-02
+Done training s.l.cost=0.0577 (t=228.8s).
+Done training err=0.0412 fp=0.0013 fn=0.0011 (t=232.4s).
+Confusion Matrix:
+  Columns 1 through 10
+
+        7451           0           2           1           3          11          12           6           1           1
+           1         177          12           0           0           5           3           1           0           0
+           0           0         514           2           0           4          10           0           1           0
+           0           0          12         299           6           5           8           4           2           1
+           1           0           0           2         687          33           6           4           0           0
+           2           0           0           0          27        2612         103           1           1           0
+           7           0           0           0           2          20        6897          39           0           0
+           2           0           0           0           5           1          79        2638          16           0
+           1           0           0           0           3           2           5          24         703           2
+           3           0           0           0           5           7           6           4           3         289
+           0           0           0           0           0           1           5           2           1           6
+           2           0           0           0           0           1           3           1           0           0
+           4           0           0           0           0           1           6           2           2           0
+           0           0           0           0           0           1           0           1           2           0
+           2           0           0           0           2           5           2           5           2           1
+           3           0           0           0           1           1          12           1           1           0
+           1           0           1           0           0           0          23           2           0           0
+           4           0           0           0           2           0          14           1           0           0
+           3           0           2           0           1           5           5           5           1           0
+           0           0           1           0           0           4           0           0           1           0
+           4           0           4           0           3           4           2           4           0           0
+
+  Columns 11 through 20
+
+           8           0           0           0           0           1           0           2           1           0
+           0           0           0           0           0           1           1           3           0           0
+           1           0           0           0           0           0           1           4           0           0
+           3           0           0           0           0           3           0           5           0           0
+           1           0           0           0           4           4           0           3           1           0
+           3           0           0           0           0           5           1           1           1           0
+           0           0           0           0           0           5          13           3           0           0
+           1           0           0           0           2           1           4           8           0           0
+           1           0           0           0           2           0           0           3           0           0
+          30           0           0           0           0           8           1           3           0           0
+         502           4           1           0           0           3           1           0           0           0
+          29         166           9           0           0           2           1           2           0           0
+          13           1         301           8           1           2           0           2           0           0
+           4           0           6         254          11           3           1           2           0           0
+           3           0           0           0         833          47           0           1           0           0
+           3           0           0           0          42        3360          64           2           0           0
+           0           0           0           0           0          59        2652          70           0           0
+           1           0           0           0           0           3         101        3337          27           0
+           0           0           0           0           0           0           0          70         810           0
+           1           0           0           0           0           3           0           7           9         224
+           1           0           0           0           0           3           0           6           1           5
+
+  Column 21
+
+           0
+          12
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           1
+           9
+         332
+
+Done training stage 0 (time=2131s).
+---------------------------------------------------------------------------
+Training stage 1
+Sampled 7500 windows from 512 images.
+Done sampling windows (time=558s).
+Extracting features... done (time=55s).
+Training BAdaCost: nWeak=128 shrinkage=0.100000 resampling=1.000000 fracFtrs=0.062500
+Training BadaCost: nWeak=128 nFtrs=12480
+ i=   1 alpha=0.036 depth=8 w.l.cost=0.609 s.l.cost=6.09e-01
+ i=   2 alpha=0.035 depth=8 w.l.cost=0.588 s.l.cost=6.28e-01
+ i=   3 alpha=0.034 depth=8 w.l.cost=0.598 s.l.cost=4.56e-01
+ i=   4 alpha=0.033 depth=8 w.l.cost=0.614 s.l.cost=3.88e-01
+ i=   5 alpha=0.032 depth=8 w.l.cost=0.620 s.l.cost=3.42e-01
+ i=   6 alpha=0.031 depth=8 w.l.cost=0.639 s.l.cost=3.07e-01
+ i=   7 alpha=0.031 depth=8 w.l.cost=0.645 s.l.cost=2.74e-01
+ i=   8 alpha=0.030 depth=8 w.l.cost=0.660 s.l.cost=2.51e-01
+ i=   9 alpha=0.030 depth=8 w.l.cost=0.665 s.l.cost=2.29e-01
+ i=  10 alpha=0.029 depth=8 w.l.cost=0.686 s.l.cost=2.10e-01
+ i=  11 alpha=0.028 depth=8 w.l.cost=0.673 s.l.cost=1.95e-01
+ i=  12 alpha=0.028 depth=8 w.l.cost=0.735 s.l.cost=1.81e-01
+ i=  13 alpha=0.027 depth=8 w.l.cost=0.741 s.l.cost=1.66e-01
+ i=  14 alpha=0.027 depth=8 w.l.cost=0.720 s.l.cost=1.53e-01
+ i=  15 alpha=0.027 depth=8 w.l.cost=0.753 s.l.cost=1.41e-01
+ i=  16 alpha=0.027 depth=8 w.l.cost=0.780 s.l.cost=1.31e-01
+ i=  17 alpha=0.026 depth=8 w.l.cost=0.789 s.l.cost=1.25e-01
+ i=  18 alpha=0.026 depth=8 w.l.cost=0.775 s.l.cost=1.15e-01
+ i=  19 alpha=0.025 depth=8 w.l.cost=0.851 s.l.cost=1.06e-01
+ i=  20 alpha=0.025 depth=8 w.l.cost=0.828 s.l.cost=9.86e-02
+ i=  21 alpha=0.025 depth=8 w.l.cost=0.896 s.l.cost=9.07e-02
+ i=  22 alpha=0.025 depth=8 w.l.cost=0.810 s.l.cost=8.39e-02
+ i=  23 alpha=0.024 depth=8 w.l.cost=0.868 s.l.cost=7.90e-02
+ i=  24 alpha=0.025 depth=8 w.l.cost=0.805 s.l.cost=7.61e-02
+ i=  25 alpha=0.025 depth=8 w.l.cost=0.861 s.l.cost=7.00e-02
+ i=  26 alpha=0.024 depth=8 w.l.cost=0.902 s.l.cost=6.64e-02
+ i=  27 alpha=0.024 depth=8 w.l.cost=0.870 s.l.cost=6.17e-02
+ i=  28 alpha=0.024 depth=8 w.l.cost=0.859 s.l.cost=5.98e-02
+ i=  29 alpha=0.024 depth=8 w.l.cost=0.853 s.l.cost=5.63e-02
+ i=  30 alpha=0.023 depth=8 w.l.cost=0.936 s.l.cost=5.44e-02
+ i=  31 alpha=0.024 depth=8 w.l.cost=0.857 s.l.cost=5.07e-02
+ i=  32 alpha=0.024 depth=8 w.l.cost=0.885 s.l.cost=4.79e-02
+ i=  33 alpha=0.023 depth=8 w.l.cost=0.910 s.l.cost=4.51e-02
+ i=  34 alpha=0.023 depth=8 w.l.cost=0.931 s.l.cost=4.24e-02
+ i=  35 alpha=0.024 depth=8 w.l.cost=0.837 s.l.cost=3.88e-02
+ i=  36 alpha=0.023 depth=8 w.l.cost=0.982 s.l.cost=3.66e-02
+ i=  37 alpha=0.023 depth=8 w.l.cost=0.902 s.l.cost=3.56e-02
+ i=  38 alpha=0.023 depth=8 w.l.cost=0.927 s.l.cost=3.49e-02
+ i=  39 alpha=0.023 depth=8 w.l.cost=0.928 s.l.cost=3.36e-02
+ i=  40 alpha=0.022 depth=8 w.l.cost=0.952 s.l.cost=3.19e-02
+ i=  41 alpha=0.023 depth=8 w.l.cost=0.840 s.l.cost=3.20e-02
+ i=  42 alpha=0.024 depth=8 w.l.cost=0.923 s.l.cost=3.06e-02
+ i=  43 alpha=0.023 depth=8 w.l.cost=0.927 s.l.cost=2.96e-02
+ i=  44 alpha=0.023 depth=8 w.l.cost=0.956 s.l.cost=2.79e-02
+ i=  45 alpha=0.023 depth=8 w.l.cost=0.959 s.l.cost=2.66e-02
+ i=  46 alpha=0.023 depth=8 w.l.cost=0.978 s.l.cost=2.50e-02
+ i=  47 alpha=0.023 depth=8 w.l.cost=0.929 s.l.cost=2.37e-02
+ i=  48 alpha=0.023 depth=8 w.l.cost=0.881 s.l.cost=2.27e-02
+ i=  49 alpha=0.024 depth=8 w.l.cost=0.911 s.l.cost=2.22e-02
+ i=  50 alpha=0.024 depth=8 w.l.cost=0.959 s.l.cost=2.12e-02
+ i=  51 alpha=0.023 depth=8 w.l.cost=0.848 s.l.cost=2.03e-02
+ i=  52 alpha=0.023 depth=8 w.l.cost=1.012 s.l.cost=1.92e-02
+ i=  53 alpha=0.023 depth=8 w.l.cost=0.936 s.l.cost=1.87e-02
+ i=  54 alpha=0.023 depth=8 w.l.cost=0.931 s.l.cost=1.85e-02
+ i=  55 alpha=0.023 depth=8 w.l.cost=1.034 s.l.cost=1.79e-02
+ i=  56 alpha=0.023 depth=8 w.l.cost=0.963 s.l.cost=1.73e-02
+ i=  57 alpha=0.023 depth=8 w.l.cost=0.963 s.l.cost=1.72e-02
+ i=  58 alpha=0.023 depth=8 w.l.cost=0.973 s.l.cost=1.63e-02
+ i=  59 alpha=0.023 depth=8 w.l.cost=0.935 s.l.cost=1.65e-02
+ i=  60 alpha=0.023 depth=8 w.l.cost=1.024 s.l.cost=1.66e-02
+ i=  61 alpha=0.023 depth=8 w.l.cost=0.907 s.l.cost=1.65e-02
+ i=  62 alpha=0.023 depth=8 w.l.cost=1.034 s.l.cost=1.60e-02
+ i=  63 alpha=0.022 depth=8 w.l.cost=1.045 s.l.cost=1.57e-02
+ i=  64 alpha=0.023 depth=8 w.l.cost=0.940 s.l.cost=1.48e-02
+ i=  65 alpha=0.023 depth=8 w.l.cost=0.930 s.l.cost=1.45e-02
+ i=  66 alpha=0.023 depth=8 w.l.cost=0.948 s.l.cost=1.48e-02
+ i=  67 alpha=0.024 depth=8 w.l.cost=0.963 s.l.cost=1.44e-02
+ i=  68 alpha=0.023 depth=8 w.l.cost=0.929 s.l.cost=1.38e-02
+ i=  69 alpha=0.022 depth=8 w.l.cost=1.000 s.l.cost=1.32e-02
+ i=  70 alpha=0.023 depth=8 w.l.cost=1.011 s.l.cost=1.26e-02
+ i=  71 alpha=0.023 depth=8 w.l.cost=0.998 s.l.cost=1.25e-02
+ i=  72 alpha=0.023 depth=8 w.l.cost=0.968 s.l.cost=1.28e-02
+ i=  73 alpha=0.023 depth=8 w.l.cost=0.914 s.l.cost=1.23e-02
+ i=  74 alpha=0.023 depth=8 w.l.cost=0.929 s.l.cost=1.21e-02
+ i=  75 alpha=0.022 depth=8 w.l.cost=1.046 s.l.cost=1.17e-02
+ i=  76 alpha=0.024 depth=8 w.l.cost=1.003 s.l.cost=1.18e-02
+ i=  77 alpha=0.023 depth=8 w.l.cost=0.979 s.l.cost=1.19e-02
+ i=  78 alpha=0.023 depth=8 w.l.cost=0.993 s.l.cost=1.18e-02
+ i=  79 alpha=0.023 depth=8 w.l.cost=0.995 s.l.cost=1.19e-02
+ i=  80 alpha=0.023 depth=8 w.l.cost=0.984 s.l.cost=1.11e-02
+ i=  81 alpha=0.023 depth=8 w.l.cost=1.019 s.l.cost=1.10e-02
+ i=  82 alpha=0.022 depth=8 w.l.cost=0.990 s.l.cost=1.08e-02
+ i=  83 alpha=0.024 depth=8 w.l.cost=0.943 s.l.cost=1.09e-02
+ i=  84 alpha=0.023 depth=8 w.l.cost=0.926 s.l.cost=1.12e-02
+ i=  85 alpha=0.023 depth=8 w.l.cost=1.061 s.l.cost=1.09e-02
+ i=  86 alpha=0.022 depth=8 w.l.cost=1.023 s.l.cost=1.08e-02
+ i=  87 alpha=0.023 depth=8 w.l.cost=0.954 s.l.cost=1.07e-02
+ i=  88 alpha=0.023 depth=8 w.l.cost=0.957 s.l.cost=1.04e-02
+ i=  89 alpha=0.023 depth=8 w.l.cost=0.991 s.l.cost=1.05e-02
+ i=  90 alpha=0.023 depth=8 w.l.cost=0.997 s.l.cost=1.06e-02
+ i=  91 alpha=0.023 depth=8 w.l.cost=1.035 s.l.cost=1.04e-02
+ i=  92 alpha=0.023 depth=8 w.l.cost=0.988 s.l.cost=1.05e-02
+ i=  93 alpha=0.022 depth=8 w.l.cost=0.985 s.l.cost=1.04e-02
+ i=  94 alpha=0.022 depth=8 w.l.cost=1.048 s.l.cost=1.01e-02
+ i=  95 alpha=0.023 depth=8 w.l.cost=0.980 s.l.cost=1.01e-02
+ i=  96 alpha=0.022 depth=8 w.l.cost=0.968 s.l.cost=9.82e-03
+ i=  97 alpha=0.022 depth=8 w.l.cost=1.001 s.l.cost=9.68e-03
+ i=  98 alpha=0.023 depth=8 w.l.cost=0.977 s.l.cost=9.64e-03
+ i=  99 alpha=0.022 depth=8 w.l.cost=1.051 s.l.cost=9.85e-03
+ i= 100 alpha=0.022 depth=8 w.l.cost=1.023 s.l.cost=9.76e-03
+ i= 101 alpha=0.021 depth=8 w.l.cost=1.036 s.l.cost=9.99e-03
+ i= 102 alpha=0.022 depth=8 w.l.cost=0.987 s.l.cost=9.60e-03
+ i= 103 alpha=0.023 depth=8 w.l.cost=0.982 s.l.cost=9.50e-03
+ i= 104 alpha=0.023 depth=8 w.l.cost=0.981 s.l.cost=9.22e-03
+ i= 105 alpha=0.022 depth=8 w.l.cost=0.966 s.l.cost=9.31e-03
+ i= 106 alpha=0.023 depth=8 w.l.cost=0.953 s.l.cost=9.53e-03
+ i= 107 alpha=0.021 depth=8 w.l.cost=1.072 s.l.cost=9.45e-03
+ i= 108 alpha=0.022 depth=8 w.l.cost=1.028 s.l.cost=9.72e-03
+ i= 109 alpha=0.021 depth=8 w.l.cost=1.083 s.l.cost=9.58e-03
+ i= 110 alpha=0.023 depth=8 w.l.cost=0.987 s.l.cost=9.18e-03
+ i= 111 alpha=0.022 depth=8 w.l.cost=1.002 s.l.cost=9.06e-03
+ i= 112 alpha=0.023 depth=8 w.l.cost=1.097 s.l.cost=9.03e-03
+ i= 113 alpha=0.023 depth=8 w.l.cost=0.986 s.l.cost=8.94e-03
+ i= 114 alpha=0.023 depth=8 w.l.cost=0.918 s.l.cost=9.01e-03
+ i= 115 alpha=0.023 depth=8 w.l.cost=0.954 s.l.cost=9.04e-03
+ i= 116 alpha=0.022 depth=8 w.l.cost=0.967 s.l.cost=9.07e-03
+ i= 117 alpha=0.023 depth=8 w.l.cost=0.957 s.l.cost=9.19e-03
+ i= 118 alpha=0.022 depth=8 w.l.cost=0.999 s.l.cost=9.11e-03
+ i= 119 alpha=0.022 depth=8 w.l.cost=0.991 s.l.cost=9.07e-03
+ i= 120 alpha=0.021 depth=8 w.l.cost=1.081 s.l.cost=9.01e-03
+ i= 121 alpha=0.022 depth=8 w.l.cost=1.068 s.l.cost=8.80e-03
+ i= 122 alpha=0.023 depth=8 w.l.cost=1.017 s.l.cost=8.75e-03
+ i= 123 alpha=0.023 depth=8 w.l.cost=0.959 s.l.cost=8.70e-03
+ i= 124 alpha=0.022 depth=8 w.l.cost=1.084 s.l.cost=8.47e-03
+ i= 125 alpha=0.023 depth=8 w.l.cost=0.944 s.l.cost=8.52e-03
+ i= 126 alpha=0.022 depth=8 w.l.cost=1.056 s.l.cost=8.57e-03
+ i= 127 alpha=0.022 depth=8 w.l.cost=1.034 s.l.cost=8.70e-03
+ i= 128 alpha=0.023 depth=8 w.l.cost=0.981 s.l.cost=8.85e-03
+Done training s.l.cost=0.0089 (t=977.2s).
+Done training err=0.0074 fp=0.0000 fn=0.0002 (t=991.5s).
+Confusion Matrix:
+  Columns 1 through 10
+
+       15000           0           0           0           0           0           0           0           0           0
+           0         216           0           0           0           0           0           0           0           0
+           0           0         537           0           0           0           0           0           0           0
+           0           0           1         347           0           0           0           0           0           0
+           1           0           0           0         745           0           0           0           0           0
+           2           0           0           0           1        2717          37           0           0           0
+           0           0           0           0           0          10        6970           6           0           0
+           1           0           0           0           0           0          29        2726           1           0
+           1           0           0           0           0           0           0           2         743           0
+           0           0           0           0           0           0           0           0           0         359
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           1           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           1           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           1           0           0           0           0           0           0           0           0           0
+
+  Columns 11 through 20
+
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+         526           0           0           0           0           0           0           0           0           0
+           0         216           0           0           0           0           0           0           0           0
+           1           0         341           0           0           0           0           0           0           0
+           0           0           0         283           2           0           0           0           0           0
+           0           0           0           0         881          22           0           0           0           0
+           0           0           0           0           8        3428          54           0           0           0
+           0           0           0           0           0          39        2728          41           0           0
+           0           0           0           0           0           0          42        3437          10           0
+           0           0           0           0           0           0           0          11         892           0
+           0           0           0           0           0           0           0           0           1         258
+           0           0           0           0           0           0           0           0           0           0
+
+  Column 21
+
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+         368
+
+Done training stage 1 (time=1672s).
+---------------------------------------------------------------------------
+Training stage 2
+Sampled 7500 windows from 1728 images.
+Done sampling windows (time=1890s).
+Extracting features... done (time=59s).
+Training BAdaCost: nWeak=256 shrinkage=0.100000 resampling=1.000000 fracFtrs=0.062500
+Training BadaCost: nWeak=256 nFtrs=12480
+ i=   1 alpha=0.037 depth=8 w.l.cost=0.608 s.l.cost=6.08e-01
+ i=   2 alpha=0.036 depth=8 w.l.cost=0.608 s.l.cost=6.10e-01
+ i=   3 alpha=0.033 depth=8 w.l.cost=0.663 s.l.cost=4.79e-01
+ i=   4 alpha=0.033 depth=8 w.l.cost=0.625 s.l.cost=4.16e-01
+ i=   5 alpha=0.032 depth=8 w.l.cost=0.648 s.l.cost=3.76e-01
+ i=   6 alpha=0.031 depth=8 w.l.cost=0.658 s.l.cost=3.45e-01
+ i=   7 alpha=0.031 depth=8 w.l.cost=0.663 s.l.cost=3.17e-01
+ i=   8 alpha=0.030 depth=8 w.l.cost=0.685 s.l.cost=2.96e-01
+ i=   9 alpha=0.029 depth=8 w.l.cost=0.713 s.l.cost=2.76e-01
+ i=  10 alpha=0.029 depth=8 w.l.cost=0.681 s.l.cost=2.55e-01
+ i=  11 alpha=0.027 depth=8 w.l.cost=0.741 s.l.cost=2.42e-01
+ i=  12 alpha=0.027 depth=8 w.l.cost=0.735 s.l.cost=2.25e-01
+ i=  13 alpha=0.027 depth=8 w.l.cost=0.756 s.l.cost=2.12e-01
+ i=  14 alpha=0.026 depth=8 w.l.cost=0.815 s.l.cost=2.00e-01
+ i=  15 alpha=0.026 depth=8 w.l.cost=0.776 s.l.cost=1.88e-01
+ i=  16 alpha=0.026 depth=8 w.l.cost=0.800 s.l.cost=1.77e-01
+ i=  17 alpha=0.025 depth=8 w.l.cost=0.839 s.l.cost=1.69e-01
+ i=  18 alpha=0.026 depth=8 w.l.cost=0.786 s.l.cost=1.58e-01
+ i=  19 alpha=0.026 depth=8 w.l.cost=0.789 s.l.cost=1.48e-01
+ i=  20 alpha=0.025 depth=8 w.l.cost=0.813 s.l.cost=1.39e-01
+ i=  21 alpha=0.026 depth=8 w.l.cost=0.883 s.l.cost=1.29e-01
+ i=  22 alpha=0.025 depth=8 w.l.cost=0.836 s.l.cost=1.20e-01
+ i=  23 alpha=0.024 depth=8 w.l.cost=0.868 s.l.cost=1.13e-01
+ i=  24 alpha=0.024 depth=8 w.l.cost=0.896 s.l.cost=1.06e-01
+ i=  25 alpha=0.024 depth=8 w.l.cost=0.882 s.l.cost=1.01e-01
+ i=  26 alpha=0.024 depth=8 w.l.cost=0.844 s.l.cost=9.60e-02
+ i=  27 alpha=0.024 depth=8 w.l.cost=0.873 s.l.cost=9.13e-02
+ i=  28 alpha=0.024 depth=8 w.l.cost=0.907 s.l.cost=8.53e-02
+ i=  29 alpha=0.025 depth=8 w.l.cost=0.850 s.l.cost=8.17e-02
+ i=  30 alpha=0.023 depth=8 w.l.cost=0.942 s.l.cost=7.74e-02
+ i=  31 alpha=0.024 depth=8 w.l.cost=0.883 s.l.cost=7.26e-02
+ i=  32 alpha=0.023 depth=8 w.l.cost=0.950 s.l.cost=6.83e-02
+ i=  33 alpha=0.024 depth=8 w.l.cost=0.929 s.l.cost=6.48e-02
+ i=  34 alpha=0.024 depth=8 w.l.cost=0.920 s.l.cost=6.18e-02
+ i=  35 alpha=0.022 depth=8 w.l.cost=0.951 s.l.cost=5.89e-02
+ i=  36 alpha=0.023 depth=8 w.l.cost=1.005 s.l.cost=5.62e-02
+ i=  37 alpha=0.023 depth=8 w.l.cost=0.948 s.l.cost=5.32e-02
+ i=  38 alpha=0.022 depth=8 w.l.cost=0.949 s.l.cost=5.08e-02
+ i=  39 alpha=0.023 depth=8 w.l.cost=0.891 s.l.cost=4.86e-02
+ i=  40 alpha=0.024 depth=8 w.l.cost=0.893 s.l.cost=4.65e-02
+ i=  41 alpha=0.023 depth=8 w.l.cost=0.941 s.l.cost=4.39e-02
+ i=  42 alpha=0.023 depth=8 w.l.cost=0.994 s.l.cost=4.21e-02
+ i=  43 alpha=0.022 depth=8 w.l.cost=0.959 s.l.cost=4.10e-02
+ i=  44 alpha=0.022 depth=8 w.l.cost=1.026 s.l.cost=3.96e-02
+ i=  45 alpha=0.024 depth=8 w.l.cost=0.939 s.l.cost=3.80e-02
+ i=  46 alpha=0.024 depth=8 w.l.cost=0.958 s.l.cost=3.75e-02
+ i=  47 alpha=0.022 depth=8 w.l.cost=0.971 s.l.cost=3.61e-02
+ i=  48 alpha=0.022 depth=8 w.l.cost=1.021 s.l.cost=3.48e-02
+ i=  49 alpha=0.024 depth=8 w.l.cost=0.861 s.l.cost=3.33e-02
+ i=  50 alpha=0.022 depth=8 w.l.cost=0.995 s.l.cost=3.23e-02
+ i=  51 alpha=0.023 depth=8 w.l.cost=0.987 s.l.cost=3.12e-02
+ i=  52 alpha=0.022 depth=8 w.l.cost=1.053 s.l.cost=3.08e-02
+ i=  53 alpha=0.023 depth=8 w.l.cost=0.967 s.l.cost=2.96e-02
+ i=  54 alpha=0.023 depth=8 w.l.cost=1.004 s.l.cost=2.83e-02
+ i=  55 alpha=0.022 depth=8 w.l.cost=0.963 s.l.cost=2.76e-02
+ i=  56 alpha=0.022 depth=8 w.l.cost=1.006 s.l.cost=2.65e-02
+ i=  57 alpha=0.023 depth=8 w.l.cost=1.062 s.l.cost=2.54e-02
+ i=  58 alpha=0.023 depth=8 w.l.cost=0.991 s.l.cost=2.46e-02
+ i=  59 alpha=0.023 depth=8 w.l.cost=0.953 s.l.cost=2.46e-02
+ i=  60 alpha=0.022 depth=8 w.l.cost=1.008 s.l.cost=2.46e-02
+ i=  61 alpha=0.022 depth=8 w.l.cost=1.066 s.l.cost=2.36e-02
+ i=  62 alpha=0.021 depth=8 w.l.cost=0.991 s.l.cost=2.31e-02
+ i=  63 alpha=0.022 depth=8 w.l.cost=0.995 s.l.cost=2.22e-02
+ i=  64 alpha=0.022 depth=8 w.l.cost=1.011 s.l.cost=2.12e-02
+ i=  65 alpha=0.022 depth=8 w.l.cost=0.994 s.l.cost=2.06e-02
+ i=  66 alpha=0.022 depth=8 w.l.cost=1.016 s.l.cost=2.03e-02
+ i=  67 alpha=0.022 depth=8 w.l.cost=0.999 s.l.cost=2.02e-02
+ i=  68 alpha=0.021 depth=8 w.l.cost=1.070 s.l.cost=2.00e-02
+ i=  69 alpha=0.023 depth=8 w.l.cost=1.001 s.l.cost=1.96e-02
+ i=  70 alpha=0.021 depth=8 w.l.cost=0.997 s.l.cost=1.98e-02
+ i=  71 alpha=0.023 depth=8 w.l.cost=1.039 s.l.cost=1.93e-02
+ i=  72 alpha=0.022 depth=8 w.l.cost=1.009 s.l.cost=1.87e-02
+ i=  73 alpha=0.023 depth=8 w.l.cost=0.978 s.l.cost=1.82e-02
+ i=  74 alpha=0.022 depth=8 w.l.cost=1.018 s.l.cost=1.76e-02
+ i=  75 alpha=0.021 depth=8 w.l.cost=1.058 s.l.cost=1.73e-02
+ i=  76 alpha=0.023 depth=8 w.l.cost=1.017 s.l.cost=1.73e-02
+ i=  77 alpha=0.021 depth=8 w.l.cost=1.040 s.l.cost=1.69e-02
+ i=  78 alpha=0.022 depth=8 w.l.cost=1.010 s.l.cost=1.68e-02
+ i=  79 alpha=0.022 depth=8 w.l.cost=0.987 s.l.cost=1.62e-02
+ i=  80 alpha=0.023 depth=8 w.l.cost=1.032 s.l.cost=1.59e-02
+ i=  81 alpha=0.022 depth=8 w.l.cost=1.001 s.l.cost=1.58e-02
+ i=  82 alpha=0.022 depth=8 w.l.cost=1.020 s.l.cost=1.54e-02
+ i=  83 alpha=0.023 depth=8 w.l.cost=0.975 s.l.cost=1.50e-02
+ i=  84 alpha=0.022 depth=8 w.l.cost=1.068 s.l.cost=1.49e-02
+ i=  85 alpha=0.022 depth=8 w.l.cost=1.020 s.l.cost=1.51e-02
+ i=  86 alpha=0.022 depth=8 w.l.cost=1.036 s.l.cost=1.49e-02
+ i=  87 alpha=0.022 depth=8 w.l.cost=1.021 s.l.cost=1.44e-02
+ i=  88 alpha=0.021 depth=8 w.l.cost=1.058 s.l.cost=1.40e-02
+ i=  89 alpha=0.023 depth=8 w.l.cost=1.079 s.l.cost=1.38e-02
+ i=  90 alpha=0.023 depth=8 w.l.cost=1.059 s.l.cost=1.37e-02
+ i=  91 alpha=0.023 depth=8 w.l.cost=0.959 s.l.cost=1.38e-02
+ i=  92 alpha=0.022 depth=8 w.l.cost=1.001 s.l.cost=1.35e-02
+ i=  93 alpha=0.021 depth=8 w.l.cost=1.015 s.l.cost=1.32e-02
+ i=  94 alpha=0.023 depth=8 w.l.cost=1.053 s.l.cost=1.31e-02
+ i=  95 alpha=0.021 depth=8 w.l.cost=1.072 s.l.cost=1.31e-02
+ i=  96 alpha=0.022 depth=8 w.l.cost=0.976 s.l.cost=1.29e-02
+ i=  97 alpha=0.023 depth=8 w.l.cost=0.918 s.l.cost=1.28e-02
+ i=  98 alpha=0.022 depth=8 w.l.cost=1.072 s.l.cost=1.28e-02
+ i=  99 alpha=0.022 depth=8 w.l.cost=1.022 s.l.cost=1.28e-02
+ i= 100 alpha=0.023 depth=8 w.l.cost=0.997 s.l.cost=1.25e-02
+ i= 101 alpha=0.022 depth=8 w.l.cost=1.049 s.l.cost=1.23e-02
+ i= 102 alpha=0.021 depth=8 w.l.cost=1.059 s.l.cost=1.22e-02
+ i= 103 alpha=0.022 depth=8 w.l.cost=1.035 s.l.cost=1.24e-02
+ i= 104 alpha=0.023 depth=8 w.l.cost=0.961 s.l.cost=1.22e-02
+ i= 105 alpha=0.021 depth=8 w.l.cost=1.132 s.l.cost=1.16e-02
+ i= 106 alpha=0.021 depth=8 w.l.cost=1.055 s.l.cost=1.19e-02
+ i= 107 alpha=0.022 depth=8 w.l.cost=0.960 s.l.cost=1.17e-02
+ i= 108 alpha=0.022 depth=8 w.l.cost=1.185 s.l.cost=1.16e-02
+ i= 109 alpha=0.023 depth=8 w.l.cost=1.006 s.l.cost=1.14e-02
+ i= 110 alpha=0.022 depth=8 w.l.cost=1.013 s.l.cost=1.14e-02
+ i= 111 alpha=0.022 depth=8 w.l.cost=1.076 s.l.cost=1.12e-02
+ i= 112 alpha=0.023 depth=8 w.l.cost=0.969 s.l.cost=1.12e-02
+ i= 113 alpha=0.022 depth=8 w.l.cost=1.051 s.l.cost=1.13e-02
+ i= 114 alpha=0.021 depth=8 w.l.cost=1.042 s.l.cost=1.11e-02
+ i= 115 alpha=0.022 depth=8 w.l.cost=1.071 s.l.cost=1.11e-02
+ i= 116 alpha=0.022 depth=8 w.l.cost=1.096 s.l.cost=1.12e-02
+ i= 117 alpha=0.022 depth=8 w.l.cost=1.024 s.l.cost=1.12e-02
+ i= 118 alpha=0.021 depth=8 w.l.cost=1.186 s.l.cost=1.09e-02
+ i= 119 alpha=0.021 depth=8 w.l.cost=1.066 s.l.cost=1.08e-02
+ i= 120 alpha=0.023 depth=8 w.l.cost=1.053 s.l.cost=1.05e-02
+ i= 121 alpha=0.023 depth=8 w.l.cost=1.132 s.l.cost=1.04e-02
+ i= 122 alpha=0.021 depth=8 w.l.cost=1.032 s.l.cost=1.02e-02
+ i= 123 alpha=0.021 depth=8 w.l.cost=1.175 s.l.cost=1.02e-02
+ i= 124 alpha=0.022 depth=8 w.l.cost=1.082 s.l.cost=1.01e-02
+ i= 125 alpha=0.023 depth=8 w.l.cost=0.968 s.l.cost=1.01e-02
+ i= 126 alpha=0.021 depth=8 w.l.cost=0.986 s.l.cost=1.03e-02
+ i= 127 alpha=0.022 depth=8 w.l.cost=1.055 s.l.cost=9.94e-03
+ i= 128 alpha=0.023 depth=8 w.l.cost=1.061 s.l.cost=1.01e-02
+ i= 129 alpha=0.023 depth=8 w.l.cost=1.039 s.l.cost=1.02e-02
+ i= 130 alpha=0.022 depth=8 w.l.cost=1.035 s.l.cost=1.01e-02
+ i= 131 alpha=0.022 depth=8 w.l.cost=0.997 s.l.cost=1.01e-02
+ i= 132 alpha=0.022 depth=8 w.l.cost=1.028 s.l.cost=9.97e-03
+ i= 133 alpha=0.020 depth=8 w.l.cost=1.149 s.l.cost=1.01e-02
+ i= 134 alpha=0.023 depth=8 w.l.cost=0.947 s.l.cost=1.02e-02
+ i= 135 alpha=0.022 depth=8 w.l.cost=1.091 s.l.cost=9.89e-03
+ i= 136 alpha=0.021 depth=8 w.l.cost=1.095 s.l.cost=1.00e-02
+ i= 137 alpha=0.022 depth=8 w.l.cost=1.062 s.l.cost=9.97e-03
+ i= 138 alpha=0.023 depth=8 w.l.cost=1.016 s.l.cost=9.97e-03
+ i= 139 alpha=0.021 depth=8 w.l.cost=1.080 s.l.cost=1.00e-02
+ i= 140 alpha=0.022 depth=8 w.l.cost=0.960 s.l.cost=9.90e-03
+ i= 141 alpha=0.020 depth=8 w.l.cost=1.081 s.l.cost=9.63e-03
+ i= 142 alpha=0.023 depth=8 w.l.cost=1.038 s.l.cost=9.86e-03
+ i= 143 alpha=0.023 depth=8 w.l.cost=1.043 s.l.cost=9.89e-03
+ i= 144 alpha=0.021 depth=8 w.l.cost=1.135 s.l.cost=1.01e-02
+ i= 145 alpha=0.022 depth=8 w.l.cost=1.014 s.l.cost=9.82e-03
+ i= 146 alpha=0.022 depth=8 w.l.cost=1.035 s.l.cost=9.88e-03
+ i= 147 alpha=0.022 depth=8 w.l.cost=1.050 s.l.cost=9.88e-03
+ i= 148 alpha=0.021 depth=8 w.l.cost=1.081 s.l.cost=9.75e-03
+ i= 149 alpha=0.023 depth=8 w.l.cost=1.020 s.l.cost=9.62e-03
+ i= 150 alpha=0.020 depth=8 w.l.cost=1.134 s.l.cost=9.57e-03
+ i= 151 alpha=0.023 depth=8 w.l.cost=1.025 s.l.cost=9.47e-03
+ i= 152 alpha=0.023 depth=8 w.l.cost=1.041 s.l.cost=9.80e-03
+ i= 153 alpha=0.022 depth=8 w.l.cost=1.019 s.l.cost=9.62e-03
+ i= 154 alpha=0.023 depth=8 w.l.cost=1.107 s.l.cost=9.46e-03
+ i= 155 alpha=0.021 depth=8 w.l.cost=1.100 s.l.cost=9.51e-03
+ i= 156 alpha=0.022 depth=8 w.l.cost=1.104 s.l.cost=9.33e-03
+ i= 157 alpha=0.021 depth=8 w.l.cost=1.109 s.l.cost=9.19e-03
+ i= 158 alpha=0.022 depth=8 w.l.cost=0.995 s.l.cost=9.30e-03
+ i= 159 alpha=0.023 depth=8 w.l.cost=1.072 s.l.cost=9.02e-03
+ i= 160 alpha=0.021 depth=8 w.l.cost=1.075 s.l.cost=9.26e-03
+ i= 161 alpha=0.024 depth=8 w.l.cost=1.003 s.l.cost=9.06e-03
+ i= 162 alpha=0.021 depth=8 w.l.cost=1.123 s.l.cost=9.11e-03
+ i= 163 alpha=0.022 depth=8 w.l.cost=1.045 s.l.cost=8.87e-03
+ i= 164 alpha=0.022 depth=8 w.l.cost=1.089 s.l.cost=8.93e-03
+ i= 165 alpha=0.022 depth=8 w.l.cost=1.010 s.l.cost=8.94e-03
+ i= 166 alpha=0.022 depth=8 w.l.cost=1.110 s.l.cost=9.03e-03
+ i= 167 alpha=0.021 depth=8 w.l.cost=1.080 s.l.cost=8.98e-03
+ i= 168 alpha=0.022 depth=8 w.l.cost=1.096 s.l.cost=8.98e-03
+ i= 169 alpha=0.022 depth=8 w.l.cost=1.069 s.l.cost=9.05e-03
+ i= 170 alpha=0.021 depth=8 w.l.cost=1.070 s.l.cost=9.09e-03
+ i= 171 alpha=0.023 depth=8 w.l.cost=1.123 s.l.cost=9.04e-03
+ i= 172 alpha=0.023 depth=8 w.l.cost=1.052 s.l.cost=8.97e-03
+ i= 173 alpha=0.023 depth=8 w.l.cost=0.988 s.l.cost=8.87e-03
+ i= 174 alpha=0.021 depth=8 w.l.cost=1.073 s.l.cost=8.92e-03
+ i= 175 alpha=0.021 depth=8 w.l.cost=1.144 s.l.cost=9.00e-03
+ i= 176 alpha=0.022 depth=8 w.l.cost=1.026 s.l.cost=8.84e-03
+ i= 177 alpha=0.022 depth=8 w.l.cost=1.136 s.l.cost=8.64e-03
+ i= 178 alpha=0.021 depth=8 w.l.cost=1.008 s.l.cost=8.88e-03
+ i= 179 alpha=0.021 depth=8 w.l.cost=1.056 s.l.cost=8.85e-03
+ i= 180 alpha=0.020 depth=8 w.l.cost=1.069 s.l.cost=8.65e-03
+ i= 181 alpha=0.023 depth=8 w.l.cost=1.040 s.l.cost=8.64e-03
+ i= 182 alpha=0.021 depth=8 w.l.cost=1.146 s.l.cost=8.60e-03
+ i= 183 alpha=0.022 depth=8 w.l.cost=1.026 s.l.cost=8.58e-03
+ i= 184 alpha=0.022 depth=8 w.l.cost=1.087 s.l.cost=8.58e-03
+ i= 185 alpha=0.022 depth=8 w.l.cost=1.149 s.l.cost=8.50e-03
+ i= 186 alpha=0.022 depth=8 w.l.cost=1.026 s.l.cost=8.45e-03
+ i= 187 alpha=0.022 depth=8 w.l.cost=0.994 s.l.cost=8.47e-03
+ i= 188 alpha=0.022 depth=8 w.l.cost=1.031 s.l.cost=8.35e-03
+ i= 189 alpha=0.022 depth=8 w.l.cost=1.036 s.l.cost=8.42e-03
+ i= 190 alpha=0.022 depth=8 w.l.cost=1.031 s.l.cost=8.33e-03
+ i= 191 alpha=0.021 depth=8 w.l.cost=1.134 s.l.cost=8.23e-03
+ i= 192 alpha=0.022 depth=8 w.l.cost=1.033 s.l.cost=8.15e-03
+ i= 193 alpha=0.022 depth=8 w.l.cost=1.004 s.l.cost=8.02e-03
+ i= 194 alpha=0.020 depth=8 w.l.cost=1.149 s.l.cost=8.13e-03
+ i= 195 alpha=0.022 depth=8 w.l.cost=1.060 s.l.cost=8.07e-03
+ i= 196 alpha=0.023 depth=8 w.l.cost=1.061 s.l.cost=8.04e-03
+ i= 197 alpha=0.023 depth=8 w.l.cost=0.988 s.l.cost=8.13e-03
+ i= 198 alpha=0.022 depth=8 w.l.cost=1.080 s.l.cost=8.31e-03
+ i= 199 alpha=0.023 depth=8 w.l.cost=0.995 s.l.cost=8.35e-03
+ i= 200 alpha=0.023 depth=8 w.l.cost=1.112 s.l.cost=8.26e-03
+ i= 201 alpha=0.022 depth=8 w.l.cost=0.985 s.l.cost=8.54e-03
+ i= 202 alpha=0.022 depth=8 w.l.cost=1.059 s.l.cost=8.37e-03
+ i= 203 alpha=0.022 depth=8 w.l.cost=1.014 s.l.cost=8.22e-03
+ i= 204 alpha=0.021 depth=8 w.l.cost=1.073 s.l.cost=8.16e-03
+ i= 205 alpha=0.022 depth=8 w.l.cost=1.083 s.l.cost=8.13e-03
+ i= 206 alpha=0.021 depth=8 w.l.cost=1.022 s.l.cost=8.11e-03
+ i= 207 alpha=0.020 depth=8 w.l.cost=1.132 s.l.cost=8.09e-03
+ i= 208 alpha=0.022 depth=8 w.l.cost=1.029 s.l.cost=8.01e-03
+ i= 209 alpha=0.022 depth=8 w.l.cost=1.000 s.l.cost=7.99e-03
+ i= 210 alpha=0.022 depth=8 w.l.cost=1.026 s.l.cost=8.11e-03
+ i= 211 alpha=0.022 depth=8 w.l.cost=1.009 s.l.cost=7.95e-03
+ i= 212 alpha=0.020 depth=8 w.l.cost=1.111 s.l.cost=8.08e-03
+ i= 213 alpha=0.020 depth=8 w.l.cost=1.134 s.l.cost=7.95e-03
+ i= 214 alpha=0.023 depth=8 w.l.cost=1.051 s.l.cost=7.85e-03
+ i= 215 alpha=0.021 depth=8 w.l.cost=1.076 s.l.cost=7.94e-03
+ i= 216 alpha=0.022 depth=8 w.l.cost=1.084 s.l.cost=8.07e-03
+ i= 217 alpha=0.022 depth=8 w.l.cost=1.047 s.l.cost=8.07e-03
+ i= 218 alpha=0.021 depth=8 w.l.cost=1.134 s.l.cost=8.00e-03
+ i= 219 alpha=0.021 depth=8 w.l.cost=1.166 s.l.cost=7.96e-03
+ i= 220 alpha=0.021 depth=8 w.l.cost=1.038 s.l.cost=7.89e-03
+ i= 221 alpha=0.022 depth=8 w.l.cost=1.089 s.l.cost=8.08e-03
+ i= 222 alpha=0.021 depth=8 w.l.cost=1.131 s.l.cost=7.98e-03
+ i= 223 alpha=0.023 depth=8 w.l.cost=1.063 s.l.cost=8.04e-03
+ i= 224 alpha=0.023 depth=8 w.l.cost=0.956 s.l.cost=8.02e-03
+ i= 225 alpha=0.022 depth=8 w.l.cost=1.008 s.l.cost=7.94e-03
+ i= 226 alpha=0.022 depth=8 w.l.cost=1.027 s.l.cost=7.81e-03
+ i= 227 alpha=0.022 depth=8 w.l.cost=1.023 s.l.cost=7.83e-03
+ i= 228 alpha=0.022 depth=8 w.l.cost=1.056 s.l.cost=7.88e-03
+ i= 229 alpha=0.021 depth=8 w.l.cost=1.107 s.l.cost=7.88e-03
+ i= 230 alpha=0.022 depth=8 w.l.cost=1.067 s.l.cost=7.91e-03
+ i= 231 alpha=0.021 depth=8 w.l.cost=1.140 s.l.cost=7.81e-03
+ i= 232 alpha=0.021 depth=8 w.l.cost=1.031 s.l.cost=7.78e-03
+ i= 233 alpha=0.022 depth=8 w.l.cost=1.176 s.l.cost=7.77e-03
+ i= 234 alpha=0.023 depth=8 w.l.cost=1.070 s.l.cost=7.63e-03
+ i= 235 alpha=0.022 depth=8 w.l.cost=0.980 s.l.cost=7.64e-03
+ i= 236 alpha=0.021 depth=8 w.l.cost=1.128 s.l.cost=7.75e-03
+ i= 237 alpha=0.022 depth=8 w.l.cost=1.088 s.l.cost=7.57e-03
+ i= 238 alpha=0.022 depth=8 w.l.cost=1.081 s.l.cost=7.55e-03
+ i= 239 alpha=0.021 depth=8 w.l.cost=1.067 s.l.cost=7.63e-03
+ i= 240 alpha=0.021 depth=8 w.l.cost=1.103 s.l.cost=7.61e-03
+ i= 241 alpha=0.022 depth=8 w.l.cost=1.040 s.l.cost=7.68e-03
+ i= 242 alpha=0.022 depth=8 w.l.cost=1.107 s.l.cost=7.71e-03
+ i= 243 alpha=0.021 depth=8 w.l.cost=1.043 s.l.cost=7.63e-03
+ i= 244 alpha=0.023 depth=8 w.l.cost=1.089 s.l.cost=7.57e-03
+ i= 245 alpha=0.022 depth=8 w.l.cost=1.104 s.l.cost=7.58e-03
+ i= 246 alpha=0.021 depth=8 w.l.cost=1.118 s.l.cost=7.53e-03
+ i= 247 alpha=0.022 depth=8 w.l.cost=1.107 s.l.cost=7.51e-03
+ i= 248 alpha=0.022 depth=8 w.l.cost=1.077 s.l.cost=7.59e-03
+ i= 249 alpha=0.022 depth=8 w.l.cost=1.069 s.l.cost=7.55e-03
+ i= 250 alpha=0.023 depth=8 w.l.cost=1.038 s.l.cost=7.51e-03
+ i= 251 alpha=0.023 depth=8 w.l.cost=1.063 s.l.cost=7.53e-03
+ i= 252 alpha=0.023 depth=8 w.l.cost=1.072 s.l.cost=7.48e-03
+ i= 253 alpha=0.022 depth=8 w.l.cost=1.046 s.l.cost=7.66e-03
+ i= 254 alpha=0.022 depth=8 w.l.cost=1.060 s.l.cost=7.68e-03
+ i= 255 alpha=0.023 depth=8 w.l.cost=0.997 s.l.cost=7.61e-03
+ i= 256 alpha=0.022 depth=8 w.l.cost=1.053 s.l.cost=7.51e-03
+Done training s.l.cost=0.0075 (t=1881.8s).
+Done training err=0.0062 fp=0.0000 fn=0.0002 (t=1907.9s).
+Confusion Matrix:
+  Columns 1 through 10
+
+       22500           0           0           0           0           0           0           0           0           0
+           0         216           0           0           0           0           0           0           0           0
+           0           0         537           0           0           0           0           0           0           0
+           0           0           0         348           0           0           0           0           0           0
+           0           0           0           0         745           1           0           0           0           0
+           1           0           0           0           0        2726          30           0           0           0
+           2           0           0           0           0           7        6969           8           0           0
+           2           0           0           0           0           0          32        2723           0           0
+           0           0           0           0           0           0           0           1         745           0
+           0           0           0           0           0           0           0           0           0         358
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           2           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           1           0           0           0           0           0           0           0           0           0
+
+  Columns 11 through 20
+
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           1           0           0           0           0           0           0           0           0           0
+         526           0           0           0           0           0           0           0           0           0
+           0         216           0           0           0           0           0           0           0           0
+           0           0         341           0           0           0           0           0           0           0
+           0           0           0         285           0           0           0           0           0           0
+           0           0           0           0         891          12           0           0           0           0
+           0           0           0           0           8        3429          53           0           0           0
+           0           0           0           0           0          37        2728          43           0           0
+           0           0           0           0           0           0          58        3427           5           0
+           0           0           0           0           0           0           0          12         891           0
+           0           0           0           0           0           0           0           0           1         258
+           0           0           0           0           0           0           0           0           0           0
+
+  Column 21
+
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+         368
+
+Done training stage 2 (time=5290s).
+---------------------------------------------------------------------------
+Training stage 3
+Sampled 1366 windows from 13464 images.
+Done sampling windows (time=15901s).
+Extracting features... done (time=10s).
+Training BAdaCost: nWeak=1024 shrinkage=0.100000 resampling=1.000000 fracFtrs=0.062500
+Training BadaCost: nWeak=1024 nFtrs=12480
+ i=   1 alpha=0.036 depth=8 w.l.cost=0.651 s.l.cost=6.51e-01
+ i=   2 alpha=0.035 depth=8 w.l.cost=0.641 s.l.cost=6.40e-01
+ i=   3 alpha=0.034 depth=8 w.l.cost=0.638 s.l.cost=5.09e-01
+ i=   4 alpha=0.033 depth=8 w.l.cost=0.647 s.l.cost=4.44e-01
+ i=   5 alpha=0.032 depth=8 w.l.cost=0.642 s.l.cost=3.94e-01
+ i=   6 alpha=0.031 depth=8 w.l.cost=0.660 s.l.cost=3.61e-01
+ i=   7 alpha=0.030 depth=8 w.l.cost=0.679 s.l.cost=3.36e-01
+ i=   8 alpha=0.029 depth=8 w.l.cost=0.710 s.l.cost=3.15e-01
+ i=   9 alpha=0.029 depth=8 w.l.cost=0.689 s.l.cost=2.91e-01
+ i=  10 alpha=0.028 depth=8 w.l.cost=0.715 s.l.cost=2.71e-01
+ i=  11 alpha=0.028 depth=8 w.l.cost=0.754 s.l.cost=2.53e-01
+ i=  12 alpha=0.028 depth=8 w.l.cost=0.751 s.l.cost=2.35e-01
+ i=  13 alpha=0.027 depth=8 w.l.cost=0.741 s.l.cost=2.21e-01
+ i=  14 alpha=0.027 depth=8 w.l.cost=0.732 s.l.cost=2.07e-01
+ i=  15 alpha=0.026 depth=8 w.l.cost=0.787 s.l.cost=1.96e-01
+ i=  16 alpha=0.026 depth=8 w.l.cost=0.803 s.l.cost=1.84e-01
+ i=  17 alpha=0.026 depth=8 w.l.cost=0.805 s.l.cost=1.72e-01
+ i=  18 alpha=0.025 depth=8 w.l.cost=0.836 s.l.cost=1.64e-01
+ i=  19 alpha=0.026 depth=8 w.l.cost=0.771 s.l.cost=1.55e-01
+ i=  20 alpha=0.025 depth=8 w.l.cost=0.843 s.l.cost=1.47e-01
+ i=  21 alpha=0.025 depth=8 w.l.cost=0.865 s.l.cost=1.38e-01
+ i=  22 alpha=0.025 depth=8 w.l.cost=0.815 s.l.cost=1.27e-01
+ i=  23 alpha=0.025 depth=8 w.l.cost=0.861 s.l.cost=1.20e-01
+ i=  24 alpha=0.024 depth=8 w.l.cost=0.912 s.l.cost=1.15e-01
+ i=  25 alpha=0.023 depth=8 w.l.cost=0.924 s.l.cost=1.11e-01
+ i=  26 alpha=0.024 depth=8 w.l.cost=0.860 s.l.cost=1.03e-01
+ i=  27 alpha=0.023 depth=8 w.l.cost=0.961 s.l.cost=9.84e-02
+ i=  28 alpha=0.024 depth=8 w.l.cost=0.880 s.l.cost=9.47e-02
+ i=  29 alpha=0.024 depth=8 w.l.cost=0.891 s.l.cost=8.97e-02
+ i=  30 alpha=0.024 depth=8 w.l.cost=0.899 s.l.cost=8.63e-02
+ i=  31 alpha=0.022 depth=8 w.l.cost=0.982 s.l.cost=8.07e-02
+ i=  32 alpha=0.024 depth=8 w.l.cost=0.949 s.l.cost=7.66e-02
+ i=  33 alpha=0.023 depth=8 w.l.cost=0.935 s.l.cost=7.28e-02
+ i=  34 alpha=0.022 depth=8 w.l.cost=1.035 s.l.cost=6.99e-02
+ i=  35 alpha=0.022 depth=8 w.l.cost=0.976 s.l.cost=6.71e-02
+ i=  36 alpha=0.023 depth=8 w.l.cost=0.981 s.l.cost=6.31e-02
+ i=  37 alpha=0.023 depth=8 w.l.cost=0.922 s.l.cost=6.09e-02
+ i=  38 alpha=0.023 depth=8 w.l.cost=0.901 s.l.cost=5.90e-02
+ i=  39 alpha=0.023 depth=8 w.l.cost=0.968 s.l.cost=5.77e-02
+ i=  40 alpha=0.023 depth=8 w.l.cost=0.977 s.l.cost=5.54e-02
+ i=  41 alpha=0.023 depth=8 w.l.cost=0.952 s.l.cost=5.27e-02
+ i=  42 alpha=0.023 depth=8 w.l.cost=0.975 s.l.cost=5.15e-02
+ i=  43 alpha=0.021 depth=8 w.l.cost=1.048 s.l.cost=5.02e-02
+ i=  44 alpha=0.022 depth=8 w.l.cost=0.999 s.l.cost=4.82e-02
+ i=  45 alpha=0.022 depth=8 w.l.cost=0.970 s.l.cost=4.60e-02
+ i=  46 alpha=0.022 depth=8 w.l.cost=1.047 s.l.cost=4.40e-02
+ i=  47 alpha=0.023 depth=8 w.l.cost=0.994 s.l.cost=4.33e-02
+ i=  48 alpha=0.022 depth=8 w.l.cost=1.031 s.l.cost=4.19e-02
+ i=  49 alpha=0.023 depth=8 w.l.cost=0.977 s.l.cost=4.03e-02
+ i=  50 alpha=0.024 depth=8 w.l.cost=0.919 s.l.cost=3.96e-02
+ i=  51 alpha=0.022 depth=8 w.l.cost=1.038 s.l.cost=3.81e-02
+ i=  52 alpha=0.022 depth=8 w.l.cost=1.059 s.l.cost=3.70e-02
+ i=  53 alpha=0.022 depth=8 w.l.cost=1.036 s.l.cost=3.59e-02
+ i=  54 alpha=0.022 depth=8 w.l.cost=1.010 s.l.cost=3.38e-02
+ i=  55 alpha=0.023 depth=8 w.l.cost=1.048 s.l.cost=3.23e-02
+ i=  56 alpha=0.023 depth=8 w.l.cost=0.999 s.l.cost=3.21e-02
+ i=  57 alpha=0.023 depth=8 w.l.cost=0.966 s.l.cost=3.15e-02
+ i=  58 alpha=0.022 depth=8 w.l.cost=0.948 s.l.cost=3.06e-02
+ i=  59 alpha=0.022 depth=8 w.l.cost=1.046 s.l.cost=2.92e-02
+ i=  60 alpha=0.023 depth=8 w.l.cost=1.017 s.l.cost=2.92e-02
+ i=  61 alpha=0.022 depth=8 w.l.cost=1.033 s.l.cost=2.83e-02
+ i=  62 alpha=0.023 depth=8 w.l.cost=0.990 s.l.cost=2.75e-02
+ i=  63 alpha=0.023 depth=8 w.l.cost=1.019 s.l.cost=2.70e-02
+ i=  64 alpha=0.022 depth=8 w.l.cost=1.052 s.l.cost=2.63e-02
+ i=  65 alpha=0.023 depth=8 w.l.cost=1.032 s.l.cost=2.55e-02
+ i=  66 alpha=0.022 depth=8 w.l.cost=1.042 s.l.cost=2.52e-02
+ i=  67 alpha=0.023 depth=8 w.l.cost=1.043 s.l.cost=2.50e-02
+ i=  68 alpha=0.024 depth=8 w.l.cost=1.059 s.l.cost=2.38e-02
+ i=  69 alpha=0.023 depth=8 w.l.cost=1.058 s.l.cost=2.36e-02
+ i=  70 alpha=0.023 depth=8 w.l.cost=0.935 s.l.cost=2.30e-02
+ i=  71 alpha=0.022 depth=8 w.l.cost=0.976 s.l.cost=2.26e-02
+ i=  72 alpha=0.022 depth=8 w.l.cost=1.025 s.l.cost=2.20e-02
+ i=  73 alpha=0.021 depth=8 w.l.cost=1.107 s.l.cost=2.13e-02
+ i=  74 alpha=0.023 depth=8 w.l.cost=0.941 s.l.cost=2.17e-02
+ i=  75 alpha=0.023 depth=8 w.l.cost=0.976 s.l.cost=2.10e-02
+ i=  76 alpha=0.022 depth=8 w.l.cost=1.101 s.l.cost=2.07e-02
+ i=  77 alpha=0.021 depth=8 w.l.cost=1.082 s.l.cost=2.05e-02
+ i=  78 alpha=0.022 depth=8 w.l.cost=1.022 s.l.cost=1.97e-02
+ i=  79 alpha=0.023 depth=8 w.l.cost=1.039 s.l.cost=1.92e-02
+ i=  80 alpha=0.023 depth=8 w.l.cost=1.045 s.l.cost=1.84e-02
+ i=  81 alpha=0.022 depth=8 w.l.cost=1.034 s.l.cost=1.86e-02
+ i=  82 alpha=0.021 depth=8 w.l.cost=1.123 s.l.cost=1.82e-02
+ i=  83 alpha=0.022 depth=8 w.l.cost=1.085 s.l.cost=1.83e-02
+ i=  84 alpha=0.022 depth=8 w.l.cost=1.011 s.l.cost=1.80e-02
+ i=  85 alpha=0.021 depth=8 w.l.cost=1.114 s.l.cost=1.74e-02
+ i=  86 alpha=0.023 depth=8 w.l.cost=1.029 s.l.cost=1.74e-02
+ i=  87 alpha=0.021 depth=8 w.l.cost=1.035 s.l.cost=1.76e-02
+ i=  88 alpha=0.021 depth=8 w.l.cost=1.067 s.l.cost=1.69e-02
+ i=  89 alpha=0.021 depth=8 w.l.cost=1.037 s.l.cost=1.67e-02
+ i=  90 alpha=0.022 depth=8 w.l.cost=1.054 s.l.cost=1.66e-02
+ i=  91 alpha=0.021 depth=8 w.l.cost=1.097 s.l.cost=1.65e-02
+ i=  92 alpha=0.022 depth=8 w.l.cost=1.061 s.l.cost=1.65e-02
+ i=  93 alpha=0.022 depth=8 w.l.cost=1.085 s.l.cost=1.63e-02
+ i=  94 alpha=0.022 depth=8 w.l.cost=0.981 s.l.cost=1.60e-02
+ i=  95 alpha=0.022 depth=8 w.l.cost=1.039 s.l.cost=1.55e-02
+ i=  96 alpha=0.023 depth=8 w.l.cost=0.996 s.l.cost=1.59e-02
+ i=  97 alpha=0.022 depth=8 w.l.cost=1.082 s.l.cost=1.53e-02
+ i=  98 alpha=0.022 depth=8 w.l.cost=1.056 s.l.cost=1.53e-02
+ i=  99 alpha=0.022 depth=8 w.l.cost=0.972 s.l.cost=1.53e-02
+ i= 100 alpha=0.022 depth=8 w.l.cost=1.072 s.l.cost=1.46e-02
+ i= 101 alpha=0.023 depth=8 w.l.cost=0.982 s.l.cost=1.42e-02
+ i= 102 alpha=0.022 depth=8 w.l.cost=1.072 s.l.cost=1.38e-02
+ i= 103 alpha=0.022 depth=8 w.l.cost=1.089 s.l.cost=1.41e-02
+ i= 104 alpha=0.022 depth=8 w.l.cost=1.041 s.l.cost=1.38e-02
+ i= 105 alpha=0.022 depth=8 w.l.cost=0.980 s.l.cost=1.36e-02
+ i= 106 alpha=0.022 depth=8 w.l.cost=1.106 s.l.cost=1.33e-02
+ i= 107 alpha=0.021 depth=8 w.l.cost=1.082 s.l.cost=1.30e-02
+ i= 108 alpha=0.021 depth=8 w.l.cost=1.091 s.l.cost=1.31e-02
+ i= 109 alpha=0.021 depth=8 w.l.cost=1.091 s.l.cost=1.28e-02
+ i= 110 alpha=0.022 depth=8 w.l.cost=1.114 s.l.cost=1.27e-02
+ i= 111 alpha=0.022 depth=8 w.l.cost=1.155 s.l.cost=1.25e-02
+ i= 112 alpha=0.022 depth=8 w.l.cost=1.136 s.l.cost=1.26e-02
+ i= 113 alpha=0.022 depth=8 w.l.cost=1.064 s.l.cost=1.28e-02
+ i= 114 alpha=0.022 depth=8 w.l.cost=1.046 s.l.cost=1.24e-02
+ i= 115 alpha=0.022 depth=8 w.l.cost=1.058 s.l.cost=1.21e-02
+ i= 116 alpha=0.022 depth=8 w.l.cost=1.038 s.l.cost=1.21e-02
+ i= 117 alpha=0.023 depth=8 w.l.cost=0.985 s.l.cost=1.21e-02
+ i= 118 alpha=0.023 depth=8 w.l.cost=1.026 s.l.cost=1.20e-02
+ i= 119 alpha=0.021 depth=8 w.l.cost=1.105 s.l.cost=1.19e-02
+ i= 120 alpha=0.022 depth=8 w.l.cost=1.050 s.l.cost=1.15e-02
+ i= 121 alpha=0.022 depth=8 w.l.cost=1.070 s.l.cost=1.14e-02
+ i= 122 alpha=0.022 depth=8 w.l.cost=1.066 s.l.cost=1.14e-02
+ i= 123 alpha=0.021 depth=8 w.l.cost=0.955 s.l.cost=1.15e-02
+ i= 124 alpha=0.022 depth=8 w.l.cost=1.028 s.l.cost=1.17e-02
+ i= 125 alpha=0.022 depth=8 w.l.cost=1.068 s.l.cost=1.16e-02
+ i= 126 alpha=0.023 depth=8 w.l.cost=0.972 s.l.cost=1.17e-02
+ i= 127 alpha=0.022 depth=8 w.l.cost=1.107 s.l.cost=1.17e-02
+ i= 128 alpha=0.021 depth=8 w.l.cost=1.099 s.l.cost=1.16e-02
+ i= 129 alpha=0.022 depth=8 w.l.cost=1.017 s.l.cost=1.15e-02
+ i= 130 alpha=0.022 depth=8 w.l.cost=1.116 s.l.cost=1.14e-02
+ i= 131 alpha=0.022 depth=8 w.l.cost=1.085 s.l.cost=1.14e-02
+ i= 132 alpha=0.022 depth=8 w.l.cost=1.075 s.l.cost=1.13e-02
+ i= 133 alpha=0.022 depth=8 w.l.cost=1.119 s.l.cost=1.12e-02
+ i= 134 alpha=0.022 depth=8 w.l.cost=1.033 s.l.cost=1.11e-02
+ i= 135 alpha=0.020 depth=8 w.l.cost=1.159 s.l.cost=1.10e-02
+ i= 136 alpha=0.022 depth=8 w.l.cost=1.130 s.l.cost=1.10e-02
+ i= 137 alpha=0.022 depth=8 w.l.cost=1.022 s.l.cost=1.07e-02
+ i= 138 alpha=0.020 depth=8 w.l.cost=1.126 s.l.cost=1.07e-02
+ i= 139 alpha=0.022 depth=8 w.l.cost=1.023 s.l.cost=1.06e-02
+ i= 140 alpha=0.021 depth=8 w.l.cost=1.063 s.l.cost=1.05e-02
+ i= 141 alpha=0.021 depth=8 w.l.cost=1.089 s.l.cost=1.06e-02
+ i= 142 alpha=0.022 depth=8 w.l.cost=1.091 s.l.cost=1.03e-02
+ i= 143 alpha=0.022 depth=8 w.l.cost=1.033 s.l.cost=1.03e-02
+ i= 144 alpha=0.020 depth=8 w.l.cost=1.127 s.l.cost=1.03e-02
+ i= 145 alpha=0.021 depth=8 w.l.cost=1.130 s.l.cost=1.01e-02
+ i= 146 alpha=0.023 depth=8 w.l.cost=1.008 s.l.cost=1.01e-02
+ i= 147 alpha=0.022 depth=8 w.l.cost=1.121 s.l.cost=9.89e-03
+ i= 148 alpha=0.021 depth=8 w.l.cost=1.125 s.l.cost=9.89e-03
+ i= 149 alpha=0.022 depth=8 w.l.cost=1.118 s.l.cost=9.60e-03
+ i= 150 alpha=0.023 depth=8 w.l.cost=1.032 s.l.cost=9.64e-03
+ i= 151 alpha=0.022 depth=8 w.l.cost=1.158 s.l.cost=9.70e-03
+ i= 152 alpha=0.021 depth=8 w.l.cost=1.146 s.l.cost=9.67e-03
+ i= 153 alpha=0.022 depth=8 w.l.cost=1.045 s.l.cost=9.74e-03
+ i= 154 alpha=0.023 depth=8 w.l.cost=0.997 s.l.cost=9.66e-03
+ i= 155 alpha=0.022 depth=8 w.l.cost=1.003 s.l.cost=9.99e-03
+ i= 156 alpha=0.021 depth=8 w.l.cost=1.133 s.l.cost=9.61e-03
+ i= 157 alpha=0.023 depth=8 w.l.cost=1.071 s.l.cost=9.47e-03
+ i= 158 alpha=0.020 depth=8 w.l.cost=1.116 s.l.cost=9.55e-03
+ i= 159 alpha=0.022 depth=8 w.l.cost=1.143 s.l.cost=9.25e-03
+ i= 160 alpha=0.023 depth=8 w.l.cost=1.100 s.l.cost=9.41e-03
+ i= 161 alpha=0.021 depth=8 w.l.cost=1.143 s.l.cost=9.37e-03
+ i= 162 alpha=0.022 depth=8 w.l.cost=1.083 s.l.cost=9.30e-03
+ i= 163 alpha=0.022 depth=8 w.l.cost=1.080 s.l.cost=9.39e-03
+ i= 164 alpha=0.020 depth=8 w.l.cost=1.109 s.l.cost=9.45e-03
+ i= 165 alpha=0.023 depth=8 w.l.cost=1.027 s.l.cost=9.34e-03
+ i= 166 alpha=0.021 depth=8 w.l.cost=1.164 s.l.cost=9.14e-03
+ i= 167 alpha=0.020 depth=8 w.l.cost=1.126 s.l.cost=9.31e-03
+ i= 168 alpha=0.022 depth=8 w.l.cost=1.139 s.l.cost=9.41e-03
+ i= 169 alpha=0.022 depth=8 w.l.cost=1.116 s.l.cost=9.31e-03
+ i= 170 alpha=0.022 depth=8 w.l.cost=1.124 s.l.cost=9.42e-03
+ i= 171 alpha=0.022 depth=8 w.l.cost=1.064 s.l.cost=9.15e-03
+ i= 172 alpha=0.022 depth=8 w.l.cost=1.061 s.l.cost=9.17e-03
+ i= 173 alpha=0.022 depth=8 w.l.cost=1.116 s.l.cost=9.03e-03
+ i= 174 alpha=0.020 depth=8 w.l.cost=1.074 s.l.cost=9.09e-03
+ i= 175 alpha=0.021 depth=8 w.l.cost=1.167 s.l.cost=9.00e-03
+ i= 176 alpha=0.022 depth=8 w.l.cost=1.082 s.l.cost=8.81e-03
+ i= 177 alpha=0.021 depth=8 w.l.cost=1.081 s.l.cost=9.04e-03
+ i= 178 alpha=0.021 depth=8 w.l.cost=1.108 s.l.cost=9.06e-03
+ i= 179 alpha=0.022 depth=8 w.l.cost=1.115 s.l.cost=8.76e-03
+ i= 180 alpha=0.023 depth=8 w.l.cost=1.050 s.l.cost=8.56e-03
+ i= 181 alpha=0.022 depth=8 w.l.cost=1.039 s.l.cost=8.42e-03
+ i= 182 alpha=0.022 depth=8 w.l.cost=0.964 s.l.cost=8.56e-03
+ i= 183 alpha=0.021 depth=8 w.l.cost=1.028 s.l.cost=8.36e-03
+ i= 184 alpha=0.022 depth=8 w.l.cost=1.079 s.l.cost=8.56e-03
+ i= 185 alpha=0.021 depth=8 w.l.cost=1.079 s.l.cost=8.60e-03
+ i= 186 alpha=0.021 depth=8 w.l.cost=1.198 s.l.cost=8.75e-03
+ i= 187 alpha=0.021 depth=8 w.l.cost=1.126 s.l.cost=8.42e-03
+ i= 188 alpha=0.022 depth=8 w.l.cost=1.118 s.l.cost=8.41e-03
+ i= 189 alpha=0.022 depth=8 w.l.cost=1.039 s.l.cost=8.46e-03
+ i= 190 alpha=0.022 depth=8 w.l.cost=1.103 s.l.cost=8.33e-03
+ i= 191 alpha=0.022 depth=8 w.l.cost=1.047 s.l.cost=8.36e-03
+ i= 192 alpha=0.022 depth=8 w.l.cost=1.076 s.l.cost=8.30e-03
+ i= 193 alpha=0.022 depth=8 w.l.cost=1.103 s.l.cost=8.14e-03
+ i= 194 alpha=0.022 depth=8 w.l.cost=1.082 s.l.cost=8.18e-03
+ i= 195 alpha=0.022 depth=8 w.l.cost=1.091 s.l.cost=8.29e-03
+ i= 196 alpha=0.022 depth=8 w.l.cost=1.135 s.l.cost=8.40e-03
+ i= 197 alpha=0.021 depth=8 w.l.cost=1.148 s.l.cost=8.39e-03
+ i= 198 alpha=0.023 depth=8 w.l.cost=0.994 s.l.cost=8.23e-03
+ i= 199 alpha=0.022 depth=8 w.l.cost=1.070 s.l.cost=8.09e-03
+ i= 200 alpha=0.021 depth=8 w.l.cost=1.113 s.l.cost=7.91e-03
+ i= 201 alpha=0.021 depth=8 w.l.cost=1.087 s.l.cost=7.96e-03
+ i= 202 alpha=0.021 depth=8 w.l.cost=1.112 s.l.cost=8.31e-03
+ i= 203 alpha=0.023 depth=8 w.l.cost=1.017 s.l.cost=8.14e-03
+ i= 204 alpha=0.022 depth=8 w.l.cost=1.110 s.l.cost=8.25e-03
+ i= 205 alpha=0.023 depth=8 w.l.cost=1.060 s.l.cost=8.04e-03
+ i= 206 alpha=0.022 depth=8 w.l.cost=1.060 s.l.cost=7.88e-03
+ i= 207 alpha=0.019 depth=8 w.l.cost=1.177 s.l.cost=7.91e-03
+ i= 208 alpha=0.023 depth=8 w.l.cost=1.052 s.l.cost=7.99e-03
+ i= 209 alpha=0.021 depth=8 w.l.cost=1.133 s.l.cost=7.89e-03
+ i= 210 alpha=0.022 depth=8 w.l.cost=1.097 s.l.cost=7.83e-03
+ i= 211 alpha=0.022 depth=8 w.l.cost=1.038 s.l.cost=7.97e-03
+ i= 212 alpha=0.021 depth=8 w.l.cost=1.167 s.l.cost=7.81e-03
+ i= 213 alpha=0.020 depth=8 w.l.cost=1.100 s.l.cost=7.88e-03
+ i= 214 alpha=0.021 depth=8 w.l.cost=1.095 s.l.cost=7.60e-03
+ i= 215 alpha=0.019 depth=8 w.l.cost=1.224 s.l.cost=7.61e-03
+ i= 216 alpha=0.023 depth=8 w.l.cost=1.028 s.l.cost=7.63e-03
+ i= 217 alpha=0.022 depth=8 w.l.cost=1.031 s.l.cost=7.61e-03
+ i= 218 alpha=0.023 depth=8 w.l.cost=0.955 s.l.cost=7.51e-03
+ i= 219 alpha=0.023 depth=8 w.l.cost=1.135 s.l.cost=7.66e-03
+ i= 220 alpha=0.021 depth=8 w.l.cost=1.092 s.l.cost=7.40e-03
+ i= 221 alpha=0.022 depth=8 w.l.cost=1.123 s.l.cost=7.50e-03
+ i= 222 alpha=0.022 depth=8 w.l.cost=1.128 s.l.cost=7.36e-03
+ i= 223 alpha=0.021 depth=8 w.l.cost=1.013 s.l.cost=7.27e-03
+ i= 224 alpha=0.021 depth=8 w.l.cost=1.149 s.l.cost=7.25e-03
+ i= 225 alpha=0.022 depth=8 w.l.cost=1.042 s.l.cost=7.25e-03
+ i= 226 alpha=0.022 depth=8 w.l.cost=1.037 s.l.cost=7.14e-03
+ i= 227 alpha=0.022 depth=8 w.l.cost=1.061 s.l.cost=7.31e-03
+ i= 228 alpha=0.022 depth=8 w.l.cost=1.062 s.l.cost=7.27e-03
+ i= 229 alpha=0.022 depth=8 w.l.cost=1.216 s.l.cost=7.22e-03
+ i= 230 alpha=0.023 depth=8 w.l.cost=1.063 s.l.cost=7.40e-03
+ i= 231 alpha=0.022 depth=8 w.l.cost=1.123 s.l.cost=7.19e-03
+ i= 232 alpha=0.023 depth=8 w.l.cost=0.996 s.l.cost=7.08e-03
+ i= 233 alpha=0.022 depth=8 w.l.cost=1.033 s.l.cost=7.14e-03
+ i= 234 alpha=0.021 depth=8 w.l.cost=1.079 s.l.cost=7.16e-03
+ i= 235 alpha=0.022 depth=8 w.l.cost=1.067 s.l.cost=7.12e-03
+ i= 236 alpha=0.022 depth=8 w.l.cost=1.109 s.l.cost=7.07e-03
+ i= 237 alpha=0.022 depth=8 w.l.cost=1.059 s.l.cost=7.20e-03
+ i= 238 alpha=0.022 depth=8 w.l.cost=1.071 s.l.cost=7.29e-03
+ i= 239 alpha=0.020 depth=8 w.l.cost=1.112 s.l.cost=7.43e-03
+ i= 240 alpha=0.021 depth=8 w.l.cost=1.123 s.l.cost=7.34e-03
+ i= 241 alpha=0.022 depth=8 w.l.cost=1.071 s.l.cost=7.30e-03
+ i= 242 alpha=0.021 depth=8 w.l.cost=1.098 s.l.cost=7.42e-03
+ i= 243 alpha=0.021 depth=8 w.l.cost=1.088 s.l.cost=7.26e-03
+ i= 244 alpha=0.022 depth=8 w.l.cost=1.104 s.l.cost=7.24e-03
+ i= 245 alpha=0.020 depth=8 w.l.cost=1.146 s.l.cost=7.31e-03
+ i= 246 alpha=0.022 depth=8 w.l.cost=1.078 s.l.cost=7.22e-03
+ i= 247 alpha=0.021 depth=8 w.l.cost=1.127 s.l.cost=7.15e-03
+ i= 248 alpha=0.023 depth=8 w.l.cost=1.040 s.l.cost=7.15e-03
+ i= 249 alpha=0.022 depth=8 w.l.cost=1.042 s.l.cost=7.18e-03
+ i= 250 alpha=0.022 depth=8 w.l.cost=1.072 s.l.cost=7.18e-03
+ i= 251 alpha=0.021 depth=8 w.l.cost=1.069 s.l.cost=7.14e-03
+ i= 252 alpha=0.022 depth=8 w.l.cost=1.104 s.l.cost=7.29e-03
+ i= 253 alpha=0.022 depth=8 w.l.cost=1.106 s.l.cost=7.36e-03
+ i= 254 alpha=0.022 depth=8 w.l.cost=1.114 s.l.cost=7.34e-03
+ i= 255 alpha=0.023 depth=8 w.l.cost=1.046 s.l.cost=7.47e-03
+ i= 256 alpha=0.021 depth=8 w.l.cost=1.147 s.l.cost=7.26e-03
+ i= 257 alpha=0.022 depth=8 w.l.cost=1.028 s.l.cost=7.37e-03
+ i= 258 alpha=0.021 depth=8 w.l.cost=1.184 s.l.cost=7.39e-03
+ i= 259 alpha=0.022 depth=8 w.l.cost=1.121 s.l.cost=7.33e-03
+ i= 260 alpha=0.022 depth=8 w.l.cost=1.033 s.l.cost=7.28e-03
+ i= 261 alpha=0.020 depth=8 w.l.cost=1.073 s.l.cost=7.29e-03
+ i= 262 alpha=0.019 depth=8 w.l.cost=1.215 s.l.cost=7.31e-03
+ i= 263 alpha=0.022 depth=8 w.l.cost=1.113 s.l.cost=7.34e-03
+ i= 264 alpha=0.020 depth=8 w.l.cost=1.141 s.l.cost=7.25e-03
+ i= 265 alpha=0.022 depth=8 w.l.cost=1.143 s.l.cost=7.17e-03
+ i= 266 alpha=0.023 depth=8 w.l.cost=1.079 s.l.cost=7.10e-03
+ i= 267 alpha=0.022 depth=8 w.l.cost=1.077 s.l.cost=7.13e-03
+ i= 268 alpha=0.023 depth=8 w.l.cost=1.066 s.l.cost=7.19e-03
+ i= 269 alpha=0.023 depth=8 w.l.cost=1.049 s.l.cost=7.22e-03
+ i= 270 alpha=0.023 depth=8 w.l.cost=1.086 s.l.cost=6.97e-03
+ i= 271 alpha=0.022 depth=8 w.l.cost=1.094 s.l.cost=6.93e-03
+ i= 272 alpha=0.021 depth=8 w.l.cost=1.085 s.l.cost=6.96e-03
+ i= 273 alpha=0.022 depth=8 w.l.cost=1.110 s.l.cost=6.92e-03
+ i= 274 alpha=0.022 depth=8 w.l.cost=1.052 s.l.cost=6.85e-03
+ i= 275 alpha=0.021 depth=8 w.l.cost=1.164 s.l.cost=6.92e-03
+ i= 276 alpha=0.021 depth=8 w.l.cost=1.121 s.l.cost=6.95e-03
+ i= 277 alpha=0.022 depth=8 w.l.cost=1.074 s.l.cost=7.03e-03
+ i= 278 alpha=0.020 depth=8 w.l.cost=1.246 s.l.cost=6.96e-03
+ i= 279 alpha=0.022 depth=8 w.l.cost=1.045 s.l.cost=6.97e-03
+ i= 280 alpha=0.022 depth=8 w.l.cost=1.130 s.l.cost=7.04e-03
+ i= 281 alpha=0.022 depth=8 w.l.cost=1.093 s.l.cost=7.04e-03
+ i= 282 alpha=0.022 depth=8 w.l.cost=1.160 s.l.cost=7.08e-03
+ i= 283 alpha=0.022 depth=8 w.l.cost=1.009 s.l.cost=7.12e-03
+ i= 284 alpha=0.022 depth=8 w.l.cost=1.151 s.l.cost=7.12e-03
+ i= 285 alpha=0.022 depth=8 w.l.cost=1.064 s.l.cost=7.23e-03
+ i= 286 alpha=0.021 depth=8 w.l.cost=1.095 s.l.cost=7.30e-03
+ i= 287 alpha=0.021 depth=8 w.l.cost=1.135 s.l.cost=7.31e-03
+ i= 288 alpha=0.023 depth=8 w.l.cost=1.070 s.l.cost=7.24e-03
+ i= 289 alpha=0.022 depth=8 w.l.cost=1.065 s.l.cost=7.16e-03
+ i= 290 alpha=0.022 depth=8 w.l.cost=1.090 s.l.cost=7.23e-03
+ i= 291 alpha=0.022 depth=8 w.l.cost=1.070 s.l.cost=7.30e-03
+ i= 292 alpha=0.022 depth=8 w.l.cost=1.075 s.l.cost=7.16e-03
+ i= 293 alpha=0.021 depth=8 w.l.cost=1.115 s.l.cost=7.01e-03
+ i= 294 alpha=0.022 depth=8 w.l.cost=1.075 s.l.cost=7.20e-03
+ i= 295 alpha=0.022 depth=8 w.l.cost=1.140 s.l.cost=7.14e-03
+ i= 296 alpha=0.021 depth=8 w.l.cost=1.131 s.l.cost=7.07e-03
+ i= 297 alpha=0.022 depth=8 w.l.cost=1.121 s.l.cost=7.07e-03
+ i= 298 alpha=0.022 depth=8 w.l.cost=1.089 s.l.cost=7.07e-03
+ i= 299 alpha=0.022 depth=8 w.l.cost=1.004 s.l.cost=7.12e-03
+ i= 300 alpha=0.022 depth=8 w.l.cost=1.105 s.l.cost=7.01e-03
+ i= 301 alpha=0.021 depth=8 w.l.cost=1.101 s.l.cost=7.12e-03
+ i= 302 alpha=0.022 depth=8 w.l.cost=1.031 s.l.cost=7.20e-03
+ i= 303 alpha=0.022 depth=8 w.l.cost=1.102 s.l.cost=7.10e-03
+ i= 304 alpha=0.022 depth=8 w.l.cost=1.031 s.l.cost=7.19e-03
+ i= 305 alpha=0.022 depth=8 w.l.cost=1.056 s.l.cost=7.10e-03
+ i= 306 alpha=0.023 depth=8 w.l.cost=1.075 s.l.cost=6.91e-03
+ i= 307 alpha=0.022 depth=8 w.l.cost=1.058 s.l.cost=6.79e-03
+ i= 308 alpha=0.022 depth=8 w.l.cost=1.020 s.l.cost=7.02e-03
+ i= 309 alpha=0.023 depth=8 w.l.cost=0.943 s.l.cost=6.93e-03
+ i= 310 alpha=0.021 depth=8 w.l.cost=1.076 s.l.cost=6.91e-03
+ i= 311 alpha=0.021 depth=8 w.l.cost=1.100 s.l.cost=6.82e-03
+ i= 312 alpha=0.021 depth=8 w.l.cost=1.123 s.l.cost=6.89e-03
+ i= 313 alpha=0.021 depth=8 w.l.cost=1.187 s.l.cost=6.99e-03
+ i= 314 alpha=0.022 depth=8 w.l.cost=1.094 s.l.cost=6.99e-03
+ i= 315 alpha=0.023 depth=8 w.l.cost=1.044 s.l.cost=7.02e-03
+ i= 316 alpha=0.022 depth=8 w.l.cost=1.064 s.l.cost=6.98e-03
+ i= 317 alpha=0.022 depth=8 w.l.cost=1.090 s.l.cost=7.00e-03
+ i= 318 alpha=0.022 depth=8 w.l.cost=1.065 s.l.cost=7.02e-03
+ i= 319 alpha=0.022 depth=8 w.l.cost=1.014 s.l.cost=7.04e-03
+ i= 320 alpha=0.022 depth=8 w.l.cost=1.050 s.l.cost=7.16e-03
+ i= 321 alpha=0.020 depth=8 w.l.cost=1.125 s.l.cost=7.33e-03
+ i= 322 alpha=0.022 depth=8 w.l.cost=1.071 s.l.cost=7.18e-03
+ i= 323 alpha=0.022 depth=8 w.l.cost=1.009 s.l.cost=7.31e-03
+ i= 324 alpha=0.022 depth=8 w.l.cost=1.055 s.l.cost=7.26e-03
+ i= 325 alpha=0.021 depth=8 w.l.cost=1.114 s.l.cost=7.18e-03
+ i= 326 alpha=0.021 depth=8 w.l.cost=1.125 s.l.cost=7.04e-03
+ i= 327 alpha=0.023 depth=8 w.l.cost=1.056 s.l.cost=6.99e-03
+ i= 328 alpha=0.022 depth=8 w.l.cost=1.111 s.l.cost=7.03e-03
+ i= 329 alpha=0.021 depth=8 w.l.cost=1.104 s.l.cost=6.87e-03
+ i= 330 alpha=0.022 depth=8 w.l.cost=1.117 s.l.cost=6.95e-03
+ i= 331 alpha=0.022 depth=8 w.l.cost=1.135 s.l.cost=6.96e-03
+ i= 332 alpha=0.022 depth=8 w.l.cost=1.105 s.l.cost=6.96e-03
+ i= 333 alpha=0.022 depth=8 w.l.cost=1.126 s.l.cost=6.94e-03
+ i= 334 alpha=0.022 depth=8 w.l.cost=1.103 s.l.cost=7.02e-03
+ i= 335 alpha=0.023 depth=8 w.l.cost=1.137 s.l.cost=7.17e-03
+ i= 336 alpha=0.021 depth=8 w.l.cost=1.113 s.l.cost=7.06e-03
+ i= 337 alpha=0.023 depth=8 w.l.cost=1.091 s.l.cost=7.12e-03
+ i= 338 alpha=0.021 depth=8 w.l.cost=0.997 s.l.cost=7.08e-03
+ i= 339 alpha=0.022 depth=8 w.l.cost=1.075 s.l.cost=6.90e-03
+ i= 340 alpha=0.022 depth=8 w.l.cost=1.076 s.l.cost=6.88e-03
+ i= 341 alpha=0.022 depth=8 w.l.cost=1.039 s.l.cost=7.04e-03
+ i= 342 alpha=0.022 depth=8 w.l.cost=1.001 s.l.cost=7.11e-03
+ i= 343 alpha=0.022 depth=8 w.l.cost=1.100 s.l.cost=7.01e-03
+ i= 344 alpha=0.022 depth=8 w.l.cost=1.122 s.l.cost=6.94e-03
+ i= 345 alpha=0.023 depth=8 w.l.cost=1.002 s.l.cost=7.17e-03
+ i= 346 alpha=0.021 depth=8 w.l.cost=1.102 s.l.cost=7.23e-03
+ i= 347 alpha=0.020 depth=8 w.l.cost=1.118 s.l.cost=7.15e-03
+ i= 348 alpha=0.021 depth=8 w.l.cost=1.049 s.l.cost=7.13e-03
+ i= 349 alpha=0.022 depth=8 w.l.cost=1.089 s.l.cost=7.09e-03
+ i= 350 alpha=0.022 depth=8 w.l.cost=1.118 s.l.cost=7.15e-03
+ i= 351 alpha=0.021 depth=8 w.l.cost=1.164 s.l.cost=7.08e-03
+ i= 352 alpha=0.021 depth=8 w.l.cost=1.134 s.l.cost=7.11e-03
+ i= 353 alpha=0.022 depth=8 w.l.cost=1.135 s.l.cost=7.17e-03
+ i= 354 alpha=0.022 depth=8 w.l.cost=1.054 s.l.cost=6.97e-03
+ i= 355 alpha=0.022 depth=8 w.l.cost=1.071 s.l.cost=6.99e-03
+ i= 356 alpha=0.021 depth=8 w.l.cost=1.089 s.l.cost=7.09e-03
+ i= 357 alpha=0.022 depth=8 w.l.cost=1.095 s.l.cost=7.09e-03
+ i= 358 alpha=0.020 depth=8 w.l.cost=1.189 s.l.cost=6.95e-03
+ i= 359 alpha=0.021 depth=8 w.l.cost=1.104 s.l.cost=6.95e-03
+ i= 360 alpha=0.021 depth=8 w.l.cost=1.138 s.l.cost=7.05e-03
+ i= 361 alpha=0.022 depth=8 w.l.cost=1.077 s.l.cost=7.07e-03
+ i= 362 alpha=0.022 depth=8 w.l.cost=1.175 s.l.cost=7.18e-03
+ i= 363 alpha=0.021 depth=8 w.l.cost=1.117 s.l.cost=7.16e-03
+ i= 364 alpha=0.022 depth=8 w.l.cost=1.079 s.l.cost=7.01e-03
+ i= 365 alpha=0.022 depth=8 w.l.cost=1.094 s.l.cost=6.99e-03
+ i= 366 alpha=0.022 depth=8 w.l.cost=1.159 s.l.cost=7.07e-03
+ i= 367 alpha=0.021 depth=8 w.l.cost=1.115 s.l.cost=7.11e-03
+ i= 368 alpha=0.022 depth=8 w.l.cost=1.054 s.l.cost=7.13e-03
+ i= 369 alpha=0.021 depth=8 w.l.cost=1.119 s.l.cost=7.09e-03
+ i= 370 alpha=0.021 depth=8 w.l.cost=1.062 s.l.cost=7.07e-03
+ i= 371 alpha=0.021 depth=8 w.l.cost=1.124 s.l.cost=7.03e-03
+ i= 372 alpha=0.021 depth=8 w.l.cost=1.147 s.l.cost=7.06e-03
+ i= 373 alpha=0.021 depth=8 w.l.cost=1.099 s.l.cost=7.23e-03
+ i= 374 alpha=0.022 depth=8 w.l.cost=1.105 s.l.cost=7.11e-03
+ i= 375 alpha=0.021 depth=8 w.l.cost=1.087 s.l.cost=7.05e-03
+ i= 376 alpha=0.021 depth=8 w.l.cost=1.120 s.l.cost=7.11e-03
+ i= 377 alpha=0.022 depth=8 w.l.cost=1.161 s.l.cost=7.15e-03
+ i= 378 alpha=0.020 depth=8 w.l.cost=1.301 s.l.cost=7.17e-03
+ i= 379 alpha=0.021 depth=8 w.l.cost=1.112 s.l.cost=7.15e-03
+ i= 380 alpha=0.022 depth=8 w.l.cost=1.092 s.l.cost=6.99e-03
+ i= 381 alpha=0.017 depth=8 w.l.cost=1.253 s.l.cost=7.01e-03
+ i= 382 alpha=0.022 depth=8 w.l.cost=1.058 s.l.cost=7.01e-03
+ i= 383 alpha=0.021 depth=8 w.l.cost=1.151 s.l.cost=7.07e-03
+ i= 384 alpha=0.021 depth=8 w.l.cost=1.144 s.l.cost=7.16e-03
+ i= 385 alpha=0.023 depth=8 w.l.cost=1.107 s.l.cost=7.09e-03
+ i= 386 alpha=0.020 depth=8 w.l.cost=1.112 s.l.cost=7.09e-03
+ i= 387 alpha=0.021 depth=8 w.l.cost=1.153 s.l.cost=7.05e-03
+ i= 388 alpha=0.021 depth=8 w.l.cost=1.149 s.l.cost=7.18e-03
+ i= 389 alpha=0.020 depth=8 w.l.cost=1.127 s.l.cost=7.13e-03
+ i= 390 alpha=0.021 depth=8 w.l.cost=1.034 s.l.cost=7.19e-03
+ i= 391 alpha=0.022 depth=8 w.l.cost=1.029 s.l.cost=7.21e-03
+ i= 392 alpha=0.022 depth=8 w.l.cost=1.056 s.l.cost=7.10e-03
+ i= 393 alpha=0.021 depth=8 w.l.cost=1.143 s.l.cost=7.23e-03
+ i= 394 alpha=0.020 depth=8 w.l.cost=1.070 s.l.cost=7.21e-03
+ i= 395 alpha=0.020 depth=8 w.l.cost=1.065 s.l.cost=7.25e-03
+ i= 396 alpha=0.021 depth=8 w.l.cost=1.161 s.l.cost=7.17e-03
+ i= 397 alpha=0.017 depth=8 w.l.cost=1.238 s.l.cost=7.13e-03
+ i= 398 alpha=0.021 depth=8 w.l.cost=1.061 s.l.cost=7.15e-03
+ i= 399 alpha=0.021 depth=8 w.l.cost=1.034 s.l.cost=7.19e-03
+ i= 400 alpha=0.020 depth=8 w.l.cost=1.178 s.l.cost=7.25e-03
+ i= 401 alpha=0.017 depth=8 w.l.cost=1.276 s.l.cost=7.25e-03
+ i= 402 alpha=0.018 depth=8 w.l.cost=1.234 s.l.cost=7.25e-03
+ i= 403 alpha=0.021 depth=8 w.l.cost=1.104 s.l.cost=7.27e-03
+ i= 404 alpha=0.021 depth=8 w.l.cost=1.055 s.l.cost=7.41e-03
+ i= 405 alpha=0.019 depth=8 w.l.cost=1.166 s.l.cost=7.34e-03
+ i= 406 alpha=0.020 depth=8 w.l.cost=1.174 s.l.cost=7.39e-03
+ i= 407 alpha=0.021 depth=8 w.l.cost=1.147 s.l.cost=7.38e-03
+ i= 408 alpha=0.021 depth=8 w.l.cost=1.083 s.l.cost=7.29e-03
+ i= 409 alpha=0.021 depth=8 w.l.cost=1.093 s.l.cost=7.36e-03
+ i= 410 alpha=0.020 depth=8 w.l.cost=1.164 s.l.cost=7.40e-03
+ i= 411 alpha=0.019 depth=8 w.l.cost=1.160 s.l.cost=7.50e-03
+ i= 412 alpha=0.021 depth=8 w.l.cost=1.168 s.l.cost=7.40e-03
+ i= 413 alpha=0.021 depth=8 w.l.cost=1.096 s.l.cost=7.38e-03
+ i= 414 alpha=0.018 depth=8 w.l.cost=1.233 s.l.cost=7.41e-03
+ i= 415 alpha=0.020 depth=8 w.l.cost=1.093 s.l.cost=7.45e-03
+ i= 416 alpha=0.019 depth=8 w.l.cost=1.136 s.l.cost=7.41e-03
+ i= 417 alpha=0.020 depth=8 w.l.cost=1.125 s.l.cost=7.34e-03
+ i= 418 alpha=0.021 depth=8 w.l.cost=1.059 s.l.cost=7.52e-03
+ i= 419 alpha=0.019 depth=8 w.l.cost=1.073 s.l.cost=7.52e-03
+ i= 420 alpha=0.020 depth=8 w.l.cost=1.178 s.l.cost=7.44e-03
+ i= 421 alpha=0.019 depth=8 w.l.cost=1.199 s.l.cost=7.44e-03
+ i= 422 alpha=0.021 depth=8 w.l.cost=1.178 s.l.cost=7.41e-03
+ i= 423 alpha=0.021 depth=8 w.l.cost=1.107 s.l.cost=7.48e-03
+ i= 424 alpha=0.020 depth=8 w.l.cost=1.127 s.l.cost=7.50e-03
+ i= 425 alpha=0.020 depth=8 w.l.cost=1.094 s.l.cost=7.50e-03
+ i= 426 alpha=0.019 depth=8 w.l.cost=1.200 s.l.cost=7.52e-03
+ i= 427 alpha=0.021 depth=8 w.l.cost=1.102 s.l.cost=7.50e-03
+ i= 428 alpha=0.020 depth=8 w.l.cost=1.211 s.l.cost=7.46e-03
+ i= 429 alpha=0.021 depth=8 w.l.cost=1.177 s.l.cost=7.48e-03
+ i= 430 alpha=0.021 depth=8 w.l.cost=1.240 s.l.cost=7.57e-03
+ i= 431 alpha=0.020 depth=8 w.l.cost=1.052 s.l.cost=7.48e-03
+ i= 432 alpha=0.019 depth=8 w.l.cost=1.255 s.l.cost=7.50e-03
+ i= 433 alpha=0.020 depth=8 w.l.cost=1.139 s.l.cost=7.53e-03
+ i= 434 alpha=0.021 depth=8 w.l.cost=1.108 s.l.cost=7.53e-03
+ i= 435 alpha=0.022 depth=8 w.l.cost=1.081 s.l.cost=7.49e-03
+ i= 436 alpha=0.020 depth=8 w.l.cost=1.118 s.l.cost=7.51e-03
+ i= 437 alpha=0.021 depth=8 w.l.cost=1.127 s.l.cost=7.45e-03
+ i= 438 alpha=0.020 depth=8 w.l.cost=1.154 s.l.cost=7.43e-03
+ i= 439 alpha=0.022 depth=8 w.l.cost=1.090 s.l.cost=7.48e-03
+ i= 440 alpha=0.021 depth=8 w.l.cost=1.104 s.l.cost=7.50e-03
+ i= 441 alpha=0.020 depth=8 w.l.cost=1.186 s.l.cost=7.52e-03
+ i= 442 alpha=0.020 depth=8 w.l.cost=1.141 s.l.cost=7.57e-03
+ i= 443 alpha=0.019 depth=8 w.l.cost=1.213 s.l.cost=7.52e-03
+ i= 444 alpha=0.021 depth=8 w.l.cost=1.113 s.l.cost=7.44e-03
+ i= 445 alpha=0.021 depth=8 w.l.cost=1.140 s.l.cost=7.38e-03
+ i= 446 alpha=0.020 depth=8 w.l.cost=1.166 s.l.cost=7.26e-03
+ i= 447 alpha=0.020 depth=8 w.l.cost=1.168 s.l.cost=7.24e-03
+ i= 448 alpha=0.020 depth=8 w.l.cost=1.133 s.l.cost=7.32e-03
+ i= 449 alpha=0.020 depth=8 w.l.cost=1.193 s.l.cost=7.45e-03
+ i= 450 alpha=0.022 depth=8 w.l.cost=1.053 s.l.cost=7.45e-03
+ i= 451 alpha=0.018 depth=8 w.l.cost=1.200 s.l.cost=7.37e-03
+ i= 452 alpha=0.016 depth=8 w.l.cost=1.234 s.l.cost=7.43e-03
+ i= 453 alpha=0.021 depth=8 w.l.cost=1.110 s.l.cost=7.34e-03
+ i= 454 alpha=0.022 depth=8 w.l.cost=1.114 s.l.cost=7.37e-03
+ i= 455 alpha=0.021 depth=8 w.l.cost=1.179 s.l.cost=7.45e-03
+ i= 456 alpha=0.021 depth=8 w.l.cost=1.148 s.l.cost=7.45e-03
+ i= 457 alpha=0.019 depth=8 w.l.cost=1.116 s.l.cost=7.34e-03
+ i= 458 alpha=0.022 depth=8 w.l.cost=1.080 s.l.cost=7.43e-03
+ i= 459 alpha=0.020 depth=8 w.l.cost=1.253 s.l.cost=7.39e-03
+ i= 460 alpha=0.019 depth=8 w.l.cost=1.181 s.l.cost=7.36e-03
+ i= 461 alpha=0.016 depth=8 w.l.cost=1.228 s.l.cost=7.48e-03
+ i= 462 alpha=0.020 depth=8 w.l.cost=1.121 s.l.cost=7.39e-03
+ i= 463 alpha=0.017 depth=8 w.l.cost=1.281 s.l.cost=7.47e-03
+ i= 464 alpha=0.018 depth=8 w.l.cost=1.216 s.l.cost=7.42e-03
+ i= 465 alpha=0.021 depth=8 w.l.cost=1.118 s.l.cost=7.48e-03
+ i= 466 alpha=0.021 depth=8 w.l.cost=1.119 s.l.cost=7.42e-03
+ i= 467 alpha=0.021 depth=8 w.l.cost=1.094 s.l.cost=7.30e-03
+ i= 468 alpha=0.022 depth=8 w.l.cost=1.125 s.l.cost=7.41e-03
+ i= 469 alpha=0.017 depth=8 w.l.cost=1.177 s.l.cost=7.43e-03
+ i= 470 alpha=0.017 depth=8 w.l.cost=1.236 s.l.cost=7.51e-03
+ i= 471 alpha=0.019 depth=8 w.l.cost=1.146 s.l.cost=7.51e-03
+ i= 472 alpha=0.019 depth=8 w.l.cost=1.114 s.l.cost=7.49e-03
+ i= 473 alpha=0.020 depth=8 w.l.cost=1.142 s.l.cost=7.45e-03
+ i= 474 alpha=0.021 depth=8 w.l.cost=1.147 s.l.cost=7.47e-03
+ i= 475 alpha=0.016 depth=8 w.l.cost=1.277 s.l.cost=7.53e-03
+ i= 476 alpha=0.016 depth=8 w.l.cost=1.234 s.l.cost=7.47e-03
+ i= 477 alpha=0.020 depth=8 w.l.cost=1.137 s.l.cost=7.49e-03
+ i= 478 alpha=0.021 depth=8 w.l.cost=1.109 s.l.cost=7.45e-03
+ i= 479 alpha=0.012 depth=8 w.l.cost=1.329 s.l.cost=7.53e-03
+ i= 480 alpha=0.019 depth=8 w.l.cost=1.214 s.l.cost=7.51e-03
+ i= 481 alpha=0.020 depth=8 w.l.cost=1.188 s.l.cost=7.51e-03
+ i= 482 alpha=0.021 depth=8 w.l.cost=1.137 s.l.cost=7.47e-03
+ i= 483 alpha=0.020 depth=8 w.l.cost=1.145 s.l.cost=7.60e-03
+ i= 484 alpha=0.012 depth=8 w.l.cost=1.287 s.l.cost=7.51e-03
+ i= 485 alpha=0.020 depth=8 w.l.cost=1.191 s.l.cost=7.57e-03
+ i= 486 alpha=0.020 depth=8 w.l.cost=1.123 s.l.cost=7.53e-03
+ i= 487 alpha=0.017 depth=8 w.l.cost=1.271 s.l.cost=7.64e-03
+ i= 488 alpha=0.018 depth=8 w.l.cost=1.233 s.l.cost=7.60e-03
+ i= 489 alpha=0.014 depth=8 w.l.cost=1.286 s.l.cost=7.60e-03
+ i= 490 alpha=0.018 depth=8 w.l.cost=1.167 s.l.cost=7.64e-03
+ i= 491 alpha=0.018 depth=8 w.l.cost=1.237 s.l.cost=7.68e-03
+ i= 492 alpha=0.020 depth=8 w.l.cost=1.167 s.l.cost=7.70e-03
+ i= 493 alpha=0.015 depth=8 w.l.cost=1.243 s.l.cost=7.57e-03
+ i= 494 alpha=0.015 depth=8 w.l.cost=1.295 s.l.cost=7.60e-03
+ i= 495 alpha=0.019 depth=8 w.l.cost=1.235 s.l.cost=7.62e-03
+ i= 496 alpha=0.020 depth=8 w.l.cost=1.123 s.l.cost=7.73e-03
+ i= 497 alpha=0.016 depth=8 w.l.cost=1.208 s.l.cost=7.71e-03
+ i= 498 alpha=0.017 depth=8 w.l.cost=1.138 s.l.cost=7.80e-03
+ i= 499 alpha=0.017 depth=8 w.l.cost=1.346 s.l.cost=7.82e-03
+ i= 500 alpha=0.014 depth=8 w.l.cost=1.278 s.l.cost=7.80e-03
+ i= 501 alpha=0.016 depth=8 w.l.cost=1.240 s.l.cost=7.76e-03
+ i= 502 alpha=0.015 depth=8 w.l.cost=1.246 s.l.cost=7.76e-03
+ i= 503 alpha=0.016 depth=8 w.l.cost=1.261 s.l.cost=7.78e-03
+ i= 504 alpha=0.014 depth=8 w.l.cost=1.210 s.l.cost=7.85e-03
+ i= 505 alpha=0.015 depth=8 w.l.cost=1.241 s.l.cost=7.81e-03
+ i= 506 alpha=0.017 depth=8 w.l.cost=1.164 s.l.cost=7.85e-03
+ i= 507 alpha=0.015 depth=8 w.l.cost=1.360 s.l.cost=7.81e-03
+ i= 508 alpha=0.016 depth=8 w.l.cost=1.297 s.l.cost=7.76e-03
+ i= 509 alpha=0.018 depth=8 w.l.cost=1.263 s.l.cost=7.76e-03
+ i= 510 alpha=0.016 depth=8 w.l.cost=1.218 s.l.cost=7.83e-03
+ i= 511 alpha=0.017 depth=8 w.l.cost=1.210 s.l.cost=7.78e-03
+ i= 512 alpha=0.015 depth=8 w.l.cost=1.315 s.l.cost=7.90e-03
+ i= 513 alpha=0.014 depth=8 w.l.cost=1.339 s.l.cost=7.90e-03
+ i= 514 alpha=0.009 depth=8 w.l.cost=1.360 s.l.cost=7.94e-03
+ i= 515 alpha=0.014 depth=8 w.l.cost=1.230 s.l.cost=7.90e-03
+ i= 516 alpha=0.017 depth=8 w.l.cost=1.263 s.l.cost=7.96e-03
+ i= 517 alpha=0.014 depth=8 w.l.cost=1.372 s.l.cost=7.99e-03
+ i= 518 alpha=0.014 depth=8 w.l.cost=1.308 s.l.cost=7.96e-03
+ i= 519 alpha=0.015 depth=8 w.l.cost=1.192 s.l.cost=7.93e-03
+ i= 520 alpha=0.013 depth=8 w.l.cost=1.358 s.l.cost=7.89e-03
+ i= 521 alpha=0.019 depth=8 w.l.cost=1.197 s.l.cost=7.87e-03
+ i= 522 alpha=0.013 depth=8 w.l.cost=1.367 s.l.cost=7.94e-03
+ i= 523 alpha=0.018 depth=8 w.l.cost=1.164 s.l.cost=7.90e-03
+ i= 524 alpha=0.014 depth=8 w.l.cost=1.342 s.l.cost=7.88e-03
+ i= 525 alpha=0.015 depth=8 w.l.cost=1.284 s.l.cost=8.01e-03
+ i= 526 alpha=0.012 depth=8 w.l.cost=1.329 s.l.cost=8.01e-03
+ i= 527 alpha=0.014 depth=8 w.l.cost=1.431 s.l.cost=7.99e-03
+ i= 528 alpha=0.016 depth=8 w.l.cost=1.169 s.l.cost=8.03e-03
+ i= 529 alpha=0.019 depth=8 w.l.cost=1.230 s.l.cost=7.95e-03
+ i= 530 alpha=0.016 depth=8 w.l.cost=1.258 s.l.cost=7.97e-03
+ i= 531 alpha=0.017 depth=8 w.l.cost=1.279 s.l.cost=7.87e-03
+ i= 532 alpha=0.014 depth=8 w.l.cost=1.344 s.l.cost=7.87e-03
+ i= 533 alpha=0.015 depth=8 w.l.cost=1.320 s.l.cost=7.93e-03
+ i= 534 alpha=0.018 depth=8 w.l.cost=1.137 s.l.cost=7.99e-03
+ i= 535 alpha=0.016 depth=8 w.l.cost=1.280 s.l.cost=7.96e-03
+ i= 536 alpha=0.017 depth=8 w.l.cost=1.144 s.l.cost=8.01e-03
+ i= 537 alpha=0.019 depth=8 w.l.cost=1.111 s.l.cost=8.07e-03
+ i= 538 alpha=0.018 depth=8 w.l.cost=1.174 s.l.cost=8.09e-03
+ i= 539 alpha=0.016 depth=8 w.l.cost=1.329 s.l.cost=8.11e-03
+ i= 540 alpha=0.018 depth=8 w.l.cost=1.184 s.l.cost=8.15e-03
+ i= 541 alpha=0.012 depth=8 w.l.cost=1.376 s.l.cost=8.17e-03
+ i= 542 alpha=0.014 depth=8 w.l.cost=1.343 s.l.cost=8.13e-03
+ i= 543 alpha=0.016 depth=8 w.l.cost=1.116 s.l.cost=8.15e-03
+ i= 544 alpha=0.015 depth=8 w.l.cost=1.379 s.l.cost=8.17e-03
+ i= 545 alpha=0.015 depth=8 w.l.cost=1.262 s.l.cost=8.09e-03
+ i= 546 alpha=0.015 depth=8 w.l.cost=1.306 s.l.cost=8.07e-03
+ i= 547 alpha=0.016 depth=8 w.l.cost=1.185 s.l.cost=8.11e-03
+ i= 548 alpha=0.018 depth=8 w.l.cost=1.299 s.l.cost=8.05e-03
+ i= 549 alpha=0.015 depth=8 w.l.cost=1.244 s.l.cost=8.20e-03
+ i= 550 alpha=0.010 depth=8 w.l.cost=1.396 s.l.cost=8.20e-03
+ i= 551 alpha=0.018 depth=8 w.l.cost=1.252 s.l.cost=8.13e-03
+ i= 552 alpha=0.016 depth=8 w.l.cost=1.222 s.l.cost=8.05e-03
+ i= 553 alpha=0.012 depth=8 w.l.cost=1.318 s.l.cost=8.13e-03
+ i= 554 alpha=0.017 depth=8 w.l.cost=1.290 s.l.cost=8.22e-03
+ i= 555 alpha=0.012 depth=8 w.l.cost=1.370 s.l.cost=8.17e-03
+ i= 556 alpha=0.015 depth=8 w.l.cost=1.345 s.l.cost=8.24e-03
+ i= 557 alpha=0.017 depth=8 w.l.cost=1.118 s.l.cost=8.24e-03
+ i= 558 alpha=0.015 depth=8 w.l.cost=1.408 s.l.cost=8.26e-03
+ i= 559 alpha=0.016 depth=8 w.l.cost=1.256 s.l.cost=8.30e-03
+ i= 560 alpha=0.016 depth=8 w.l.cost=1.250 s.l.cost=8.34e-03
+ i= 561 alpha=0.017 depth=8 w.l.cost=1.244 s.l.cost=8.26e-03
+ i= 562 alpha=0.017 depth=8 w.l.cost=1.225 s.l.cost=8.26e-03
+ i= 563 alpha=0.017 depth=8 w.l.cost=1.338 s.l.cost=8.26e-03
+ i= 564 alpha=0.013 depth=8 w.l.cost=1.307 s.l.cost=8.22e-03
+ i= 565 alpha=0.019 depth=8 w.l.cost=1.129 s.l.cost=8.22e-03
+ i= 566 alpha=0.013 depth=8 w.l.cost=1.421 s.l.cost=8.20e-03
+ i= 567 alpha=0.016 depth=8 w.l.cost=1.333 s.l.cost=8.26e-03
+ i= 568 alpha=0.010 depth=8 w.l.cost=1.382 s.l.cost=8.32e-03
+ i= 569 alpha=0.019 depth=8 w.l.cost=1.164 s.l.cost=8.30e-03
+ i= 570 alpha=0.016 depth=8 w.l.cost=1.318 s.l.cost=8.42e-03
+ i= 571 alpha=0.012 depth=8 w.l.cost=1.352 s.l.cost=8.43e-03
+ i= 572 alpha=0.016 depth=8 w.l.cost=1.191 s.l.cost=8.46e-03
+ i= 573 alpha=0.018 depth=8 w.l.cost=1.241 s.l.cost=8.44e-03
+ i= 574 alpha=0.014 depth=8 w.l.cost=1.315 s.l.cost=8.44e-03
+ i= 575 alpha=0.018 depth=8 w.l.cost=1.250 s.l.cost=8.44e-03
+ i= 576 alpha=0.014 depth=8 w.l.cost=1.311 s.l.cost=8.46e-03
+ i= 577 alpha=0.018 depth=8 w.l.cost=1.214 s.l.cost=8.50e-03
+ i= 578 alpha=0.015 depth=8 w.l.cost=1.330 s.l.cost=8.46e-03
+ i= 579 alpha=0.017 depth=8 w.l.cost=1.247 s.l.cost=8.54e-03
+ i= 580 alpha=0.016 depth=8 w.l.cost=1.269 s.l.cost=8.48e-03
+ i= 581 alpha=0.016 depth=8 w.l.cost=1.206 s.l.cost=8.46e-03
+ i= 582 alpha=0.012 depth=8 w.l.cost=1.408 s.l.cost=8.46e-03
+ i= 583 alpha=0.019 depth=8 w.l.cost=1.186 s.l.cost=8.44e-03
+ i= 584 alpha=0.015 depth=8 w.l.cost=1.298 s.l.cost=8.40e-03
+ i= 585 alpha=0.018 depth=8 w.l.cost=1.342 s.l.cost=8.38e-03
+ i= 586 alpha=0.018 depth=8 w.l.cost=1.211 s.l.cost=8.42e-03
+ i= 587 alpha=0.018 depth=8 w.l.cost=1.297 s.l.cost=8.40e-03
+ i= 588 alpha=0.015 depth=8 w.l.cost=1.296 s.l.cost=8.40e-03
+ i= 589 alpha=0.018 depth=8 w.l.cost=1.179 s.l.cost=8.38e-03
+ i= 590 alpha=0.018 depth=8 w.l.cost=1.150 s.l.cost=8.40e-03
+ i= 591 alpha=0.018 depth=8 w.l.cost=1.277 s.l.cost=8.48e-03
+ i= 592 alpha=0.019 depth=8 w.l.cost=1.162 s.l.cost=8.52e-03
+ i= 593 alpha=0.015 depth=8 w.l.cost=1.315 s.l.cost=8.44e-03
+ i= 594 alpha=0.015 depth=8 w.l.cost=1.311 s.l.cost=8.48e-03
+ i= 595 alpha=0.016 depth=8 w.l.cost=1.312 s.l.cost=8.42e-03
+ i= 596 alpha=0.018 depth=8 w.l.cost=1.161 s.l.cost=8.46e-03
+ i= 597 alpha=0.015 depth=8 w.l.cost=1.367 s.l.cost=8.46e-03
+ i= 598 alpha=0.016 depth=8 w.l.cost=1.226 s.l.cost=8.51e-03
+ i= 599 alpha=0.016 depth=8 w.l.cost=1.241 s.l.cost=8.41e-03
+ i= 600 alpha=0.016 depth=8 w.l.cost=1.305 s.l.cost=8.47e-03
+ i= 601 alpha=0.017 depth=8 w.l.cost=1.197 s.l.cost=8.45e-03
+ i= 602 alpha=0.015 depth=8 w.l.cost=1.362 s.l.cost=8.47e-03
+ i= 603 alpha=0.008 depth=8 w.l.cost=1.475 s.l.cost=8.45e-03
+ i= 604 alpha=0.011 depth=8 w.l.cost=1.442 s.l.cost=8.47e-03
+ i= 605 alpha=0.016 depth=8 w.l.cost=1.326 s.l.cost=8.43e-03
+ i= 606 alpha=0.016 depth=8 w.l.cost=1.231 s.l.cost=8.54e-03
+ i= 607 alpha=0.012 depth=8 w.l.cost=1.326 s.l.cost=8.56e-03
+ i= 608 alpha=0.014 depth=8 w.l.cost=1.304 s.l.cost=8.54e-03
+ i= 609 alpha=0.014 depth=8 w.l.cost=1.374 s.l.cost=8.58e-03
+ i= 610 alpha=0.012 depth=8 w.l.cost=1.336 s.l.cost=8.60e-03
+ i= 611 alpha=0.019 depth=8 w.l.cost=1.185 s.l.cost=8.43e-03
+ i= 612 alpha=0.012 depth=8 w.l.cost=1.452 s.l.cost=8.47e-03
+ i= 613 alpha=0.017 depth=8 w.l.cost=1.282 s.l.cost=8.43e-03
+ i= 614 alpha=0.015 depth=8 w.l.cost=1.307 s.l.cost=8.52e-03
+ i= 615 alpha=0.015 depth=8 w.l.cost=1.351 s.l.cost=8.44e-03
+ i= 616 alpha=0.010 depth=8 w.l.cost=1.448 s.l.cost=8.42e-03
+ i= 617 alpha=0.016 depth=8 w.l.cost=1.262 s.l.cost=8.44e-03
+ i= 618 alpha=0.015 depth=8 w.l.cost=1.341 s.l.cost=8.44e-03
+ i= 619 alpha=0.012 depth=8 w.l.cost=1.358 s.l.cost=8.46e-03
+ i= 620 alpha=0.019 depth=8 w.l.cost=1.188 s.l.cost=8.55e-03
+ i= 621 alpha=0.016 depth=8 w.l.cost=1.267 s.l.cost=8.50e-03
+ i= 622 alpha=0.020 depth=8 w.l.cost=1.230 s.l.cost=8.58e-03
+ i= 623 alpha=0.019 depth=8 w.l.cost=1.181 s.l.cost=8.54e-03
+ i= 624 alpha=0.018 depth=8 w.l.cost=1.203 s.l.cost=8.45e-03
+ i= 625 alpha=0.018 depth=8 w.l.cost=1.196 s.l.cost=8.47e-03
+ i= 626 alpha=0.012 depth=8 w.l.cost=1.258 s.l.cost=8.50e-03
+ i= 627 alpha=0.015 depth=8 w.l.cost=1.255 s.l.cost=8.54e-03
+ i= 628 alpha=0.018 depth=8 w.l.cost=1.292 s.l.cost=8.53e-03
+ i= 629 alpha=0.016 depth=8 w.l.cost=1.299 s.l.cost=8.41e-03
+ i= 630 alpha=0.011 depth=8 w.l.cost=1.289 s.l.cost=8.43e-03
+ i= 631 alpha=0.018 depth=8 w.l.cost=1.237 s.l.cost=8.45e-03
+ i= 632 alpha=0.016 depth=8 w.l.cost=1.349 s.l.cost=8.50e-03
+ i= 633 alpha=0.017 depth=8 w.l.cost=1.136 s.l.cost=8.59e-03
+ i= 634 alpha=0.016 depth=8 w.l.cost=1.139 s.l.cost=8.68e-03
+ i= 635 alpha=0.014 depth=8 w.l.cost=1.337 s.l.cost=8.64e-03
+ i= 636 alpha=0.013 depth=8 w.l.cost=1.306 s.l.cost=8.73e-03
+ i= 637 alpha=0.017 depth=8 w.l.cost=1.320 s.l.cost=8.66e-03
+ i= 638 alpha=0.018 depth=8 w.l.cost=1.255 s.l.cost=8.68e-03
+ i= 639 alpha=0.014 depth=8 w.l.cost=1.350 s.l.cost=8.75e-03
+ i= 640 alpha=0.014 depth=8 w.l.cost=1.331 s.l.cost=8.77e-03
+ i= 641 alpha=0.011 depth=8 w.l.cost=1.392 s.l.cost=8.77e-03
+ i= 642 alpha=0.018 depth=8 w.l.cost=1.287 s.l.cost=8.84e-03
+ i= 643 alpha=0.016 depth=8 w.l.cost=1.246 s.l.cost=8.82e-03
+ i= 644 alpha=0.013 depth=8 w.l.cost=1.414 s.l.cost=8.86e-03
+ i= 645 alpha=0.016 depth=8 w.l.cost=1.269 s.l.cost=8.86e-03
+ i= 646 alpha=0.015 depth=8 w.l.cost=1.309 s.l.cost=8.86e-03
+ i= 647 alpha=0.015 depth=8 w.l.cost=1.362 s.l.cost=8.89e-03
+ i= 648 alpha=0.015 depth=8 w.l.cost=1.305 s.l.cost=8.90e-03
+ i= 649 alpha=0.013 depth=8 w.l.cost=1.296 s.l.cost=8.78e-03
+ i= 650 alpha=0.016 depth=8 w.l.cost=1.147 s.l.cost=8.71e-03
+ i= 651 alpha=0.002 depth=8 w.l.cost=1.501 s.l.cost=8.73e-03
+ i= 652 alpha=0.013 depth=8 w.l.cost=1.333 s.l.cost=8.73e-03
+ i= 653 alpha=0.015 depth=8 w.l.cost=1.352 s.l.cost=8.82e-03
+ i= 654 alpha=0.017 depth=8 w.l.cost=1.252 s.l.cost=8.84e-03
+ i= 655 alpha=0.016 depth=8 w.l.cost=1.318 s.l.cost=8.82e-03
+ i= 656 alpha=0.019 depth=8 w.l.cost=1.256 s.l.cost=8.74e-03
+ i= 657 alpha=0.014 depth=8 w.l.cost=1.281 s.l.cost=8.76e-03
+ i= 658 alpha=0.015 depth=8 w.l.cost=1.267 s.l.cost=8.88e-03
+ i= 659 alpha=0.015 depth=8 w.l.cost=1.370 s.l.cost=8.94e-03
+ i= 660 alpha=0.014 depth=8 w.l.cost=1.302 s.l.cost=8.90e-03
+ i= 661 alpha=0.010 depth=8 w.l.cost=1.420 s.l.cost=8.90e-03
+ i= 662 alpha=0.008 depth=8 w.l.cost=1.481 s.l.cost=8.86e-03
+ i= 663 alpha=0.017 depth=8 w.l.cost=1.272 s.l.cost=8.96e-03
+ i= 664 alpha=0.010 depth=8 w.l.cost=1.443 s.l.cost=8.96e-03
+ i= 665 alpha=0.007 depth=8 w.l.cost=1.480 s.l.cost=8.98e-03
+ i= 666 alpha=0.011 depth=8 w.l.cost=1.395 s.l.cost=8.96e-03
+ i= 667 alpha=0.010 depth=8 w.l.cost=1.465 s.l.cost=8.93e-03
+ i= 668 alpha=0.014 depth=8 w.l.cost=1.352 s.l.cost=8.98e-03
+ i= 669 alpha=0.016 depth=8 w.l.cost=1.304 s.l.cost=8.98e-03
+ i= 670 alpha=0.018 depth=8 w.l.cost=1.206 s.l.cost=9.00e-03
+ i= 671 alpha=0.014 depth=8 w.l.cost=1.309 s.l.cost=8.96e-03
+ i= 672 alpha=0.013 depth=8 w.l.cost=1.323 s.l.cost=8.92e-03
+ i= 673 alpha=0.014 depth=8 w.l.cost=1.185 s.l.cost=8.86e-03
+ i= 674 alpha=0.018 depth=8 w.l.cost=1.263 s.l.cost=8.90e-03
+ i= 675 alpha=0.015 depth=8 w.l.cost=1.314 s.l.cost=8.94e-03
+ i= 676 alpha=0.008 depth=8 w.l.cost=1.497 s.l.cost=8.96e-03
+ i= 677 alpha=0.015 depth=8 w.l.cost=1.254 s.l.cost=8.90e-03
+ i= 678 alpha=0.014 depth=8 w.l.cost=1.322 s.l.cost=8.92e-03
+ i= 679 alpha=0.007 depth=8 w.l.cost=1.442 s.l.cost=8.92e-03
+ i= 680 alpha=0.015 depth=8 w.l.cost=1.311 s.l.cost=8.98e-03
+ i= 681 alpha=0.014 depth=8 w.l.cost=1.239 s.l.cost=8.95e-03
+ i= 682 alpha=0.011 depth=8 w.l.cost=1.372 s.l.cost=8.95e-03
+ i= 683 alpha=0.011 depth=8 w.l.cost=1.415 s.l.cost=8.90e-03
+ i= 684 alpha=0.017 depth=8 w.l.cost=1.167 s.l.cost=8.83e-03
+ i= 685 alpha=0.017 depth=8 w.l.cost=1.304 s.l.cost=8.75e-03
+ i= 686 alpha=0.012 depth=8 w.l.cost=1.392 s.l.cost=8.73e-03
+ i= 687 alpha=0.015 depth=8 w.l.cost=1.322 s.l.cost=8.68e-03
+ i= 688 alpha=0.010 depth=8 w.l.cost=1.377 s.l.cost=8.82e-03
+ i= 689 alpha=0.017 depth=8 w.l.cost=1.247 s.l.cost=8.82e-03
+ i= 690 alpha=0.013 depth=8 w.l.cost=1.227 s.l.cost=8.86e-03
+ i= 691 alpha=0.012 depth=8 w.l.cost=1.393 s.l.cost=8.86e-03
+ i= 692 alpha=0.014 depth=8 w.l.cost=1.347 s.l.cost=8.94e-03
+ i= 693 alpha=0.015 depth=8 w.l.cost=1.207 s.l.cost=8.98e-03
+ i= 694 alpha=0.012 depth=8 w.l.cost=1.265 s.l.cost=8.98e-03
+ i= 695 alpha=0.014 depth=8 w.l.cost=1.232 s.l.cost=9.02e-03
+ i= 696 alpha=0.015 depth=8 w.l.cost=1.257 s.l.cost=9.05e-03
+ i= 697 alpha=0.015 depth=8 w.l.cost=1.366 s.l.cost=9.05e-03
+ i= 698 alpha=0.010 depth=8 w.l.cost=1.431 s.l.cost=8.94e-03
+ i= 699 alpha=0.012 depth=8 w.l.cost=1.420 s.l.cost=8.96e-03
+ i= 700 alpha=0.014 depth=8 w.l.cost=1.244 s.l.cost=9.08e-03
+ i= 701 alpha=0.015 depth=8 w.l.cost=1.279 s.l.cost=9.03e-03
+ i= 702 alpha=0.014 depth=8 w.l.cost=1.346 s.l.cost=9.05e-03
+ i= 703 alpha=0.009 depth=8 w.l.cost=1.384 s.l.cost=9.08e-03
+ i= 704 alpha=0.014 depth=8 w.l.cost=1.303 s.l.cost=9.06e-03
+ i= 705 alpha=0.010 depth=8 w.l.cost=1.415 s.l.cost=9.15e-03
+ i= 706 alpha=0.015 depth=8 w.l.cost=1.296 s.l.cost=9.12e-03
+ i= 707 alpha=0.009 depth=8 w.l.cost=1.410 s.l.cost=9.10e-03
+ i= 708 alpha=0.013 depth=8 w.l.cost=1.348 s.l.cost=9.10e-03
+ i= 709 alpha=0.009 depth=8 w.l.cost=1.394 s.l.cost=9.10e-03
+ i= 710 alpha=0.010 depth=8 w.l.cost=1.356 s.l.cost=9.12e-03
+ i= 711 alpha=0.013 depth=8 w.l.cost=1.387 s.l.cost=9.09e-03
+ i= 712 alpha=0.012 depth=8 w.l.cost=1.404 s.l.cost=9.11e-03
+ i= 713 alpha=0.015 depth=8 w.l.cost=1.246 s.l.cost=9.16e-03
+ i= 714 alpha=0.017 depth=8 w.l.cost=1.302 s.l.cost=9.15e-03
+ i= 715 alpha=0.012 depth=8 w.l.cost=1.316 s.l.cost=9.11e-03
+ i= 716 alpha=0.016 depth=8 w.l.cost=1.368 s.l.cost=9.11e-03
+ i= 717 alpha=0.015 depth=8 w.l.cost=1.349 s.l.cost=9.13e-03
+ i= 718 alpha=0.014 depth=8 w.l.cost=1.229 s.l.cost=9.21e-03
+ i= 719 alpha=0.015 depth=8 w.l.cost=1.292 s.l.cost=9.18e-03
+ i= 720 alpha=0.015 depth=8 w.l.cost=1.289 s.l.cost=9.23e-03
+ i= 721 alpha=0.018 depth=8 w.l.cost=1.275 s.l.cost=9.19e-03
+ i= 722 alpha=0.011 depth=8 w.l.cost=1.404 s.l.cost=9.28e-03
+ i= 723 alpha=0.016 depth=8 w.l.cost=1.314 s.l.cost=9.30e-03
+ i= 724 alpha=0.017 depth=8 w.l.cost=1.281 s.l.cost=9.14e-03
+ i= 725 alpha=0.010 depth=8 w.l.cost=1.477 s.l.cost=9.10e-03
+ i= 726 alpha=0.013 depth=8 w.l.cost=1.316 s.l.cost=9.21e-03
+ i= 727 alpha=0.013 depth=8 w.l.cost=1.409 s.l.cost=9.28e-03
+ i= 728 alpha=0.014 depth=8 w.l.cost=1.309 s.l.cost=9.19e-03
+ i= 729 alpha=0.016 depth=8 w.l.cost=1.380 s.l.cost=9.23e-03
+ i= 730 alpha=0.013 depth=8 w.l.cost=1.277 s.l.cost=9.27e-03
+ i= 731 alpha=0.011 depth=8 w.l.cost=1.405 s.l.cost=9.27e-03
+ i= 732 alpha=0.016 depth=8 w.l.cost=1.353 s.l.cost=9.27e-03
+ i= 733 alpha=0.015 depth=8 w.l.cost=1.231 s.l.cost=9.31e-03
+ i= 734 alpha=0.018 depth=8 w.l.cost=1.207 s.l.cost=9.31e-03
+ i= 735 alpha=0.015 depth=8 w.l.cost=1.220 s.l.cost=9.29e-03
+ i= 736 alpha=0.011 depth=8 w.l.cost=1.370 s.l.cost=9.42e-03
+ i= 737 alpha=0.012 depth=8 w.l.cost=1.311 s.l.cost=9.42e-03
+ i= 738 alpha=0.006 depth=8 w.l.cost=1.456 s.l.cost=9.47e-03
+ i= 739 alpha=0.015 depth=8 w.l.cost=1.331 s.l.cost=9.51e-03
+ i= 740 alpha=0.009 depth=8 w.l.cost=1.397 s.l.cost=9.49e-03
+ i= 741 alpha=0.012 depth=8 w.l.cost=1.431 s.l.cost=9.47e-03
+ i= 742 alpha=0.013 depth=8 w.l.cost=1.298 s.l.cost=9.49e-03
+ i= 743 alpha=0.017 depth=8 w.l.cost=1.278 s.l.cost=9.44e-03
+ i= 744 alpha=0.014 depth=8 w.l.cost=1.324 s.l.cost=9.41e-03
+ i= 745 alpha=0.007 depth=8 w.l.cost=1.465 s.l.cost=9.41e-03
+ i= 746 alpha=0.007 depth=8 w.l.cost=1.471 s.l.cost=9.41e-03
+ i= 747 alpha=0.011 depth=8 w.l.cost=1.431 s.l.cost=9.41e-03
+ i= 748 alpha=0.011 depth=8 w.l.cost=1.334 s.l.cost=9.45e-03
+ i= 749 alpha=0.016 depth=8 w.l.cost=1.368 s.l.cost=9.47e-03
+ i= 750 alpha=0.016 depth=8 w.l.cost=1.287 s.l.cost=9.36e-03
+ i= 751 alpha=0.015 depth=8 w.l.cost=1.322 s.l.cost=9.49e-03
+ i= 752 alpha=0.015 depth=8 w.l.cost=1.371 s.l.cost=9.35e-03
+ i= 753 alpha=0.013 depth=8 w.l.cost=1.401 s.l.cost=9.44e-03
+ i= 754 alpha=0.009 depth=8 w.l.cost=1.397 s.l.cost=9.44e-03
+ i= 755 alpha=0.011 depth=8 w.l.cost=1.357 s.l.cost=9.49e-03
+ i= 756 alpha=0.011 depth=8 w.l.cost=1.410 s.l.cost=9.55e-03
+ i= 757 alpha=0.015 depth=8 w.l.cost=1.387 s.l.cost=9.52e-03
+ i= 758 alpha=0.010 depth=8 w.l.cost=1.469 s.l.cost=9.54e-03
+ i= 759 alpha=0.010 depth=8 w.l.cost=1.429 s.l.cost=9.54e-03
+ i= 760 alpha=0.016 depth=8 w.l.cost=1.329 s.l.cost=9.47e-03
+ i= 761 alpha=0.013 depth=8 w.l.cost=1.364 s.l.cost=9.37e-03
+ i= 762 alpha=0.014 depth=8 w.l.cost=1.275 s.l.cost=9.45e-03
+ i= 763 alpha=0.010 depth=8 w.l.cost=1.381 s.l.cost=9.47e-03
+ i= 764 alpha=0.020 depth=8 w.l.cost=1.155 s.l.cost=9.57e-03
+ i= 765 alpha=0.006 depth=8 w.l.cost=1.433 s.l.cost=9.59e-03
+ i= 766 alpha=0.013 depth=8 w.l.cost=1.412 s.l.cost=9.61e-03
+ i= 767 alpha=0.010 depth=8 w.l.cost=1.414 s.l.cost=9.59e-03
+ i= 768 alpha=0.012 depth=8 w.l.cost=1.323 s.l.cost=9.58e-03
+ i= 769 alpha=0.011 depth=8 w.l.cost=1.453 s.l.cost=9.58e-03
+ i= 770 alpha=0.015 depth=8 w.l.cost=1.301 s.l.cost=9.54e-03
+ i= 771 alpha=0.014 depth=8 w.l.cost=1.400 s.l.cost=9.60e-03
+ i= 772 alpha=0.010 depth=8 w.l.cost=1.454 s.l.cost=9.62e-03
+ i= 773 alpha=0.015 depth=8 w.l.cost=1.335 s.l.cost=9.62e-03
+ i= 774 alpha=0.010 depth=8 w.l.cost=1.347 s.l.cost=9.60e-03
+ i= 775 alpha=0.010 depth=8 w.l.cost=1.422 s.l.cost=9.60e-03
+ i= 776 alpha=0.013 depth=8 w.l.cost=1.216 s.l.cost=9.60e-03
+ i= 777 alpha=0.018 depth=8 w.l.cost=1.238 s.l.cost=9.59e-03
+ i= 778 alpha=0.016 depth=8 w.l.cost=1.273 s.l.cost=9.59e-03
+ i= 779 alpha=0.012 depth=8 w.l.cost=1.380 s.l.cost=9.60e-03
+ i= 780 alpha=0.011 depth=8 w.l.cost=1.385 s.l.cost=9.64e-03
+ i= 781 alpha=0.010 depth=8 w.l.cost=1.420 s.l.cost=9.59e-03
+ i= 782 alpha=0.014 depth=8 w.l.cost=1.349 s.l.cost=9.66e-03
+ i= 783 alpha=0.011 depth=8 w.l.cost=1.222 s.l.cost=9.67e-03
+ i= 784 alpha=0.012 depth=8 w.l.cost=1.352 s.l.cost=9.70e-03
+ i= 785 alpha=0.015 depth=8 w.l.cost=1.366 s.l.cost=9.61e-03
+ i= 786 alpha=0.012 depth=8 w.l.cost=1.352 s.l.cost=9.65e-03
+ i= 787 alpha=0.015 depth=8 w.l.cost=1.343 s.l.cost=9.67e-03
+ i= 788 alpha=0.004 depth=8 w.l.cost=1.432 s.l.cost=9.70e-03
+ i= 789 alpha=0.002 depth=8 w.l.cost=1.555 s.l.cost=9.70e-03
+ i= 790 alpha=0.012 depth=8 w.l.cost=1.412 s.l.cost=9.65e-03
+ i= 791 alpha=0.011 depth=8 w.l.cost=1.407 s.l.cost=9.74e-03
+ i= 792 alpha=0.008 depth=8 w.l.cost=1.414 s.l.cost=9.67e-03
+ i= 793 alpha=0.005 depth=8 w.l.cost=1.512 s.l.cost=9.67e-03
+ i= 794 alpha=0.004 depth=8 w.l.cost=1.470 s.l.cost=9.70e-03
+ i= 795 alpha=0.011 depth=8 w.l.cost=1.337 s.l.cost=9.76e-03
+ i= 796 alpha=0.013 depth=8 w.l.cost=1.374 s.l.cost=9.74e-03
+ i= 797 alpha=0.006 depth=8 w.l.cost=1.489 s.l.cost=9.74e-03
+ i= 798 alpha=0.014 depth=8 w.l.cost=1.416 s.l.cost=9.82e-03
+ i= 799 alpha=0.014 depth=8 w.l.cost=1.247 s.l.cost=9.80e-03
+ i= 800 alpha=0.016 depth=8 w.l.cost=1.227 s.l.cost=9.85e-03
+ i= 801 alpha=0.011 depth=8 w.l.cost=1.356 s.l.cost=9.85e-03
+ i= 802 alpha=0.005 depth=8 w.l.cost=1.519 s.l.cost=9.85e-03
+ i= 803 alpha=0.007 depth=8 w.l.cost=1.464 s.l.cost=9.85e-03
+ i= 804 alpha=0.007 depth=8 w.l.cost=1.476 s.l.cost=9.83e-03
+ i= 805 alpha=0.004 depth=8 w.l.cost=1.564 s.l.cost=9.83e-03
+ i= 806 alpha=0.011 depth=8 w.l.cost=1.423 s.l.cost=9.83e-03
+ i= 807 alpha=0.006 depth=8 w.l.cost=1.383 s.l.cost=9.83e-03
+ i= 808 alpha=0.009 depth=8 w.l.cost=1.461 s.l.cost=9.85e-03
+ i= 809 alpha=0.008 depth=8 w.l.cost=1.456 s.l.cost=9.87e-03
+ i= 810 alpha=0.004 depth=8 w.l.cost=1.575 s.l.cost=9.87e-03
+ i= 811 alpha=0.010 depth=8 w.l.cost=1.397 s.l.cost=9.87e-03
+ i= 812 alpha=0.009 depth=8 w.l.cost=1.493 s.l.cost=9.85e-03
+ i= 813 alpha=0.013 depth=8 w.l.cost=1.451 s.l.cost=9.89e-03
+ i= 814 alpha=0.012 depth=8 w.l.cost=1.274 s.l.cost=9.85e-03
+ i= 815 alpha=0.015 depth=8 w.l.cost=1.369 s.l.cost=9.81e-03
+ i= 816 alpha=0.005 depth=8 w.l.cost=1.432 s.l.cost=9.83e-03
+ i= 817 alpha=0.017 depth=8 w.l.cost=1.333 s.l.cost=9.83e-03
+ i= 818 alpha=0.005 depth=8 w.l.cost=1.474 s.l.cost=9.83e-03
+ i= 819 alpha=0.007 depth=8 w.l.cost=1.420 s.l.cost=9.89e-03
+ i= 820 alpha=0.012 depth=8 w.l.cost=1.443 s.l.cost=9.83e-03
+ i= 821 alpha=0.006 depth=8 w.l.cost=1.437 s.l.cost=9.83e-03
+ i= 822 alpha=0.008 depth=8 w.l.cost=1.449 s.l.cost=9.81e-03
+ i= 823 alpha=0.012 depth=8 w.l.cost=1.449 s.l.cost=9.83e-03
+ i= 824 alpha=0.005 depth=8 w.l.cost=1.526 s.l.cost=9.81e-03
+ i= 825 alpha=0.013 depth=8 w.l.cost=1.310 s.l.cost=9.79e-03
+ i= 826 alpha=0.010 depth=8 w.l.cost=1.378 s.l.cost=9.85e-03
+ i= 827 alpha=0.013 depth=8 w.l.cost=1.352 s.l.cost=9.87e-03
+ i= 828 alpha=0.005 depth=8 w.l.cost=1.562 s.l.cost=9.93e-03
+ i= 829 alpha=0.009 depth=8 w.l.cost=1.451 s.l.cost=9.93e-03
+ i= 830 alpha=0.009 depth=8 w.l.cost=1.447 s.l.cost=9.93e-03
+ i= 831 alpha=0.003 depth=8 w.l.cost=1.461 s.l.cost=9.91e-03
+ i= 832 alpha=0.007 depth=8 w.l.cost=1.507 s.l.cost=9.89e-03
+ i= 833 alpha=0.013 depth=8 w.l.cost=1.389 s.l.cost=9.79e-03
+ i= 834 alpha=0.008 depth=8 w.l.cost=1.419 s.l.cost=9.79e-03
+ i= 835 alpha=0.014 depth=8 w.l.cost=1.285 s.l.cost=9.81e-03
+ i= 836 alpha=0.004 depth=8 w.l.cost=1.509 s.l.cost=9.81e-03
+ i= 837 alpha=0.004 depth=8 w.l.cost=1.563 s.l.cost=9.81e-03
+ i= 838 alpha=0.007 depth=8 w.l.cost=1.479 s.l.cost=9.85e-03
+ i= 839 alpha=0.007 depth=8 w.l.cost=1.498 s.l.cost=9.91e-03
+ i= 840 alpha=0.014 depth=8 w.l.cost=1.336 s.l.cost=9.85e-03
+ i= 841 alpha=0.015 depth=8 w.l.cost=1.197 s.l.cost=9.83e-03
+ i= 842 alpha=0.010 depth=8 w.l.cost=1.325 s.l.cost=9.87e-03
+ i= 843 alpha=0.012 depth=8 w.l.cost=1.425 s.l.cost=9.89e-03
+ i= 844 alpha=0.010 depth=8 w.l.cost=1.419 s.l.cost=9.85e-03
+ i= 845 alpha=0.009 depth=8 w.l.cost=1.451 s.l.cost=9.81e-03
+ i= 846 alpha=0.007 depth=8 w.l.cost=1.498 s.l.cost=9.81e-03
+ i= 847 alpha=0.008 depth=8 w.l.cost=1.511 s.l.cost=9.87e-03
+ i= 848 alpha=0.010 depth=8 w.l.cost=1.397 s.l.cost=9.87e-03
+ i= 849 alpha=0.012 depth=8 w.l.cost=1.291 s.l.cost=9.91e-03
+ i= 850 alpha=0.010 depth=8 w.l.cost=1.377 s.l.cost=9.93e-03
+ i= 851 alpha=0.013 depth=8 w.l.cost=1.452 s.l.cost=9.91e-03
+ i= 852 alpha=0.009 depth=8 w.l.cost=1.443 s.l.cost=9.91e-03
+ i= 853 alpha=0.004 depth=8 w.l.cost=1.509 s.l.cost=9.89e-03
+ i= 854 alpha=0.011 depth=8 w.l.cost=1.458 s.l.cost=9.81e-03
+ i= 855 alpha=0.013 depth=8 w.l.cost=1.329 s.l.cost=9.81e-03
+ i= 856 alpha=0.009 depth=8 w.l.cost=1.447 s.l.cost=9.83e-03
+ i= 857 alpha=0.011 depth=8 w.l.cost=1.378 s.l.cost=9.89e-03
+ i= 858 alpha=0.010 depth=8 w.l.cost=1.381 s.l.cost=9.88e-03
+ i= 859 alpha=0.007 depth=8 w.l.cost=1.405 s.l.cost=9.95e-03
+ i= 860 alpha=0.004 depth=8 w.l.cost=1.490 s.l.cost=9.97e-03
+ i= 861 alpha=0.009 depth=8 w.l.cost=1.476 s.l.cost=1.00e-02
+ i= 862 alpha=0.004 depth=8 w.l.cost=1.496 s.l.cost=1.00e-02
+ i= 863 alpha=0.012 depth=8 w.l.cost=1.449 s.l.cost=1.00e-02
+ i= 864 alpha=0.011 depth=8 w.l.cost=1.456 s.l.cost=1.00e-02
+ i= 865 alpha=0.011 depth=8 w.l.cost=1.388 s.l.cost=1.00e-02
+ i= 866 alpha=0.013 depth=8 w.l.cost=1.283 s.l.cost=1.00e-02
+ i= 867 alpha=0.009 depth=8 w.l.cost=1.461 s.l.cost=1.00e-02
+ i= 868 alpha=0.007 depth=8 w.l.cost=1.471 s.l.cost=1.01e-02
+ i= 869 alpha=0.016 depth=8 w.l.cost=1.285 s.l.cost=1.01e-02
+ i= 870 alpha=0.008 depth=8 w.l.cost=1.478 s.l.cost=1.01e-02
+ i= 871 alpha=0.014 depth=8 w.l.cost=1.195 s.l.cost=1.02e-02
+ i= 872 alpha=0.011 depth=8 w.l.cost=1.451 s.l.cost=1.02e-02
+ i= 873 alpha=0.014 depth=8 w.l.cost=1.356 s.l.cost=1.01e-02
+ i= 874 alpha=0.010 depth=8 w.l.cost=1.363 s.l.cost=1.01e-02
+ i= 875 alpha=0.014 depth=8 w.l.cost=1.348 s.l.cost=1.01e-02
+ i= 876 alpha=0.005 depth=8 w.l.cost=1.508 s.l.cost=1.00e-02
+ i= 877 alpha=0.013 depth=8 w.l.cost=1.284 s.l.cost=1.01e-02
+ i= 878 alpha=0.009 depth=8 w.l.cost=1.450 s.l.cost=1.01e-02
+ i= 879 alpha=0.010 depth=8 w.l.cost=1.426 s.l.cost=1.01e-02
+ i= 880 alpha=0.009 depth=8 w.l.cost=1.381 s.l.cost=1.01e-02
+ i= 881 alpha=0.007 depth=8 w.l.cost=1.424 s.l.cost=1.01e-02
+ i= 882 alpha=0.008 depth=8 w.l.cost=1.561 s.l.cost=1.01e-02
+ i= 883 alpha=0.012 depth=8 w.l.cost=1.442 s.l.cost=1.02e-02
+ i= 884 alpha=0.011 depth=8 w.l.cost=1.350 s.l.cost=1.02e-02
+ i= 885 alpha=0.010 depth=8 w.l.cost=1.315 s.l.cost=1.02e-02
+ i= 886 alpha=0.012 depth=8 w.l.cost=1.456 s.l.cost=1.02e-02
+ i= 887 alpha=0.011 depth=8 w.l.cost=1.420 s.l.cost=1.02e-02
+ i= 888 alpha=0.010 depth=8 w.l.cost=1.503 s.l.cost=1.02e-02
+ i= 889 alpha=0.013 depth=8 w.l.cost=1.312 s.l.cost=1.03e-02
+ i= 890 alpha=0.013 depth=8 w.l.cost=1.405 s.l.cost=1.02e-02
+ i= 891 alpha=0.009 depth=8 w.l.cost=1.520 s.l.cost=1.02e-02
+ i= 892 alpha=0.011 depth=8 w.l.cost=1.378 s.l.cost=1.02e-02
+ i= 893 alpha=0.013 depth=8 w.l.cost=1.337 s.l.cost=1.02e-02
+ i= 894 alpha=0.013 depth=8 w.l.cost=1.335 s.l.cost=1.02e-02
+ i= 895 alpha=0.011 depth=8 w.l.cost=1.410 s.l.cost=1.02e-02
+ i= 896 alpha=0.002 depth=8 w.l.cost=1.527 s.l.cost=1.02e-02
+ i= 897 alpha=0.008 depth=8 w.l.cost=1.441 s.l.cost=1.03e-02
+ i= 898 alpha=0.013 depth=8 w.l.cost=1.373 s.l.cost=1.02e-02
+ i= 899 alpha=0.014 depth=8 w.l.cost=1.314 s.l.cost=1.02e-02
+ i= 900 alpha=0.014 depth=8 w.l.cost=1.201 s.l.cost=1.02e-02
+ i= 901 alpha=0.014 depth=8 w.l.cost=1.329 s.l.cost=1.02e-02
+ i= 902 alpha=0.011 depth=8 w.l.cost=1.341 s.l.cost=1.02e-02
+ i= 903 alpha=0.001 depth=8 w.l.cost=1.545 s.l.cost=1.02e-02
+ i= 904 alpha=0.011 depth=8 w.l.cost=1.456 s.l.cost=1.02e-02
+ i= 905 alpha=0.017 depth=8 w.l.cost=1.344 s.l.cost=1.01e-02
+ i= 906 alpha=0.011 depth=8 w.l.cost=1.420 s.l.cost=1.01e-02
+ i= 907 alpha=0.010 depth=8 w.l.cost=1.416 s.l.cost=1.02e-02
+ i= 908 alpha=0.016 depth=8 w.l.cost=1.318 s.l.cost=1.03e-02
+ i= 909 alpha=0.006 depth=8 w.l.cost=1.469 s.l.cost=1.03e-02
+ i= 910 alpha=0.009 depth=8 w.l.cost=1.321 s.l.cost=1.02e-02
+ i= 911 alpha=0.015 depth=8 w.l.cost=1.312 s.l.cost=1.02e-02
+ i= 912 alpha=0.011 depth=8 w.l.cost=1.376 s.l.cost=1.02e-02
+ i= 913 alpha=0.007 depth=8 w.l.cost=1.476 s.l.cost=1.02e-02
+ i= 914 alpha=0.011 depth=8 w.l.cost=1.423 s.l.cost=1.02e-02
+ i= 915 alpha=0.009 depth=8 w.l.cost=1.489 s.l.cost=1.02e-02
+ i= 916 alpha=0.012 depth=8 w.l.cost=1.392 s.l.cost=1.02e-02
+ i= 917 alpha=0.006 depth=8 w.l.cost=1.519 s.l.cost=1.02e-02
+ i= 918 alpha=0.008 depth=8 w.l.cost=1.460 s.l.cost=1.02e-02
+ i= 919 alpha=0.013 depth=8 w.l.cost=1.443 s.l.cost=1.02e-02
+ i= 920 alpha=0.006 depth=8 w.l.cost=1.460 s.l.cost=1.02e-02
+ i= 921 alpha=0.010 depth=8 w.l.cost=1.416 s.l.cost=1.02e-02
+ i= 922 alpha=0.013 depth=8 w.l.cost=1.304 s.l.cost=1.03e-02
+ i= 923 alpha=0.009 depth=8 w.l.cost=1.478 s.l.cost=1.03e-02
+ i= 924 alpha=0.004 depth=8 w.l.cost=1.399 s.l.cost=1.03e-02
+ i= 925 alpha=0.012 depth=8 w.l.cost=1.383 s.l.cost=1.04e-02
+ i= 926 alpha=0.010 depth=8 w.l.cost=1.417 s.l.cost=1.04e-02
+ i= 927 alpha=0.011 depth=8 w.l.cost=1.374 s.l.cost=1.04e-02
+ i= 928 alpha=0.011 depth=8 w.l.cost=1.435 s.l.cost=1.04e-02
+ i= 929 alpha=0.011 depth=8 w.l.cost=1.393 s.l.cost=1.03e-02
+ i= 930 alpha=0.007 depth=8 w.l.cost=1.478 s.l.cost=1.03e-02
+ i= 931 alpha=0.011 depth=8 w.l.cost=1.461 s.l.cost=1.03e-02
+ i= 932 alpha=0.011 depth=8 w.l.cost=1.444 s.l.cost=1.03e-02
+ i= 933 alpha=0.010 depth=8 w.l.cost=1.435 s.l.cost=1.04e-02
+ i= 934 alpha=0.009 depth=8 w.l.cost=1.531 s.l.cost=1.03e-02
+ i= 935 alpha=0.008 depth=8 w.l.cost=1.484 s.l.cost=1.03e-02
+ i= 936 alpha=0.014 depth=8 w.l.cost=1.364 s.l.cost=1.03e-02
+ i= 937 alpha=0.009 depth=8 w.l.cost=1.405 s.l.cost=1.03e-02
+ i= 938 alpha=0.012 depth=8 w.l.cost=1.369 s.l.cost=1.03e-02
+ i= 939 alpha=0.014 depth=8 w.l.cost=1.325 s.l.cost=1.03e-02
+ i= 940 alpha=0.010 depth=8 w.l.cost=1.412 s.l.cost=1.02e-02
+ i= 941 alpha=0.015 depth=8 w.l.cost=1.325 s.l.cost=1.02e-02
+ i= 942 alpha=0.010 depth=8 w.l.cost=1.461 s.l.cost=1.02e-02
+ i= 943 alpha=0.006 depth=8 w.l.cost=1.477 s.l.cost=1.03e-02
+ i= 944 alpha=0.012 depth=8 w.l.cost=1.414 s.l.cost=1.02e-02
+ i= 945 alpha=0.011 depth=8 w.l.cost=1.294 s.l.cost=1.02e-02
+ i= 946 alpha=0.015 depth=8 w.l.cost=1.263 s.l.cost=1.03e-02
+ i= 947 alpha=0.007 depth=8 w.l.cost=1.472 s.l.cost=1.02e-02
+ i= 948 alpha=0.011 depth=8 w.l.cost=1.343 s.l.cost=1.03e-02
+ i= 949 alpha=0.012 depth=8 w.l.cost=1.430 s.l.cost=1.02e-02
+ i= 950 alpha=0.011 depth=8 w.l.cost=1.368 s.l.cost=1.02e-02
+ i= 951 alpha=0.007 depth=8 w.l.cost=1.333 s.l.cost=1.03e-02
+ i= 952 alpha=0.011 depth=8 w.l.cost=1.399 s.l.cost=1.03e-02
+ i= 953 alpha=0.011 depth=8 w.l.cost=1.435 s.l.cost=1.03e-02
+ i= 954 alpha=0.010 depth=8 w.l.cost=1.372 s.l.cost=1.02e-02
+ i= 955 alpha=0.006 depth=8 w.l.cost=1.512 s.l.cost=1.03e-02
+ i= 956 alpha=0.015 depth=8 w.l.cost=1.229 s.l.cost=1.03e-02
+ i= 957 alpha=0.014 depth=8 w.l.cost=1.394 s.l.cost=1.03e-02
+ i= 958 alpha=0.013 depth=8 w.l.cost=1.308 s.l.cost=1.03e-02
+ i= 959 alpha=0.009 depth=8 w.l.cost=1.434 s.l.cost=1.04e-02
+ i= 960 alpha=0.003 depth=8 w.l.cost=1.570 s.l.cost=1.03e-02
+ i= 961 alpha=0.004 depth=8 w.l.cost=1.456 s.l.cost=1.03e-02
+ i= 962 alpha=0.013 depth=8 w.l.cost=1.422 s.l.cost=1.03e-02
+ i= 963 alpha=0.012 depth=8 w.l.cost=1.447 s.l.cost=1.03e-02
+ i= 964 alpha=0.011 depth=8 w.l.cost=1.365 s.l.cost=1.03e-02
+ i= 965 alpha=0.013 depth=8 w.l.cost=1.317 s.l.cost=1.03e-02
+ i= 966 alpha=0.006 depth=8 w.l.cost=1.487 s.l.cost=1.03e-02
+ i= 967 alpha=0.013 depth=8 w.l.cost=1.378 s.l.cost=1.04e-02
+ i= 968 alpha=0.015 depth=8 w.l.cost=1.210 s.l.cost=1.04e-02
+ i= 969 alpha=0.009 depth=8 w.l.cost=1.425 s.l.cost=1.04e-02
+ i= 970 alpha=0.015 depth=8 w.l.cost=1.321 s.l.cost=1.04e-02
+ i= 971 alpha=0.013 depth=8 w.l.cost=1.339 s.l.cost=1.04e-02
+ i= 972 alpha=0.013 depth=8 w.l.cost=1.317 s.l.cost=1.04e-02
+ i= 973 alpha=0.008 depth=8 w.l.cost=1.500 s.l.cost=1.03e-02
+ i= 974 alpha=0.013 depth=8 w.l.cost=1.393 s.l.cost=1.03e-02
+ i= 975 alpha=0.010 depth=8 w.l.cost=1.441 s.l.cost=1.03e-02
+ i= 976 alpha=0.008 depth=8 w.l.cost=1.420 s.l.cost=1.04e-02
+ i= 977 alpha=0.008 depth=8 w.l.cost=1.462 s.l.cost=1.03e-02
+ i= 978 alpha=0.004 depth=8 w.l.cost=1.513 s.l.cost=1.03e-02
+ i= 979 alpha=0.007 depth=8 w.l.cost=1.474 s.l.cost=1.03e-02
+ i= 980 alpha=0.013 depth=8 w.l.cost=1.317 s.l.cost=1.04e-02
+ i= 981 alpha=0.011 depth=8 w.l.cost=1.427 s.l.cost=1.04e-02
+ i= 982 alpha=0.009 depth=8 w.l.cost=1.441 s.l.cost=1.04e-02
+ i= 983 alpha=0.013 depth=8 w.l.cost=1.364 s.l.cost=1.04e-02
+ i= 984 alpha=0.016 depth=8 w.l.cost=1.268 s.l.cost=1.04e-02
+ i= 985 alpha=0.010 depth=8 w.l.cost=1.448 s.l.cost=1.04e-02
+ i= 986 alpha=0.008 depth=8 w.l.cost=1.508 s.l.cost=1.03e-02
+ i= 987 alpha=0.013 depth=8 w.l.cost=1.370 s.l.cost=1.04e-02
+ i= 988 alpha=0.016 depth=8 w.l.cost=1.339 s.l.cost=1.04e-02
+ i= 989 alpha=0.013 depth=8 w.l.cost=1.303 s.l.cost=1.05e-02
+ i= 990 alpha=0.009 depth=8 w.l.cost=1.455 s.l.cost=1.05e-02
+ i= 991 alpha=0.015 depth=8 w.l.cost=1.361 s.l.cost=1.04e-02
+ i= 992 alpha=0.013 depth=8 w.l.cost=1.330 s.l.cost=1.04e-02
+ i= 993 alpha=0.016 depth=8 w.l.cost=1.259 s.l.cost=1.04e-02
+ i= 994 alpha=0.017 depth=8 w.l.cost=1.227 s.l.cost=1.05e-02
+ i= 995 alpha=0.012 depth=8 w.l.cost=1.342 s.l.cost=1.06e-02
+ i= 996 alpha=0.012 depth=8 w.l.cost=1.363 s.l.cost=1.06e-02
+ i= 997 alpha=0.012 depth=8 w.l.cost=1.344 s.l.cost=1.06e-02
+ i= 998 alpha=0.010 depth=8 w.l.cost=1.495 s.l.cost=1.05e-02
+ i= 999 alpha=0.009 depth=8 w.l.cost=1.435 s.l.cost=1.06e-02
+ i=1000 alpha=0.010 depth=8 w.l.cost=1.362 s.l.cost=1.05e-02
+ i=1001 alpha=0.008 depth=8 w.l.cost=1.457 s.l.cost=1.05e-02
+ i=1002 alpha=0.008 depth=8 w.l.cost=1.464 s.l.cost=1.06e-02
+ i=1003 alpha=0.008 depth=8 w.l.cost=1.439 s.l.cost=1.06e-02
+ i=1004 alpha=0.014 depth=8 w.l.cost=1.295 s.l.cost=1.05e-02
+ i=1005 alpha=0.009 depth=8 w.l.cost=1.372 s.l.cost=1.05e-02
+ i=1006 alpha=0.010 depth=8 w.l.cost=1.386 s.l.cost=1.06e-02
+ i=1007 alpha=0.005 depth=8 w.l.cost=1.524 s.l.cost=1.06e-02
+ i=1008 alpha=0.009 depth=8 w.l.cost=1.319 s.l.cost=1.06e-02
+ i=1009 alpha=0.007 depth=8 w.l.cost=1.540 s.l.cost=1.06e-02
+ i=1010 alpha=0.007 depth=8 w.l.cost=1.444 s.l.cost=1.06e-02
+ i=1011 alpha=0.013 depth=8 w.l.cost=1.349 s.l.cost=1.06e-02
+ i=1012 alpha=0.007 depth=8 w.l.cost=1.488 s.l.cost=1.06e-02
+ i=1013 alpha=0.001 depth=8 w.l.cost=1.563 s.l.cost=1.06e-02
+ i=1014 alpha=0.004 depth=8 w.l.cost=1.490 s.l.cost=1.06e-02
+ i=1015 alpha=0.007 depth=8 w.l.cost=1.475 s.l.cost=1.05e-02
+ i=1016 alpha=0.014 depth=8 w.l.cost=1.349 s.l.cost=1.06e-02
+ i=1017 alpha=0.011 depth=8 w.l.cost=1.429 s.l.cost=1.06e-02
+ i=1018 alpha=0.012 depth=8 w.l.cost=1.304 s.l.cost=1.05e-02
+ i=1019 alpha=0.009 depth=8 w.l.cost=1.493 s.l.cost=1.06e-02
+ i=1020 alpha=0.009 depth=8 w.l.cost=1.467 s.l.cost=1.06e-02
+ i=1021 alpha=0.006 depth=8 w.l.cost=1.518 s.l.cost=1.06e-02
+ i=1022 alpha=0.006 depth=8 w.l.cost=1.506 s.l.cost=1.06e-02
+ i=1023 alpha=0.012 depth=8 w.l.cost=1.311 s.l.cost=1.06e-02
+ i=1024 alpha=0.010 depth=8 w.l.cost=1.453 s.l.cost=1.06e-02
+Done training s.l.cost=0.0106 (t=5877.7s).
+Done training err=0.0091 fp=0.0000 fn=0.0000 (t=5979.4s).
+Confusion Matrix:
+  Columns 1 through 10
+
+       23865           0           0           0           0           0           1           0           0           0
+           0         216           0           0           0           0           0           0           0           0
+           0           0         537           0           0           0           0           0           0           0
+           0           0           0         348           0           0           0           0           0           0
+           0           0           0           0         742           4           0           0           0           0
+           0           0           0           0           1        2700          56           0           0           0
+           1           0           0           0           0           7        6965          12           0           0
+           1           0           0           0           0           0          54        2701           1           0
+           0           0           0           0           0           0           0           3         743           0
+           0           0           0           0           0           0           0           0           0         357
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           1           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+
+  Columns 11 through 20
+
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           1           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           0           0           0           0           0           0           0           0           0           0
+           2           0           0           0           0           0           0           0           0           0
+         526           0           0           0           0           0           0           0           0           0
+           0         215           1           0           0           0           0           0           0           0
+           0           0         343           0           0           0           0           0           0           0
+           0           0           0         284           1           0           0           0           0           0
+           0           0           0           0         888          15           0           0           0           0
+           0           0           0           0          14        3379          96           0           0           0
+           0           0           0           0           0          30        2732          46           0           0
+           0           0           0           0           0           0          96        3376          18           0
+           0           0           0           0           0           0           0          16         887           0
+           0           0           0           0           0           0           0           0           1         258
+           0           0           0           0           0           0           0           0           0           0
+
+  Column 21
+
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+           0
+         369
+
+Done training stage 3 (time=22477s).
+---------------------------------------------------------------------------
+Done training (time=31653s).

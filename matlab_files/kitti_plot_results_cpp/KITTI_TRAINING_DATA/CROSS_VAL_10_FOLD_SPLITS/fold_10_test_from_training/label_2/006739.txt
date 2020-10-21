@@ -1,0 +1,1 @@
+/home/imagenes/CARS_DATABASES/KITTI_DATABASE/training/label_2/006739.txt
