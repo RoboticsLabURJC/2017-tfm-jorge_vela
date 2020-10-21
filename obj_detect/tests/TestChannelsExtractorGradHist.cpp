@@ -139,7 +139,7 @@ TestChannelsExtractorGradHist::compareGradientOrientationHistogram
 //    cv::waitKey();
 #endif
 
-    ASSERT_TRUE(num_pixels_ok > 0.8 * absDiff.rows * absDiff.cols);
+    ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.rows * absDiff.cols);
   }
   fs.release();
 }
