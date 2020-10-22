@@ -337,25 +337,21 @@ ChannelsExtractorGradHistPDollar::gradH
   int hConv = h/m_binSize;
   int wConv = w/m_binSize;
   int size = hConv*wConv*dChan*m_nOrients;
-  // JM: Don't delete H, it is used in channelsGradHist!!
-  float *H = new float[size]();
 
+  float *H = new float[size]();
   gradHist(M, O, H, h, w, m_binSize, m_nOrients, m_softBin, m_full);
 
+  // Create the cv::Mat images copying memory from the H buffer.
   std::vector<cv::Mat> H2;
-
-  //float *arr[m_nOrients];
-  int pos = hConv*wConv;
-  int i;
-
-  
-  for(i = 0; i < m_nOrients; i++)
+  int nb = hConv*wConv;
+  for(int i = 0; i < m_nOrients; i++)
   {
     //arr[i] = &H[i*pos];
-    cv::Mat gradH = cv::Mat(wConv, hConv, CV_32FC1, &H[i*pos]); //arr[i]
+    cv::Mat gradH = cv::Mat(wConv, hConv, CV_32FC1, &H[i*nb]).clone(); // <-- copy
     transpose(gradH, gradH);
     H2.push_back(gradH);
   }
+  delete [] H; // As we have copyed the memory we can delete H.
 
   return H2;
 }
