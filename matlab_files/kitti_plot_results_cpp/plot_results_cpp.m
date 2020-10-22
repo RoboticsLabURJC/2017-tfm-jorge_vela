@@ -14,7 +14,10 @@ results_dirs{i} = fullfile(OUTPUT_DATA_PATH, 'BADACOST_1_3_3_D_8_T_1024_N_7500_N
 legend_text{i} =  'Matlab';
 i = i + 1;
 results_dirs{i} = fullfile(OUTPUT_DATA_PATH, 'BADACOST_CPP_APPROX_PARALLEL');
-legend_text{i} =  'C++-P.D.-Approx-Parallel';
+legend_text{i} =  'C++-P.D.-App-Parallel';
+i = i + 1;
+results_dirs{i} = fullfile(OUTPUT_DATA_PATH, 'BADACOST_CPP_ALL_PARALLEL');
+legend_text{i} =  'C++-P.D.-All-Parallel';
 i = i + 1;
 % results_dirs{i} = fullfile(OUTPUT_DATA_PATH, 'SAMME_D_8_T_1024_N_7500_NA_30000');
 % legend_text{i} =  'SAMME, D=8';
