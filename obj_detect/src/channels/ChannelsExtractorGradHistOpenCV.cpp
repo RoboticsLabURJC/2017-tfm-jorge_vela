@@ -30,9 +30,8 @@ ChannelsExtractorGradHistOpenCV::gradHist
   cv::Size sz = M.size();
   const int hb = sz.height/bin; // Number of bins in height
   const int wb = sz.width/bin;  // Number of bins in width
-  const float s = (float)bin;   // number of pixels per bin in float
-//  const float sInv = 1/s;
-  const float sInv2 = 1/s/s;
+  const float s = static_cast<float>(bin);   // number of pixels per bin in float
+  const float sInv2 = 1.0/s/s;
 
   cv::Mat O0; // = new int[sz.height*sizeof(int)+16]();
   cv::Mat M0; // = new float[sz.height*sizeof(int)+16]();
@@ -71,8 +70,13 @@ ChannelsExtractorGradHistOpenCV::gradHist
       // histogram, do not need overlaping windows and we should be doing convolution with
       // stride = bin. On the other hand, filter2D do not support stride.
       cv::Mat kernel = cv::Mat::ones(bin, 1, CV_32F);
-      cv::filter2D(M0_orient_i, Haux, CV_32F, kernel, cv::Point(0,0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux, Haux, CV_32F, kernel.t(), cv::Point(0,0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(M0_orient_i, Haux, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux, Haux, CV_32F, kernel.t(), cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+
+//      // shift the Haux0 matrix bin/2 pixels up and 1 pixel to the left.
+//      cv::Mat out = cv::Mat::zeros(Haux.size(), Haux.type());
+//      Haux(cv::Rect(bin/2, bin/2, Haux.cols-(bin/2), Haux.rows-(bin/2))).copyTo(out(cv::Rect(0, 0, Haux.cols-bin/2, Haux.rows-bin/2)));
+//      Haux = out;
 
       // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
       // (keep the right values of the Haux matrix).
@@ -102,10 +106,20 @@ ChannelsExtractorGradHistOpenCV::gradHist
       // histogram, do not need overlaping windows and we should be doing convolution with
       // stride = bin. On the other hand, filter2D do not support stride.
       cv::Mat kernel = cv::Mat::ones(bin, 1, CV_32F);
-      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(0,0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux0, Haux0, CV_32F, kernel.t(), cv::Point(0,0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(0,0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux1, Haux1, CV_32F, kernel.t(), cv::Point(0,0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux0, Haux0, CV_32F, kernel.t(), cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux1, Haux1, CV_32F, kernel.t(), cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+
+//      // shift the Haux0 matrix bin/2 pixels up and 1 pixel to the left.
+//      cv::Mat out = cv::Mat::zeros(Haux0.size(), Haux0.type());
+//      Haux0(cv::Rect(bin/2, bin/2, Haux0.cols-(bin/2), Haux0.rows-(bin/2))).copyTo(out(cv::Rect(0, 0, Haux0.cols-bin/2, Haux0.rows-bin/2)));
+//      Haux0 = out;
+
+//      // shift the Haux1 matrix bin/2 pixels up and 1 pixel to the left.
+//      cv::Mat out2 = cv::Mat::zeros(Haux1.size(), Haux1.type());
+//      Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))).copyTo(out2(cv::Rect(0, 0, Haux1.cols-bin/2, Haux1.rows-bin/2)));
+//      Haux1 = out2;
 
       // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
       // (keep the right values of the Haux matrix).
@@ -220,6 +234,22 @@ ChannelsExtractorGradHistOpenCV::gradHist
 //      std::cout << "kernel = " << std::endl;
 //      std::cout << kernel << std::endl;
 
+//      // Set to 0 first and last bin/2 rows
+//      M0_orient_i(cv::Range(0, bin/2), cv::Range::all()) = 0.0;
+//      M0_orient_i(cv::Range(M0_orient_i.rows-bin/2, M0_orient_i.rows), cv::Range::all()) = 0.0;
+
+//      // Set to 0 first and last bin/2 columns
+//      M0_orient_i(cv::Range::all(), cv::Range(0, bin/2)) = 0.0;
+//      M0_orient_i(cv::Range::all(), cv::Range(M0_orient_i.cols-bin/2, M0_orient_i.cols)) = 0.0;
+
+//      // Set to 0 first and last bin/2 rows
+//      M1_orient_i(cv::Range(0, bin/2), cv::Range::all()) = 0.0;
+//      M1_orient_i(cv::Range(M0_orient_i.rows-bin/2, M0_orient_i.rows), cv::Range::all()) = 0.0;
+
+//      // Set to 0 first and last bin/2 columns
+//      M1_orient_i(cv::Range::all(), cv::Range(0, bin/2)) = 0.0;
+//      M1_orient_i(cv::Range::all(), cv::Range(M1_orient_i.cols-bin/2, M1_orient_i.cols)) = 0.0;
+
       cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(bin,bin), 0, cv::BORDER_CONSTANT);
       if (m_softBin >= 0)
       {
@@ -248,12 +278,16 @@ ChannelsExtractorGradHistOpenCV::gradHist
       Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))).copyTo(out2(cv::Rect(0, 0, Haux1.cols-bin/2, Haux1.rows-bin/2)));
       Haux1 = out2;
 
-//      cv::resize(Haux0(cv::Range((bin/2), Haux0.rows), cv::Range((bin/2), Haux0.cols)), H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+// //      cv::resize(Haux0(cv::Range((bin/2), Haux0.rows), cv::Range((bin/2), Haux0.cols)), H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+//      cv::resize(Haux0(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))), H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+// //      cv::resize(Haux0(cv::Rect(bin/2, bin/2, Haux1.cols-bin, Haux1.rows-bin)), H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
       cv::resize(Haux0, H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
       if (m_softBin >= 0)
       {
         cv::Mat Hi1;
-//        cv::resize(Haux1(cv::Range((bin/2), Haux1.rows), cv::Range((bin/2), Haux1.cols)), Hi1, H[i].size(), 0, 0, cv::INTER_AREA);
+// //        cv::resize(Haux1(cv::Range((bin/2), Haux1.rows), cv::Range((bin/2), Haux1.cols)), Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
+//        cv::resize(Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))), Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
+// //        cv::resize(Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-bin, Haux1.rows-bin)), Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
         cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
         H[i] += Hi1;
       }
