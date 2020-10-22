@@ -11,6 +11,8 @@
 
 #include <opencv2/opencv.hpp>
 #include <detectors/ClassifierConfig.h>
+#include <channels/ChannelsExtractorGradHist.h>
+#include <channels/ChannelsExtractorGradMag.h>
 #include <vector>
 #include <string>
 
@@ -36,12 +38,7 @@ public:
     bool postprocess_channels = true,
 //    std::string impl_type = "opencv"
     std::string impl_type = "pdollar"
-    )
-  {
-    m_impl_type = impl_type;
-    m_clf = clf;
-    m_postprocess_channels = postprocess_channels;
-  };
+    );
 
   /**
    * This method computes all the Piotr Dollar's Aggregated Channels Features as cv::Mat from an input image:
@@ -92,6 +89,9 @@ private:
   int m_gradientHist_full;
 
   ClassifierConfig m_clf;
+
+  std::shared_ptr<ChannelsExtractorGradMag> m_pGradMagExtractor;
+  std::shared_ptr<ChannelsExtractorGradHist> m_pGradHistExtractor;
 };
 
 #endif

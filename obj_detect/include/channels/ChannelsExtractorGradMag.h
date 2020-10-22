@@ -12,6 +12,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <memory>
 
 class ChannelsExtractorGradMag
 {
@@ -19,13 +20,11 @@ public:
   ChannelsExtractorGradMag
     (
       int normRad = 0,
-      float normConst = 0.005,
-      bool use_opencv_impl = true
+      float normConst = 0.005
     )
   {
     m_normRad = normRad;
     m_normConst = normConst;
-    m_use_opencv_impl = use_opencv_impl;
   };
 
   virtual ~ChannelsExtractorGradMag
@@ -35,6 +34,14 @@ public:
     (
       cv::Mat img 
     ) = 0;
+
+  static std::shared_ptr<ChannelsExtractorGradMag>
+  createExtractor
+    (
+    std::string extractor_type = "pdollar",
+    int normRad = 0,
+    float normConst = 0.005
+    );
 
 protected:
   int m_normRad;

@@ -61,7 +61,7 @@ ChannelsExtractorGradHistOpenCV::gradHist
     // with a given quantized orientation and 0 in the rest of pixels.
     for (int i=0; i<nOrients; i++)
     {
-      O0_eq_i = (O0 == i)/255;
+      O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
       O0_eq_i.convertTo(O0_eq_i, CV_32F);
       cv::multiply(O0_eq_i, M0, M0_orient_i);
 
@@ -69,14 +69,10 @@ ChannelsExtractorGradHistOpenCV::gradHist
       // bin x bin pixels. We are doing more computation than needed as the
       // histogram, do not need overlaping windows and we should be doing convolution with
       // stride = bin. On the other hand, filter2D do not support stride.
+      // For speed, we perform computation with two kernels as the box filter is separable.
       cv::Mat kernel = cv::Mat::ones(bin, 1, CV_32F);
       cv::filter2D(M0_orient_i, Haux, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
       cv::filter2D(Haux, Haux, CV_32F, kernel.t(), cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
-
-//      // shift the Haux0 matrix bin/2 pixels up and 1 pixel to the left.
-//      cv::Mat out = cv::Mat::zeros(Haux.size(), Haux.type());
-//      Haux(cv::Rect(bin/2, bin/2, Haux.cols-(bin/2), Haux.rows-(bin/2))).copyTo(out(cv::Rect(0, 0, Haux.cols-bin/2, Haux.rows-bin/2)));
-//      Haux = out;
 
       // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
       // (keep the right values of the Haux matrix).
@@ -94,9 +90,9 @@ ChannelsExtractorGradHistOpenCV::gradHist
     // with a given quantized orientation and 0 in the rest of pixels.
     for (int i=0; i<nOrients; i++)
     {
-      O0_eq_i = (O0 == i)/255;
+      O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
       O0_eq_i.convertTo(O0_eq_i, CV_32F);
-      O1_eq_i = (O1 == i)/255;
+      O1_eq_i = (O1 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
       O1_eq_i.convertTo(O1_eq_i, CV_32F);
       cv::multiply(O0_eq_i, M0, M0_orient_i);
       cv::multiply(O1_eq_i, M1, M1_orient_i);
@@ -105,21 +101,12 @@ ChannelsExtractorGradHistOpenCV::gradHist
       // bin x bin pixels. We are doing more computation than needed as the
       // histogram, do not need overlaping windows and we should be doing convolution with
       // stride = bin. On the other hand, filter2D do not support stride.
+      // For speed, we perform computation with two kernels as the box filter is separable.
       cv::Mat kernel = cv::Mat::ones(bin, 1, CV_32F);
       cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
       cv::filter2D(Haux0, Haux0, CV_32F, kernel.t(), cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
       cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
       cv::filter2D(Haux1, Haux1, CV_32F, kernel.t(), cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
-
-//      // shift the Haux0 matrix bin/2 pixels up and 1 pixel to the left.
-//      cv::Mat out = cv::Mat::zeros(Haux0.size(), Haux0.type());
-//      Haux0(cv::Rect(bin/2, bin/2, Haux0.cols-(bin/2), Haux0.rows-(bin/2))).copyTo(out(cv::Rect(0, 0, Haux0.cols-bin/2, Haux0.rows-bin/2)));
-//      Haux0 = out;
-
-//      // shift the Haux1 matrix bin/2 pixels up and 1 pixel to the left.
-//      cv::Mat out2 = cv::Mat::zeros(Haux1.size(), Haux1.type());
-//      Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))).copyTo(out2(cv::Rect(0, 0, Haux1.cols-bin/2, Haux1.rows-bin/2)));
-//      Haux1 = out2;
 
       // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
       // (keep the right values of the Haux matrix).
@@ -153,43 +140,7 @@ ChannelsExtractorGradHistOpenCV::gradHist
       // We are doing more computation than needed as the histogram, do not need overlaping
       // windows and we should be doing convolution with stride = bin. On the other hand,
       // filter2D do not support stride.
-#define USE_FILTER_3
 
-#ifdef USE_FILTER_1
-      int klength = 2*bin;
-      cv::Mat kernel = cv::Mat::zeros(klength, 1, CV_32F);
-      for (int k=0; k < klength; k++)
-      {
-         kernel.at<float>(k, 0) = klength - k;
-//         kernel.at<float>(k, 0) = k+1;
-      }
-      kernel /= klength;
-      std::cout << "kernel = " << kernel << std::endl;
-
-      cv::filter2D(P0[i], Haux0, CV_32F, kernel, cv::Point(0,bin), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux0, Haux0, CV_32F, kernel.t(), cv::Point(bin,0), 0, cv::BORDER_CONSTANT);
-      if (m_softBin >= 0)
-      {
-        cv::filter2D(P1[i], Haux1, CV_32F, kernel, cv::Point(0,bin), 0, cv::BORDER_CONSTANT);
-        cv::filter2D(Haux1, Haux1, CV_32F, kernel.t(), cv::Point(bin,0), 0, cv::BORDER_CONSTANT);
-      }
-#endif
-
-#ifdef USE_FILTER_2
-      int klength = 2*bin;
-      cv::Mat kernel = cv::Mat::ones(klength, 1, CV_32F);
-      std::cout << "kernel = " << kernel << std::endl;
-
-      cv::filter2D(P0[i], Haux0, CV_32F, kernel, cv::Point(0,bin), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux0, Haux0, CV_32F, kernel.t(), cv::Point(bin,0), 0, cv::BORDER_CONSTANT);
-      if (m_softBin >= 0)
-      {
-        cv::filter2D(P1[i], Haux1, CV_32F, kernel, cv::Point(0,bin), 0, cv::BORDER_CONSTANT);
-        cv::filter2D(Haux1, Haux1, CV_32F, kernel.t(), cv::Point(bin,0), 0, cv::BORDER_CONSTANT);
-      }
-#endif
-
-#ifdef USE_FILTER_3
       float xb, yb, xd, yd;
       int xb0, yb0;
       float sInv = 1.0/bin;
@@ -263,7 +214,6 @@ ChannelsExtractorGradHistOpenCV::gradHist
 ////      std::cout << "Haux0.size() = " << Haux0.size() << std::endl;
 ////      std::cout << "H[i].size() = " << H[i].size() << std::endl;
 //      }
-#endif
 
       // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
       // (keep the right values of the Haux matrix).
@@ -278,16 +228,10 @@ ChannelsExtractorGradHistOpenCV::gradHist
       Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))).copyTo(out2(cv::Rect(0, 0, Haux1.cols-bin/2, Haux1.rows-bin/2)));
       Haux1 = out2;
 
-// //      cv::resize(Haux0(cv::Range((bin/2), Haux0.rows), cv::Range((bin/2), Haux0.cols)), H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
-//      cv::resize(Haux0(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))), H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
-// //      cv::resize(Haux0(cv::Rect(bin/2, bin/2, Haux1.cols-bin, Haux1.rows-bin)), H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
       cv::resize(Haux0, H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
       if (m_softBin >= 0)
       {
         cv::Mat Hi1;
-// //        cv::resize(Haux1(cv::Range((bin/2), Haux1.rows), cv::Range((bin/2), Haux1.cols)), Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
-//        cv::resize(Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))), Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
-// //        cv::resize(Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-bin, Haux1.rows-bin)), Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
         cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
         H[i] += Hi1;
       }
@@ -346,7 +290,7 @@ ChannelsExtractorGradHistOpenCV::gradQuantize
     O0.setTo(0, O0 >= nOrients);
     // O1
     O1 = O0 + 1;
-    O1.setTo(0, O1 >= nOrients);
+    O1.setTo(0, O1 == nOrients);
     // M1
     m = M*norm;
     cv::multiply(m, od, M1);

@@ -20,9 +20,8 @@ public:
   ChannelsExtractorGradMagPDollar
     (
       int normRad = 0,
-      float normConst = 0.005,
-      bool use_opencv_impl = true
-    ): ChannelsExtractorGradMag(normRad, normConst, use_opencv_impl)
+      float normConst = 0.005
+    ): ChannelsExtractorGradMag(normRad, normConst)
   {};
     
   virtual ~ChannelsExtractorGradMagPDollar() {};

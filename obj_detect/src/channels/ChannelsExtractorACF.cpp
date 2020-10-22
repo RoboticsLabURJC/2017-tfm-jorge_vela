@@ -16,9 +16,33 @@
 #include <channels/ChannelsExtractorGradHist.h>
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
+#include <memory>
+
+ChannelsExtractorACF::ChannelsExtractorACF
+  (
+  ClassifierConfig clf,
+  bool postprocess_channels,
+  std::string impl_type
+  )
+{
+  m_impl_type = impl_type;
+  m_clf = clf;
+  m_postprocess_channels = postprocess_channels;
+
+  m_pGradMagExtractor = ChannelsExtractorGradMag::createExtractor(m_impl_type,
+                                                                  m_clf.gradMag.normRad,
+                                                                  m_clf.gradMag.normConst);
+
+  m_pGradHistExtractor = ChannelsExtractorGradHist::createExtractor(m_impl_type,
+                                                                    m_clf.gradHist.binSize,
+                                                                    m_clf.gradHist.nOrients,
+                                                                    m_clf.gradHist.softBin,
+                                                                    m_clf.gradHist.full);
+};
 
 
-cv::Mat ChannelsExtractorACF::processChannels
+cv::Mat
+ChannelsExtractorACF::processChannels
 (
   cv::Mat image,
   cv::BorderTypes borderType,
@@ -37,38 +61,6 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   )
 {
   ChannelsExtractorLUV luvExtractor(m_clf.luv.smooth, m_clf.luv.smooth_kernel_size );
-
-  ChannelsExtractorGradMag* pGradMagExtractor;
-  if (m_impl_type == "opencv")
-  {
-    pGradMagExtractor = dynamic_cast<ChannelsExtractorGradMag*>(
-                new ChannelsExtractorGradMagOpenCV(m_clf.gradMag.normRad,
-                                                   m_clf.gradMag.normConst));
-  }
-  else
-  {
-    pGradMagExtractor = dynamic_cast<ChannelsExtractorGradMag*>(
-                new ChannelsExtractorGradMagPDollar(m_clf.gradMag.normRad,
-                                                    m_clf.gradMag.normConst));
-  }
-
-  ChannelsExtractorGradHist* pGradHistExtractor;
-  if (m_impl_type == "opencv")
-  {
-    pGradHistExtractor = dynamic_cast<ChannelsExtractorGradHist*>(
-                   new ChannelsExtractorGradHistOpenCV(m_clf.gradHist.binSize,
-                                                       m_clf.gradHist.nOrients,
-                                                       m_clf.gradHist.softBin,
-                                                       m_clf.gradHist.full));
-  }
-  else
-  {
-    pGradHistExtractor = dynamic_cast<ChannelsExtractorGradHist*>(
-                new ChannelsExtractorGradHistPDollar(m_clf.gradHist.binSize,
-                                                     m_clf.gradHist.nOrients,
-                                                     m_clf.gradHist.softBin,
-                                                     m_clf.gradHist.full));;
-  }
 
   //int dChan = img.channels();
   int h = img.size().height;
@@ -99,8 +91,8 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   luv_image = convTri(luv_image,  m_clf.luv.smooth_kernel_size);
   int x = round(m_clf.padding.width / m_clf.shrink);
   int y = round(m_clf.padding.height / m_clf.shrink);
-  std::vector<cv::Mat> gMagOrient = pGradMagExtractor->extractFeatures(luv_image);
-  std::vector<cv::Mat> gMagHist = pGradHistExtractor->extractFeatures(luv_image, gMagOrient);
+  std::vector<cv::Mat> gMagOrient = m_pGradMagExtractor->extractFeatures(luv_image);
+  std::vector<cv::Mat> gMagHist = m_pGradHistExtractor->extractFeatures(luv_image, gMagOrient);
 
   int wResample = w/m_clf.shrink;
   int hResample = h/m_clf.shrink;
@@ -129,10 +121,6 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 
     chnsCompute.push_back(resampleHist);
   }
-
-  // Remove allocated extractors in dynamic memory:
-  delete pGradMagExtractor;
-  delete pGradHistExtractor;
 
   return chnsCompute;
 }

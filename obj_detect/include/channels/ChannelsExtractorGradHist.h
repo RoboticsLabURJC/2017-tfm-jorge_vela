@@ -23,15 +23,13 @@ public:
       int binSize = 8,
       int nOrients = 8,
       int softBin = 1,
-      int full = 0,
-      bool use_opencv_impl = true
+      int full = 0
     ) 
   {
     m_binSize = binSize;
     m_nOrients = nOrients;
     m_softBin = softBin;
     m_full = full;
-    m_use_opencv_impl = use_opencv_impl;
   };
 
   virtual ~ChannelsExtractorGradHist() {};
@@ -41,6 +39,16 @@ public:
       cv::Mat img, 
       std::vector<cv::Mat> gradMag
     ) = 0;
+
+  static std::shared_ptr<ChannelsExtractorGradHist>
+  createExtractor
+    (
+    std::string extractor_type,
+    int binSize = 8,
+    int nOrients = 8,
+    int softBin = 1,
+    int full = 0
+    );
 
 protected:
 	int m_binSize;
