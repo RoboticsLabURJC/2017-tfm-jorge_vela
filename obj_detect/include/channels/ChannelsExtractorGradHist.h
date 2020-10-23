@@ -43,11 +43,11 @@ public:
   static std::shared_ptr<ChannelsExtractorGradHist>
   createExtractor
     (
-    std::string extractor_type,
-    int binSize = 8,
-    int nOrients = 8,
-    int softBin = 1,
-    int full = 0
+      std::string extractor_type,
+      int binSize = 8,
+      int nOrients = 8,
+      int softBin = 1,
+      int full = 0
     );
 
 protected:

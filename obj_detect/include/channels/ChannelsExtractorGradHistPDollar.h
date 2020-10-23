@@ -22,10 +22,10 @@ class ChannelsExtractorGradHistPDollar: public ChannelsExtractorGradHist
 public:
   ChannelsExtractorGradHistPDollar
     (
-    int binSize = 8,
-    int nOrients = 8,
-    int softBin = 1,
-    int full = 0
+      int binSize = 8,
+      int nOrients = 8,
+      int softBin = 1,
+      int full = 0
     ): ChannelsExtractorGradHist(binSize,
                                  nOrients,
                                  softBin,
@@ -35,48 +35,48 @@ public:
 
   virtual std::vector<cv::Mat> extractFeatures
     (
-    cv::Mat img,
-    std::vector<cv::Mat> gradMag
+      cv::Mat img,
+      std::vector<cv::Mat> gradMag
     );
 
 private:
   std::vector<cv::Mat>
   gradH
     (
-    cv::Mat image,
-    float *M,
-    float *O
+      cv::Mat image,
+      float *M,
+      float *O
     );
 
   void
   gradHist
     (
-    float *M,
-    float *O,
-    float *H,
-    int h,
-    int w,
-    int bin,
-    int nOrients,
-    int softBin,
-    bool full
+      float *M,
+      float *O,
+      float *H,
+      int h,
+      int w,
+      int bin,
+      int nOrients,
+      int softBin,
+      bool full
     );
 
   void
   gradQuantize
     (
-    float *O,
-    float *M,
-    int *O0,
-    int *O1,
-    float *M0,
-    float *M1,
-    int nb,
-    int n,
-    float norm,
-    int nOrients,
-    bool full,
-    bool interpolate
+      float *O,
+      float *M,
+      int *O0,
+      int *O1,
+      float *M0,
+      float *M1,
+      int nb,
+      int n,
+      float norm,
+      int nOrients,
+      bool full,
+      bool interpolate
     );
 };
 

@@ -22,10 +22,10 @@ class ChannelsExtractorGradHistOpenCV: public ChannelsExtractorGradHist
 public:
   ChannelsExtractorGradHistOpenCV
     (
-    int binSize = 8,
-    int nOrients = 8,
-    int softBin = 1,
-    int full = 0
+      int binSize = 8,
+      int nOrients = 8,
+      int softBin = 1,
+      int full = 0
     ): ChannelsExtractorGradHist(binSize,
                                nOrients,
                                softBin,
@@ -34,8 +34,8 @@ public:
 
   virtual std::vector<cv::Mat> extractFeatures
     (
-    cv::Mat img,
-    std::vector<cv::Mat> gradMag
+      cv::Mat img,
+      std::vector<cv::Mat> gradMag
     );
 
 private:
@@ -43,28 +43,28 @@ private:
   void
   gradQuantize
     (
-    cv::Mat O,
-    cv::Mat M,
-    float norm,
-    int nOrients,
-    bool full,
-    bool interpolate,
-    cv::Mat& O0,
-    cv::Mat& O1,
-    cv::Mat& M0,
-    cv::Mat& M1
+      cv::Mat O,
+      cv::Mat M,
+      float norm,
+      int nOrients,
+      bool full,
+      bool interpolate,
+      cv::Mat& O0,
+      cv::Mat& O1,
+      cv::Mat& M0,
+      cv::Mat& M1
     );
 
   void
   gradHist
     (
-    cv::Mat M,
-    cv::Mat O,
-    std::vector<cv::Mat>& H,
-    int bin,
-    int nOrients,
-    int softBin,
-    bool full
+      cv::Mat M,
+      cv::Mat O,
+      std::vector<cv::Mat>& H,
+      int bin,
+      int nOrients,
+      int softBin,
+      bool full
     );
 };
 

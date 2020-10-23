@@ -38,9 +38,9 @@ public:
   static std::shared_ptr<ChannelsExtractorGradMag>
   createExtractor
     (
-    std::string extractor_type = "pdollar",
-    int normRad = 0,
-    float normConst = 0.005
+      std::string extractor_type = "pdollar",
+      int normRad = 0,
+      float normConst = 0.005
     );
 
 protected:
