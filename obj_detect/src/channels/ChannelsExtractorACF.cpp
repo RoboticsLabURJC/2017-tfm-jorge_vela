@@ -38,6 +38,8 @@ ChannelsExtractorACF::ChannelsExtractorACF
                                                                     m_clf.gradHist.nOrients,
                                                                     m_clf.gradHist.softBin,
                                                                     m_clf.gradHist.full);
+
+  m_pLUVExtractor = ChannelsExtractorLUV::createExtractor(m_impl_type, m_clf.luv.smooth, m_clf.luv.smooth_kernel_size);
 };
 
 
@@ -60,8 +62,6 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   cv::Mat img
   )
 {
-  ChannelsExtractorLUV luvExtractor(m_clf.luv.smooth, m_clf.luv.smooth_kernel_size );
-
   //int dChan = img.channels();
   int h = img.size().height;
   int w = img.size().width;
@@ -79,7 +79,7 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   std::vector<cv::Mat> luvImage;
 //  if (m_color_space != "LUV")
 //  {
-    luvImage = luvExtractor.extractFeatures(imageCropped);
+    luvImage = m_pLUVExtractor->extractFeatures(imageCropped);
     merge(luvImage, luv_image);
 //  }
 //  else
@@ -132,23 +132,23 @@ ChannelsExtractorACF::postProcessChannels
   std::vector<cv::Mat>& postprocessedChannels
   )
 {
-    // Postprocessing of the ACF channels
-    int x = round(m_clf.padding.width / m_clf.shrink);
-    int y = round(m_clf.padding.height / m_clf.shrink);
+  // Postprocessing of the ACF channels
+  int x = round(m_clf.padding.width / m_clf.shrink);
+  int y = round(m_clf.padding.height / m_clf.shrink);
 
-    for (uint i=0; i < acf_channels_no_postprocessed.size(); i++)
+  for (uint i=0; i < acf_channels_no_postprocessed.size(); i++)
+  {
+    cv::Mat c_padded;
+    c_padded = convTri(acf_channels_no_postprocessed[i], 1);
+    if (i < 3) // LIV channels
     {
-      cv::Mat c_padded;
-      c_padded = convTri(acf_channels_no_postprocessed[i], 1);
-      if (i < 3) // LIV channels
-      {
-        copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
-      }
-      else
-      {
-        copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
-      }
-
-      postprocessedChannels.push_back(c_padded);
+      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
     }
+    else
+    {
+      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
+    }
+
+    postprocessedChannels.push_back(c_padded);
+  }
 }

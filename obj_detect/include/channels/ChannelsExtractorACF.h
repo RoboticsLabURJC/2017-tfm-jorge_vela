@@ -11,8 +11,9 @@
 
 #include <opencv2/opencv.hpp>
 #include <detectors/ClassifierConfig.h>
-#include <channels/ChannelsExtractorGradHist.h>
+#include <channels/ChannelsExtractorLUV.h>
 #include <channels/ChannelsExtractorGradMag.h>
+#include <channels/ChannelsExtractorGradHist.h>
 #include <vector>
 #include <string>
 
@@ -34,10 +35,10 @@ public:
     */
   ChannelsExtractorACF
     (
-    ClassifierConfig clf,
-    bool postprocess_channels = true,
+      ClassifierConfig clf,
+      bool postprocess_channels = true,
 //    std::string impl_type = "opencv"
-    std::string impl_type = "pdollar"
+      std::string impl_type = "pdollar"
     );
 
   /**
@@ -51,23 +52,23 @@ public:
    */    
   std::vector<cv::Mat> extractFeatures
     (
-    cv::Mat img
+      cv::Mat img
     );
 
   void
   postProcessChannels
     (
-    const std::vector<cv::Mat>& acf_channels_no_postprocessed, // input
-    std::vector<cv::Mat>& postprocessedChannels // output
+      const std::vector<cv::Mat>& acf_channels_no_postprocessed, // input
+      std::vector<cv::Mat>& postprocessedChannels // output
     );
 
   cv::Mat 
   processChannels
     (
-    cv::Mat img,
-    cv::BorderTypes,
-    int x,
-    int y
+      cv::Mat img,
+      cv::BorderTypes,
+      int x,
+      int y
     );
 
   int getNumChannels() { return 10; }
@@ -92,6 +93,7 @@ private:
 
   std::shared_ptr<ChannelsExtractorGradMag> m_pGradMagExtractor;
   std::shared_ptr<ChannelsExtractorGradHist> m_pGradHistExtractor;
+  std::shared_ptr<ChannelsExtractorLUV> m_pLUVExtractor;
 };
 
 #endif

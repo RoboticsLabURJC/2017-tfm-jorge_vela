@@ -6,7 +6,7 @@
  *
  *  ------------------------------------------------------------------------ */
 
-#include <channels/ChannelsExtractorLUV.h>
+#include <channels/ChannelsExtractorLUVPDollar.h>
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
 
@@ -18,8 +18,8 @@ class TestChannelsExtractorLUV: public testing::Test
 
   const int ROWS = 2;
   const int COLS = 4;
-  ChannelsExtractorLUV channExtract{false, 1};
-  ChannelsExtractorLUV channExtractSmooth{true, 5};
+  ChannelsExtractorLUVPDollar channExtract{false, 1};
+  ChannelsExtractorLUVPDollar channExtractSmooth{true, 5};
 
   virtual void SetUp()
   {

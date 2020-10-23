@@ -67,23 +67,22 @@ bool BadacostDetector::load
   bool file_exists = classifier.open(clfPath, cv::FileStorage::READ);
   if (file_exists)
   {
-    std::string clf_variable_labels[14] = {"fids", "thrs", "child", "hs", 
-      "weights", "depth"};
+    std::string clf_variable_labels[14] = {"fids", "thrs", "child", "hs", "weights", "depth"};
    
     // Remove any existing variables from the classifier map.
     m_classifier.clear();
     std::vector<float> p;
     for(int i = 0; i < 14; i++)
     {
-      int rows = static_cast<int>(classifier[clf_variable_labels[i]]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-      int cols = static_cast<int>(classifier[clf_variable_labels[i]]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-      cv::FileNode data = classifier[clf_variable_labels[i]]["data"];
+      cv::Mat matrix = readMatrixFromFileNode(classifier[clf_variable_labels[i]]);
+//      int rows = static_cast<int>(classifier[clf_variable_labels[i]]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//      int cols = static_cast<int>(classifier[clf_variable_labels[i]]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//      cv::FileNode data = classifier[clf_variable_labels[i]]["data"];
 
-      cv::Mat matrix= cv::Mat::zeros(rows, cols, CV_32F);
-      p.clear();
-      data >> p;
-      memcpy(matrix.data, p.data(), p.size()*sizeof(float));
-
+//      cv::Mat matrix= cv::Mat::zeros(rows, cols, CV_32F);
+//      p.clear();
+//      data >> p;
+//      memcpy(matrix.data, p.data(), p.size()*sizeof(float));
       m_classifier.insert({clf_variable_labels[i].c_str(), matrix });    
     }  
     m_num_classes = static_cast<int>(readScalarFromFileNode(classifier["num_classes"]));
@@ -91,44 +90,48 @@ bool BadacostDetector::load
     m_aRatioFixedWidth = static_cast<bool>(readScalarFromFileNode(classifier["aRatioFixedWidth"]));
 
     // Read Cprime data
-    int rows = static_cast<int>(classifier["Cprime"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    int cols = static_cast<int>(classifier["Cprime"]["cols"]);
-    cv::FileNode data = classifier["Cprime"]["data"];
-    m_Cprime = cv::Mat::zeros(rows, cols, CV_32F);
-    p.clear();
-    data >> p;
-    memcpy(m_Cprime.data, p.data(), p.size()*sizeof(float));
-    //transpose(m_Cprime, m_Cprime); // <-- We have transposed it!!
+    m_Cprime = readMatrixFromFileNode(classifier["Cprime"]);
+//    int rows = static_cast<int>(classifier["Cprime"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//    int cols = static_cast<int>(classifier["Cprime"]["cols"]);
+//    cv::FileNode data = classifier["Cprime"]["data"];
+//    m_Cprime = cv::Mat::zeros(rows, cols, CV_32F);
+//    p.clear();
+//    data >> p;
+//    memcpy(m_Cprime.data, p.data(), p.size()*sizeof(float));
+//    //transpose(m_Cprime, m_Cprime); // <-- We have transposed it!!
 
     // Read Y data
-    rows = static_cast<int>(classifier["Y"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    cols = static_cast<int>(classifier["Y"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    data = classifier["Y"]["data"];
-    m_Y = cv::Mat::zeros(rows, cols, CV_32F);
-    p.clear();
-    data >> p;
-    memcpy(m_Y.data, p.data(), p.size()*sizeof(float));
+    m_Y = readMatrixFromFileNode(classifier["Y"]);
+//    rows = static_cast<int>(classifier["Y"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//    cols = static_cast<int>(classifier["Y"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//    data = classifier["Y"]["data"];
+//    m_Y = cv::Mat::zeros(rows, cols, CV_32F);
+//    p.clear();
+//    data >> p;
+//    memcpy(m_Y.data, p.data(), p.size()*sizeof(float));
     
     // Read wl_weights data
-    rows = static_cast<int>(classifier["w1_weights"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    cols = static_cast<int>(classifier["w1_weights"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-    data = classifier["w1_weights"]["data"];
-    m_wl_weights = cv::Mat::zeros(rows, cols, CV_32F);
-    p.clear();
-    data >> p;
-    memcpy(m_wl_weights.data, p.data(), p.size()*sizeof(float));
+    m_wl_weights = readMatrixFromFileNode(classifier["w1_weights"]);
+//    rows = static_cast<int>(classifier["w1_weights"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//    cols = static_cast<int>(classifier["w1_weights"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//    data = classifier["w1_weights"]["data"];
+//    m_wl_weights = cv::Mat::zeros(rows, cols, CV_32F);
+//    p.clear();
+//    data >> p;
+//    memcpy(m_wl_weights.data, p.data(), p.size()*sizeof(float));
    
 
     // Read aRatio data
     if (!classifier["aRatio"].empty())
     {
-      rows = static_cast<int>(classifier["aRatio"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-      cols = static_cast<int>(classifier["aRatio"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
-      data = classifier["aRatio"]["data"];
-      m_aRatio = cv::Mat::zeros(rows, cols, CV_32F);
-      p.clear();
-      data >> p;
-      memcpy(m_aRatio.data, p.data(), p.size()*sizeof(float));
+      m_aRatio = readMatrixFromFileNode(classifier["aRatio"]);
+//      rows = static_cast<int>(classifier["aRatio"]["rows"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//      cols = static_cast<int>(classifier["aRatio"]["cols"]); // <--- Cambiar en el scrip de guardado desde matlab (está al revés).
+//      data = classifier["aRatio"]["data"];
+//      m_aRatio = cv::Mat::zeros(rows, cols, CV_32F);
+//      p.clear();
+//      data >> p;
+//      memcpy(m_aRatio.data, p.data(), p.size()*sizeof(float));
     }
 
     loadedOK = true;
@@ -146,30 +149,6 @@ bool BadacostDetector::load
   clfData.stride = classifier["stride"]["data"][0];
   clfData.cascThr = float(classifier["cascThr"]["data"][0])*0.1;
 
-  // TODO: load everything here from the classifier yaml file:
-  //m_modelDsPad.width = 96; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  //m_modelDsPad.height = 54; // JM: Esto debería venir del fichero con el clasificador entrenado.
-  //m_modelDs.width = 84;    // JM: Esto debería venir del fichero con el clasificador entrenado.
-  //m_modelDs.height = 48;  // JM: Esto debería venir del fichero con el clasificador entrenado.
-
-  //m_shrink = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  //m_stride = 4;    // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  //m_cascThr = -2.239887 * 0.1; // 1; // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
-  //m_clfData.padding.width = 6; //pPyramid["pad"]["data"][1];
-  //m_clfData.padding.height = 4; //pPyramid["pad"]["data"][0];
-  // <------ END TODO
-
-  /*cv::FileStorage pyramid;
-  file_exists = pyramid.open(pyrPath, cv::FileStorage::READ);
-  bool loadedOKPyr = false;
-  if (file_exists)
-  {
-    // TODO: JM: Aquí hay que guardar la variable filters en el fichero yaml si es distinta de []. Si esa variable
-    // no existe no se hace nada, si existe se pasan los filtros.
-    loadedOKPyr = true; //m_pChnsPyramidStrategy->load(pyrPath.c_str());
-  }*/
-
-
   clfData.luv.smooth = 1; //pyramid["pChns.pColor"]["smooth"];
   clfData.luv.smooth_kernel_size = 1;
 
@@ -179,7 +158,7 @@ bool BadacostDetector::load
   clfData.nPerOct = classifier["nPerOct"]["data"][0]; //3; //
   clfData.nApprox = classifier["nApprox"]["data"][0]; //2; //
   clfData.shrink = classifier["pChns.shrink"]["data"];
-  m_shrink = clfData.shrink*2; //  ??????????????????????????????????????????????????????? // JM: Esto debería venir del fichero yaml con el clasificador entrenado.
+  m_shrink = clfData.shrink*2;
 
   clfData.gradMag.normRad = classifier["pChns.pGradMag"]["normRad"]; 
   clfData.gradMag.normConst = classifier["pChns.pGradMag"]["normConst"]; 
@@ -190,13 +169,10 @@ bool BadacostDetector::load
   clfData.gradHist.full = false;
 
 
-
-
   int lambdasSize = classifier["lambdas"]["rows"];
   for(int i = 0; i < lambdasSize; i++)
     clfData.lambdas.push_back((float)classifier["lambdas"]["data"][i]);
 
-  // TODO: Cargar del fichero!!
   clfData.minDs.width = classifier["minDs"]["data"][1]; 
   clfData.minDs.height = classifier["minDs"]["data"][0]; 
 
@@ -380,7 +356,7 @@ BadacostDetector::detectSingleScale
   std::cout << "hs.size().height = " << m_classifier["hs"].size().height << std::endl;
 #endif
 
-  int nTreeNodes = m_classifier["fids"].size().width;
+//  int nTreeNodesMax = m_classifier["fids"].size().width;
   int nTrees = m_classifier["fids"].size().height;
   int height1 = ceil(float((height*m_shrink)-m_clfData.modelDsPad.height+1)/m_clfData.stride);
   int width1 = ceil(float((width*m_shrink)-m_clfData.modelDsPad.width+1)/m_clfData.stride);

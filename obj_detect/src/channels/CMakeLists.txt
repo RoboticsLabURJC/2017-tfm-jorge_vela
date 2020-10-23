@@ -3,8 +3,10 @@
 FILE(
   GLOB
   CHANNELS_EXTRACTION_SRC
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVPDollar.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVPDollar.cpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.cpp
