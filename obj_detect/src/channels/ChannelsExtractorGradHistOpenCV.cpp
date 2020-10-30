@@ -12,8 +12,10 @@
 #include <opencv2/opencv.hpp>
 #include "sse.hpp"
 
+#undef USE_SEPARABLE_CONVOLUTION
+//#define USE_SEPARABLE_CONVOLUTION
 
-#define PI 3.14159265f
+//#define DEBUG
 
 void
 ChannelsExtractorGradHistOpenCV::gradHist
@@ -33,12 +35,8 @@ ChannelsExtractorGradHistOpenCV::gradHist
   const float s = static_cast<float>(bin);   // number of pixels per bin in float
   const float sInv2 = 1.0/s/s;
 
-  cv::Mat O0; // = new int[sz.height*sizeof(int)+16]();
-  cv::Mat M0; // = new float[sz.height*sizeof(int)+16]();
-  cv::Mat O1; // = new int[sz.height*sizeof(int)+16]();
-  cv::Mat M1; // = new float[sz.height*sizeof(int)+16]();
-  cv::Mat O0_eq_i;
-  cv::Mat O1_eq_i;
+  cv::Mat O0, M0, O0_eq_i;
+  cv::Mat O1, M1, O1_eq_i;
 
   // Quantize the orientations into the nOrients bins.
   gradQuantize(O, M, sInv2, nOrients, full, softBin>=0, O0, O1, M0, M1);
@@ -54,6 +52,9 @@ ChannelsExtractorGradHistOpenCV::gradHist
 
   if ( (softBin < 0) && (softBin % 2 == 0) )
   {
+#ifdef DEBUG
+    std::cout << "=======> 1111111 " << std::endl;
+#endif
     // no interpolation w.r.t. either orientation or spatial bin
     cv::Mat Haux;
 
@@ -81,20 +82,22 @@ ChannelsExtractorGradHistOpenCV::gradHist
   }
   else if ( (softBin % 2 == 0) || (bin == 1) )
   {
+#ifdef DEBUG
+    std::cout << "=======> 2222222 " << std::endl;
+#endif
+
     // interpolate w.r.t. orientation only, not spatial bin
-    cv::Mat Haux0;
-    cv::Mat Haux1;
-    cv::Mat Hi1;
+    cv::Mat Haux0, Haux1, Hi1;
 
     // First we obtain te images with gradient magnitude of the pixels
     // with a given quantized orientation and 0 in the rest of pixels.
     for (int i=0; i<nOrients; i++)
     {
-      O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
+      O0_eq_i = (O0 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
       O0_eq_i.convertTo(O0_eq_i, CV_32F);
+      cv::multiply(O0_eq_i, M0, M0_orient_i);
       O1_eq_i = (O1 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
       O1_eq_i.convertTo(O1_eq_i, CV_32F);
-      cv::multiply(O0_eq_i, M0, M0_orient_i);
       cv::multiply(O1_eq_i, M1, M1_orient_i);
 
       // We use convolution with a full of ones kernel to sum over a window of
@@ -117,6 +120,10 @@ ChannelsExtractorGradHistOpenCV::gradHist
   }
   else
   {
+#ifdef DEBUG
+    std::cout << "=======> 333333333 " << std::endl;
+#endif
+
     //------------------------------------------------------------------------------
     // interpolate using trilinear interpolation:
     //   bilinear spatially, linear in the orientation
@@ -130,35 +137,36 @@ ChannelsExtractorGradHistOpenCV::gradHist
     {
       O0_eq_i = (O0 == i)/255;
       O0_eq_i.convertTo(O0_eq_i, CV_32F);
-      O1_eq_i = (O1 == i)/255;
-      O1_eq_i.convertTo(O1_eq_i, CV_32F);
       cv::multiply(O0_eq_i, M0, M0_orient_i);
-      cv::multiply(O1_eq_i, M1, M1_orient_i);
+      if (m_softBin >= 0)
+      {
+        O1_eq_i = (O1 == i)/255;
+        O1_eq_i.convertTo(O1_eq_i, CV_32F);
+        cv::multiply(O1_eq_i, M1, M1_orient_i);
+      }
 
       // We use convolution with a special kernel to perform a weighted sum over a window of
       // bin x bin pixels using also the bin x bin windows upper, upper left and to the left.
       // We are doing more computation than needed as the histogram, do not need overlaping
       // windows and we should be doing convolution with stride = bin. On the other hand,
       // filter2D do not support stride.
-
       float xb, yb, xd, yd;
       int xb0, yb0;
-      float sInv = 1.0/bin;
-      int bin2 = bin/2;
-      float init = (0+.5f)*sInv - 0.5f + sInv*static_cast<float>(bin2);
+      float sInv = 1.0/static_cast<float>(bin);
+      float init = (0+.5f)*sInv - 0.5f;
 
       int klength = 2*bin;
       cv::Mat kernel = cv::Mat::zeros(klength, klength, CV_32F);
 
-      xb = init;
-      for (int x=0; x < klength; x++)
+      xb = init; // + sInv*(bin/2);
+      for (int x=0 ; x < klength; x++)
       {
         xb0 = (int)xb;
         xd = xb - xb0;
         xb += sInv;
 
-        yb = init;
-        for (int y=0; y < klength; y++)
+        yb = init + sInv*(bin/2);
+        for (int y = 0; y < klength; y++)
         {
           yb0 = (int)yb;
           yd = yb - yb0;
@@ -178,54 +186,89 @@ ChannelsExtractorGradHistOpenCV::gradHist
           }
           else // if ((y >= bin) && (x >= bin)) // 3 -> ms[0]
           {
-            kernel.at<float>(y, x) = 1 - xd - yd + xd*yd;
+            kernel.at<float>(y, x) = 1.0 - xd - yd + xd*yd;
           }
         }
       }
+
+      int kcenter = bin;
+      if (bin % 2 == 1)
+      {
+        kernel = kernel(cv::Range(1,klength), cv::Range(1,klength));
+        kcenter -= 1;
+      }
+
+#ifdef DEBUG
+      if (i == 0)
+      {
+        std::cout << "ChannelsExtractorGradHistOpenCV::gradHist -->" << std::endl;
+        std::cout << "=============================" << std::endl;
+        std::cout << "wb, hb = " << wb << ", " << hb << std::endl;
+        std::cout << "sInv2 = " << sInv2;
+        std::cout << ", nOrients = " << nOrients;
+        std::cout << ", full = " << full;
+        std::cout << ", interpolate = " << (softBin>=0) << std::endl;
+
+        std::cout << "O0 =" << std::endl;
+        std::cout << O0 << std::endl;
+        std::cout << "O0 == i ->" << std::endl;
+        std::cout << (O0 == i) << std::endl;
+        std::cout << "O0_eq_i = " << std::endl;
+        std::cout << O0_eq_i << std::endl;
+        std::cout << "M0_orient_i = " << std::endl;
+        std::cout << M0_orient_i << std::endl;
+      }
+#endif
+
+#ifdef USE_SEPARABLE_CONVOLUTION
+      std::cout << "kernel = " << std::endl;
+      std::cout << kernel << std::endl;
+
+      // The kernel is saparable so we get the 1d kernel to speed up convolution using SVD
+      cv::SVD svd;
+      svd(kernel);
+      cv::Mat kernel1d = svd.u(cv::Range::all(), cv::Range(0,1)).clone(); // get first column of U as kernel 1d
+      kernel1d *= sqrt(svd.w.at<float>(0,0)); // Muliply by the square root of the corresponding singular value.
+
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel1d, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux0, Haux0, CV_32F, kernel1d.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+      if (m_softBin >= 0)
+      {
+        cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel1d, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+        cv::filter2D(Haux1, Haux1, CV_32F, kernel1d.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+      }
+#else
 //      std::cout << "kernel = " << std::endl;
 //      std::cout << kernel << std::endl;
 
-//      // Set to 0 first and last bin/2 rows
-//      M0_orient_i(cv::Range(0, bin/2), cv::Range::all()) = 0.0;
-//      M0_orient_i(cv::Range(M0_orient_i.rows-bin/2, M0_orient_i.rows), cv::Range::all()) = 0.0;
-
-//      // Set to 0 first and last bin/2 columns
-//      M0_orient_i(cv::Range::all(), cv::Range(0, bin/2)) = 0.0;
-//      M0_orient_i(cv::Range::all(), cv::Range(M0_orient_i.cols-bin/2, M0_orient_i.cols)) = 0.0;
-
-//      // Set to 0 first and last bin/2 rows
-//      M1_orient_i(cv::Range(0, bin/2), cv::Range::all()) = 0.0;
-//      M1_orient_i(cv::Range(M0_orient_i.rows-bin/2, M0_orient_i.rows), cv::Range::all()) = 0.0;
-
-//      // Set to 0 first and last bin/2 columns
-//      M1_orient_i(cv::Range::all(), cv::Range(0, bin/2)) = 0.0;
-//      M1_orient_i(cv::Range::all(), cv::Range(M1_orient_i.cols-bin/2, M1_orient_i.cols)) = 0.0;
-
-      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(bin,bin), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
       if (m_softBin >= 0)
       {
-        cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(bin,bin), 0, cv::BORDER_CONSTANT);
+        cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
       }
+#endif
 
-//      if (i==0)
-//      {
-//        std::cout << "Haux0 = " << std::endl;
-//        std::cout << Haux0 << std::endl;
-////      std::cout << "Haux0.size() = " << Haux0.size() << std::endl;
-////      std::cout << "H[i].size() = " << H[i].size() << std::endl;
-//      }
+#ifdef DEBUG
+      if (i == 0)
+      {
+        std::cout << "Haux0 = " << std::endl;
+        std::cout << Haux0 << std::endl;
+      }
+#endif
 
       // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
       // (keep the right values of the Haux matrix).
 
-      // shift the Haux0 matrix bin/2 pixels up and 1 pixel to the left.
+      // shift the Haux0 matrix bin/2 pixels up and to the left.
       cv::Mat out = cv::Mat::zeros(Haux0.size(), Haux0.type());
-      Haux0(cv::Rect(bin/2, bin/2, Haux0.cols-(bin/2), Haux0.rows-(bin/2))).copyTo(out(cv::Rect(0, 0, Haux0.cols-bin/2, Haux0.rows-bin/2)));
+      int shift_x = bin/2;
+      int shift_y = bin/2;
+      Haux0(cv::Rect(shift_x, shift_y, Haux0.cols-shift_x, Haux0.rows-shift_y)).copyTo(out(cv::Rect(0, 0, Haux0.cols-shift_x, Haux0.rows-shift_y)));
       Haux0 = out;
 
-      // shift the Haux1 matrix bin/2 pixels up and 1 pixel to the left.
+      // shift the Haux1 matrix bin/2 pixels up and to the left.
       cv::Mat out2 = cv::Mat::zeros(Haux1.size(), Haux1.type());
-      Haux1(cv::Rect(bin/2, bin/2, Haux1.cols-(bin/2), Haux1.rows-(bin/2))).copyTo(out2(cv::Rect(0, 0, Haux1.cols-bin/2, Haux1.rows-bin/2)));
+      Haux1(cv::Rect(shift_x, shift_y, Haux1.cols-shift_x, Haux1.rows-shift_y)).copyTo(out2(cv::Rect(0, 0, Haux1.cols-shift_x, Haux1.rows-shift_y)));
       Haux1 = out2;
 
       cv::resize(Haux0, H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
@@ -271,6 +314,7 @@ ChannelsExtractorGradHistOpenCV::gradQuantize
   )
 {
   cv::Mat o;
+  cv::Mat o_minusHalf;
   cv::Mat m;
   cv::Mat od;
   cv::Mat o0;
@@ -283,27 +327,30 @@ ChannelsExtractorGradHistOpenCV::gradQuantize
   if ( interpolate )
   {
     o = O*oMult;
-    o.convertTo(O0, CV_32S); // Convert to int (with truncation).
+    o_minusHalf = o - 0.5; // to make actualy a floor operation istead of a round one in convertTO CV_32S
+    o_minusHalf.convertTo(O0, CV_32S); // Convert to int. OpenCV uses rounding but, as we have substracted 0.5, then it performs truntacion.
     O0.convertTo(O0_float, CV_32F); // Back to float
     od = o - O0_float;
-    // O0
+    // O0 computation:
     O0.setTo(0, O0 >= nOrients);
-    // O1
+    // O1 computation:
     O1 = O0 + 1;
     O1.setTo(0, O1 == nOrients);
-    // M1
+    // M1 computation:
     m = M*norm;
     cv::multiply(m, od, M1);
-    // M0
+    // M0 computation:
     M0 = m - M1;
   }
   else
   {
-    // O0
-    o = O*oMult + 0.5;
-    o.convertTo(O0, CV_32S); // Convert to int (with truncation).
+    // O0 computation:
+    // In the P.Dollar implementation it is added 0.5 to o in order to convert with rounding (using the fact that truncation
+    // is performed from float to int). OpenCV conversion from CV_32F to CV_32S is already performing rounding.
+    o = O*oMult;
+    o.convertTo(O0, CV_32S); // Convert to int (with rounding).
     O0.setTo(0, O0 >= nOrients);
-    // M1
+    // M1 computation:
     M0 = M*norm;
     M1 = cv::Mat::zeros(M0.rows, M0.cols, CV_32F);
     O1 = cv::Mat::zeros(M0.rows, M0.cols, CV_32F);
