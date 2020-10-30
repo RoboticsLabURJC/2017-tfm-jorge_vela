@@ -50,7 +50,7 @@ ChannelsExtractorGradHistPDollar::gradQuantize
   _M1=(__m128*) M1;
   if  ( interpolate )
   {
-    for( i=0; i<=n-4; i+=4 )         // Doint it for 4 values at a time with SSE
+    for( i=0; i<=n-4; i+=4 )         // Do it for 4 values at a time with SSE
     {
       _o=MUL(LDu(O[i]),_oMult);      // o = O[i] * oMult
       _o0=CVT(_o);                   // o0 = floor(o) (truncation)
@@ -69,7 +69,7 @@ ChannelsExtractorGradHistPDollar::gradQuantize
   }
   else
   {
-    for( i=0; i<=n-4; i+=4 )         // Doint it for 4 values at a time with SSE
+    for( i=0; i<=n-4; i+=4 )         // Do it for 4 values at a time with SSE
     {
       _o=MUL(LDu(O[i]),_oMult);      // o = O[i] * oMult
       _o0=CVT(ADD(_o,SET(.5f)));     // o0 = o + 0.5
@@ -237,6 +237,7 @@ ChannelsExtractorGradHistPDollar::gradHist
           yb0 = (int) yb;
           if(yb0>=hb-1) break;
           GHinit;
+
           _m0=SET(M0[y]);
           if(hasLf)
           {
@@ -251,43 +252,45 @@ ChannelsExtractorGradHistPDollar::gradHist
         }
       }
       else
-          for( ; ; y++ )
+      {
+        for( ; ; y++ )
+        {
+          yb0 = (int) yb;
+          if(yb0>=hb-1) break;
+          GHinit;
+          _m0=SET(M0[y]);
+          _m1=SET(M1[y]);
+          if(hasLf)
           {
-            yb0 = (int) yb;
-            if(yb0>=hb-1) break;
-            GHinit;
-            _m0=SET(M0[y]);
-            _m1=SET(M1[y]);
-            if(hasLf)
-            {
-              _m=SET(0,0,ms[1],ms[0]);
-              GH(H0+O0[y],_m,_m0);
-              GH(H0+O1[y],_m,_m1);
-            }
-            if(hasRt)
-            {
-              _m=SET(0,0,ms[3],ms[2]);
-              GH(H0+O0[y]+hb,_m,_m0);
-              GH(H0+O1[y]+hb,_m,_m1);
-            }
+            _m=SET(0,0,ms[1],ms[0]);
+            GH(H0+O0[y],_m,_m0);
+            GH(H0+O1[y],_m,_m1);
           }
+          if(hasRt)
+          {
+            _m=SET(0,0,ms[3],ms[2]);
+            GH(H0+O0[y]+hb,_m,_m0);
+            GH(H0+O1[y]+hb,_m,_m1);
+          }
+        }
+      }
 
-          // final rows, no bottom bin
-          for( ; y<h0; y++ )
-          {
-            yb0 = (int) yb;
-            GHinit;
-            if(hasLf)
-            {
-              H0[O0[y]]+=ms[0]*M0[y];
-              H0[O1[y]]+=ms[0]*M1[y];
-            }
-            if(hasRt)
-            {
-              H0[O0[y]+hb]+=ms[2]*M0[y];
-              H0[O1[y]+hb]+=ms[2]*M1[y];
-            }
-          }
+      // final rows, no bottom bin
+      for( ; y<h0; y++ )
+      {
+        yb0 = (int) yb;
+        GHinit;
+        if(hasLf)
+        {
+          H0[O0[y]]+=ms[0]*M0[y];
+          H0[O1[y]]+=ms[0]*M1[y];
+        }
+        if(hasRt)
+        {
+          H0[O0[y]+hb]+=ms[2]*M0[y];
+          H0[O1[y]+hb]+=ms[2]*M1[y];
+        }
+      }
       #undef GHinit
       #undef GH
     }
@@ -299,7 +302,7 @@ ChannelsExtractorGradHistPDollar::gradHist
   delete[] M1;
 
   // normalize boundary bins which only get 7/8 of weight of interior bins
-  if ( softBin%2!=0 )
+  if ( softBin % 2 != 0 )
   {
     for( int o=0; o<nOrients; o++ )
     {
