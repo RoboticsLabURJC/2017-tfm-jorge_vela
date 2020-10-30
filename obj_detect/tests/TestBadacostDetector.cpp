@@ -21,8 +21,7 @@
 #undef DEBUG
 //#define DEBUG
 
-#define OVERLAP_THRESHOLD 0.67
-//#define OVERLAP_THRESHOLD 0.9
+#define OVERLAP_THRESHOLD 0.9
 
 class TestBadacostDetector: public testing::Test
 {
