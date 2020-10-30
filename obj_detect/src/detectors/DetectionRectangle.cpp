@@ -123,4 +123,92 @@ DetectionRectangle::squarify
 };
 
 
+void nonMaximumSuppression
+  (
+  std::vector<DetectionRectangle>& dts,  // input
+  std::vector<DetectionRectangle>& dts_nms // output
+  )
+{
+  //float thr = -std::numeric_limits<float>::infinity();
+  //float maxn = std::numeric_limits<float>::infinity(); // Maximum number of bboxes to output
+  bool ovrDnm = true;
+  float overlap = 0.3;
+  std::vector<float> radii = {0.15, 0.15, 1., 1.};
+
+  if (dts.size() == 0)
+  {
+    return;
+  }
+
+  // -----------------------------------------------------------
+  // for each i suppress all j st j>i and area-overlap>overlap
+  // -----------------------------------------------------------
+
+  // Order dts rectangles by descending order of score.
+  auto greater_score = [](DetectionRectangle& d1, DetectionRectangle& d2){ return d1.score > d2.score; };
+  std::sort(dts.begin(), dts.end(), greater_score);
+
+  std::vector<bool> kp(dts.size(), true);
+  std::vector<int> areas;
+  std::vector<int> x2, y2;
+  for (DetectionRectangle d: dts)
+  {
+    areas.push_back(d.bbox.height * d.bbox.width);
+    x2.push_back(d.bbox.x + d.bbox.width);
+    y2.push_back(d.bbox.y + d.bbox.height);
+  }
+
+  for (uint i = 0; i < dts.size(); i++)
+  {
+    if (!kp[i])
+    {
+      continue;
+    }
+    for (uint j = (i+1); j <= dts.size(); j++)
+    {
+      if (!kp[j])
+      {
+        continue;
+      }
+
+      int iw = std::min(x2[i], x2[j]) - std::max(dts[i].bbox.x, dts[j].bbox.x);
+      if (iw <= 0)
+      {
+        continue;
+      }
+
+      int ih = std::min(y2[i], y2[j]) - std::max(dts[i].bbox.y, dts[j].bbox.y);
+      if (ih <= 0)
+      {
+        continue;
+      }
+
+      float o = iw*ih;
+      int u;
+      if (ovrDnm)
+      {
+        u = areas[i] + areas[j] - o;
+      }
+      else
+      {
+        u = std::min(areas[i], areas[j]);
+      }
+      o = o / static_cast<float>(u);
+      if (o > overlap)
+      {
+        kp[j] = false;
+      }
+    }
+  }
+
+  for (uint i=0; i<dts.size(); i++)
+  {
+    if (kp[i])
+    {
+      dts_nms.push_back(dts[i]);
+    }
+  }
+}
+
+
 

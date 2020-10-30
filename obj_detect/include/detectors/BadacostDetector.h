@@ -69,25 +69,6 @@ protected:
     bool fixedWidth = false // In this case we keep the h fixed and modify w
     );
 
-  /**
-   * @brief nonMaximumSuppression Perform NMS over the detected bounding boxes.
-   *
-   * We implement the P.Dollar's toolbox bbNms with the following parameters:
-   *
-   *   - type: 'maxg'
-   *   - overlap: 0.3
-   *   - overDnm: 'union'
-   *
-   * @param dts
-   * @param dts_nms
-   */
-  void nonMaximumSuppression
-    (
-    std::vector<DetectionRectangle>& dts,
-    std::vector<DetectionRectangle>& dts_nms
-    );
-
-
   bool m_classifierIsLoaded;
     
   int m_shrink;

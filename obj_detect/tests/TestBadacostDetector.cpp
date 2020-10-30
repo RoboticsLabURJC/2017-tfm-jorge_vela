@@ -108,7 +108,7 @@ TEST_F(TestBadacostDetector, TestNms)
 
       std::vector<DetectionRectangle> dvo;
       BadacostDetector badacost;
-      badacost.nonMaximumSuppression(dv, dvo);
+      nonMaximumSuppression(dv, dvo);
 
       ASSERT_TRUE(dvo[0].bbox.x == 568);
       ASSERT_TRUE(dvo[0].bbox.y == 432);
@@ -156,7 +156,7 @@ TEST_F(TestBadacostDetector, TestNms2)
 
       std::vector<DetectionRectangle> dvo;
       BadacostDetector badacost;
-      badacost.nonMaximumSuppression(dv, dvo);
+      nonMaximumSuppression(dv, dvo);
 
       ASSERT_TRUE(dvo[0].bbox.x == 334);
       ASSERT_TRUE(dvo[0].bbox.y == 334);
@@ -170,9 +170,6 @@ TEST_F(TestBadacostDetector, TestNms2)
       //std::cout << dvo << std::endl;
 
 }
-
-
-
 
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
