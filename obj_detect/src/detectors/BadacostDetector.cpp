@@ -100,7 +100,6 @@ bool BadacostDetector::load
 
   ClassifierConfig clfData;
 
-
   clfData.modelDs.width = classifier["modelDs"]["data"][1];
   clfData.modelDs.height = classifier["modelDs"]["data"][0];
 
@@ -110,7 +109,7 @@ bool BadacostDetector::load
   clfData.stride = classifier["stride"]["data"][0];
   clfData.cascThr = float(classifier["cascThr"]["data"][0])*0.1;
 
-  clfData.luv.smooth = 1; //pyramid["pChns.pColor"]["smooth"];
+  clfData.luv.smooth = classifier["pChns.pColor"]["smooth"];
   clfData.luv.smooth_kernel_size = 1;
 
   clfData.padding.width = classifier["pad"]["data"][1]; //6; //
@@ -297,8 +296,7 @@ BadacostDetector::detectSingleScale
 #endif
 
 #ifdef DEBUG
-  std::cout << "--> img's size = " << img.size() << std::endl;
-  std::cout << "--> channel's size = " << filteredImagesResized[0].size() << std::endl;
+  std::cout << "--> channel's size = " << channels[0].size() << std::endl;
 #endif
 
   int height = channels[0].size().height;
@@ -306,8 +304,8 @@ BadacostDetector::detectSingleScale
 
 
 #ifdef DEBUG
-  std::cout << "channels[0].size().height = " << filteredImagesResized[0].size().height << std::endl;
-  std::cout << "channels[0].size().width = " << filteredImagesResized[0].size().width << std::endl;
+  std::cout << "channels[0].size().height = " << channels[0].size().height << std::endl;
+  std::cout << "channels[0].size().width = " << channels[0].size().width << std::endl;
 
   std::cout << "fids.size() = " << m_classifier["fids"].size() << std::endl;
   std::cout << "fhild.size() = " << m_classifier["child"].size() << std::endl;
@@ -317,14 +315,14 @@ BadacostDetector::detectSingleScale
   std::cout << "hs.size().height = " << m_classifier["hs"].size().height << std::endl;
 #endif
 
-//  int nTreeNodesMax = m_classifier["fids"].size().width;
+//  int nTreeNodes = m_classifier["fids"].size().width;
   int nTrees = m_classifier["fids"].size().height;
   int height1 = ceil(float((height*m_shrink)-m_clfData.modelDsPad.height+1)/m_clfData.stride);
   int width1 = ceil(float((width*m_shrink)-m_clfData.modelDsPad.width+1)/m_clfData.stride);
 
 #ifdef DEBUG
   std::cout << "nTrees = " << nTrees << std::endl;
-  std::cout << "nTreeNodes = " << nTreeNodes << std::endl;
+//  std::cout << "nTreeNodes = " << nTreeNodes << std::endl;
   std::cout << "height1 = " << height1 << std::endl;
   std::cout << "width1 = " << width1 << std::endl;
 #endif
