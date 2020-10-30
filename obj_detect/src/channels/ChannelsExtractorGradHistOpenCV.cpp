@@ -158,7 +158,7 @@ ChannelsExtractorGradHistOpenCV::gradHist
       int klength = 2*bin;
       cv::Mat kernel = cv::Mat::zeros(klength, klength, CV_32F);
 
-      xb = init; // + sInv*(bin/2);
+      xb = init + sInv*(bin/2);
       for (int x=0 ; x < klength; x++)
       {
         xb0 = (int)xb;

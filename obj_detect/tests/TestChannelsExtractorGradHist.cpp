@@ -19,8 +19,8 @@
 #include <chrono>
 
 
-//#undef DEBUG
-#define DEBUG
+#undef DEBUG
+//#define DEBUG
 
 class TestChannelsExtractorGradHist: public testing::Test
 {
