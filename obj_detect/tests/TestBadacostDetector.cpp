@@ -72,6 +72,109 @@ public:
     }
 };
 
+TEST_F(TestBadacostDetector, TestNms)
+{
+      DetectionRectangle d1;
+      d1.bbox.x = 568;
+      d1.bbox.y = 432;
+      d1.bbox.width = 123;
+      d1.bbox.height = 233;
+      d1.score = 1;
+      d1.class_index = 1;
+      gt_detections.push_back(d1);
+
+      DetectionRectangle d2;
+      d2.bbox.x = 570;
+      d2.bbox.y = 422;
+      d2.bbox.width = 120;
+      d2.bbox.height = 233;
+      d2.score = 1;
+      d2.class_index = 1;
+      gt_detections.push_back(d2);
+
+      DetectionRectangle d3;
+      d3.bbox.x = 573;
+      d3.bbox.y = 435;
+      d3.bbox.width = 118;
+      d3.bbox.height = 220;
+      d3.score = 1;
+      d3.class_index = 1;
+      gt_detections.push_back(d3);
+
+      std::vector<DetectionRectangle> dv;
+      dv.push_back(d1);
+      dv.push_back(d2);
+      dv.push_back(d3);
+
+      std::vector<DetectionRectangle> dvo;
+      BadacostDetector badacost;
+      badacost.nonMaximumSuppression(dv, dvo);
+
+      ASSERT_TRUE(dvo[0].bbox.x == 568);
+      ASSERT_TRUE(dvo[0].bbox.y == 432);
+      ASSERT_TRUE(dvo[0].bbox.width == 123);
+      ASSERT_TRUE(dvo[0].bbox.height == 233);
+
+      //std::cout << dvo << std::endl;
+
+}
+
+
+TEST_F(TestBadacostDetector, TestNms2)
+{
+      DetectionRectangle d1;
+      d1.bbox.x = 334;
+      d1.bbox.y = 334;
+      d1.bbox.width = 222;
+      d1.bbox.height = 233;
+      d1.score = 1;
+      d1.class_index = 1;
+      gt_detections.push_back(d1);
+
+      DetectionRectangle d2;
+      d2.bbox.x = 142;
+      d2.bbox.y = 543;
+      d2.bbox.width = 333;
+      d2.bbox.height = 20;
+      d2.score = 1;
+      d2.class_index = 1;
+      gt_detections.push_back(d2);
+
+      DetectionRectangle d3;
+      d3.bbox.x = 330;
+      d3.bbox.y = 210;
+      d3.bbox.width = 222;
+      d3.bbox.height = 433;
+      d3.score = 1;
+      d3.class_index = 1;
+      gt_detections.push_back(d3);
+
+      std::vector<DetectionRectangle> dv;
+      dv.push_back(d1);
+      dv.push_back(d2);
+      dv.push_back(d3);
+
+      std::vector<DetectionRectangle> dvo;
+      BadacostDetector badacost;
+      badacost.nonMaximumSuppression(dv, dvo);
+
+      ASSERT_TRUE(dvo[0].bbox.x == 334);
+      ASSERT_TRUE(dvo[0].bbox.y == 334);
+      ASSERT_TRUE(dvo[0].bbox.width == 222);
+      ASSERT_TRUE(dvo[0].bbox.height == 233);
+
+      ASSERT_TRUE(dvo[1].bbox.x == 142);
+      ASSERT_TRUE(dvo[1].bbox.y == 543);
+      ASSERT_TRUE(dvo[1].bbox.width == 333);
+      ASSERT_TRUE(dvo[1].bbox.height == 20);
+      //std::cout << dvo << std::endl;
+
+}
+
+
+
+
+
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 {
   std::string clfPath = "yaml/detectorComplete_2.yml";
