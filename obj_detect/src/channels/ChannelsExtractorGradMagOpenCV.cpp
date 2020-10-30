@@ -14,8 +14,6 @@
 #include "sse.hpp"
 #include <exception>
 
-#define PI 3.14159265f
-
 #undef DEBUG
 //#define DEBUG
 
