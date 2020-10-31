@@ -175,7 +175,7 @@ TEST_F(TestBadacostDetector, TestNms2)
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
 {
   std::string clfPath = "yaml/detectorComplete_2.yml";
-  std::string pyrPath = "yaml/pPyramid_badacost.yml";
+//  std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
   BadacostDetector badacost;
@@ -213,10 +213,11 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategy)
   }
 }
 
-TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
+TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy)
+{
 
   std::string clfPath = "yaml/detectorComplete_2.yml";
-  std::string pyrPath = "yaml/pPyramid_badacost.yml";
+//  std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
   ChannelsPyramid* pPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParallelStrategy() );
@@ -257,7 +258,8 @@ TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategy){
 }
 
 
-TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
+TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy)
+{
 
   std::string clfPath = "yaml/detectorComplete_2.yml";
   //std::string pyrPath = "yaml/pPyramid_badacost.yml";
@@ -302,10 +304,11 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategy){
 }
 
 
-TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategy){
+TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategy)
+{
 
   std::string clfPath = "yaml/detectorComplete_2.yml";
-  std::string pyrPath = "yaml/pPyramid_badacost.yml";
+//  std::string pyrPath = "yaml/pPyramid_badacost.yml";
   std::string filtersPath = "yaml/filterTest.yml";
 
   ChannelsPyramid* pPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedParallelStrategy() );
