@@ -146,10 +146,10 @@ ChannelsExtractorGradHistOpenCV::gradHist
       }
 
       // We use convolution with a special kernel to perform a weighted sum over a window of
-      // bin x bin pixels using also the bin x bin windows upper, upper left and to the left.
-      // We are doing more computation than needed as the histogram, do not need overlaping
-      // windows and we should be doing convolution with stride = bin. On the other hand,
-      // filter2D do not support stride.
+      // bin x bin pixels using also the sum over bin x bin upper, upper left and left windows.
+      // We are doing more computation than needed in the histogram. We sum over more windows
+      // that are overlaping. We should be doing convolution with stride = bin to do it on not
+      // overlapping windows. On the other hand, filter2D do not support stride.
       float xb, yb, xd, yd;
       int xb0, yb0;
       float sInv = 1.0/static_cast<float>(bin);
@@ -221,9 +221,6 @@ ChannelsExtractorGradHistOpenCV::gradHist
 #endif
 
 #ifdef USE_SEPARABLE_CONVOLUTION
-      std::cout << "kernel = " << std::endl;
-      std::cout << kernel << std::endl;
-
       // The kernel is saparable so we get the 1d kernel to speed up convolution using SVD
       cv::SVD svd;
       svd(kernel);
@@ -238,9 +235,6 @@ ChannelsExtractorGradHistOpenCV::gradHist
         cv::filter2D(Haux1, Haux1, CV_32F, kernel1d.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
       }
 #else
-//      std::cout << "kernel = " << std::endl;
-//      std::cout << kernel << std::endl;
-
       cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
       if (m_softBin >= 0)
       {
@@ -251,24 +245,43 @@ ChannelsExtractorGradHistOpenCV::gradHist
 #ifdef DEBUG
       if (i == 0)
       {
-        std::cout << "Haux0 = " << std::endl;
-        std::cout << Haux0 << std::endl;
+        std::cout << "Haux0 + Haux1 = " << std::endl;
+        std::cout << Haux0 + Haux1 << std::endl;
       }
 #endif
 
       // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
       // (keep the right values of the Haux matrix).
+      // The P.Dollar implementeation:
+      //   - skips the first bin/2 columns and bin/2 rows althought they are added to the
+      //     orientation bin that is to the right (in the first two columns) or down (in the first two rows).
+      //   - We depart from the filtered images (H0 and H1) with the weighted sum of gradient magnitude on
+      //     each quantized orienation in 2bin x 2bin regions. The sums should be performed in a non-overlapping
+      //     fashiong starting at the bin/2 pixel (both in rows and columns). We use cv::resize with cv::INTER_NEAREST
+      //     to select the sums corresponding to non-overlaping regions. In order to do as in P.Dollar's implementation
+      //     we need to remove the last rows and columns in the image that makes the size not divisible by bin (are in
+      //     outside any of the wb or hb bins). That is the reason to substract Haux0.cols%bin and Haux0.rows%bin to
+      //     new_cols and new_rows, respectively.
 
       // shift the Haux0 matrix bin/2 pixels up and to the left.
-      cv::Mat out = cv::Mat::zeros(Haux0.size(), Haux0.type());
-      int shift_x = bin/2;
-      int shift_y = bin/2;
-      Haux0(cv::Rect(shift_x, shift_y, Haux0.cols-shift_x, Haux0.rows-shift_y)).copyTo(out(cv::Rect(0, 0, Haux0.cols-shift_x, Haux0.rows-shift_y)));
+      int new_rows = Haux0.rows - Haux0.rows % bin;
+      int new_cols = Haux0.cols - Haux0.cols % bin;
+      cv::Size sz_ajusted(new_cols, new_rows);
+      cv::Mat out = cv::Mat::zeros(sz_ajusted, Haux0.type());
+      int shift_x = bin/2.0;
+      int shift_y = bin/2.0;
+      int width_copy = Haux0.cols - shift_x - Haux0.cols % bin;
+      int height_copy = Haux0.rows - shift_y - Haux0.rows % bin;
+      cv::Rect copyToRect(0, 0, Haux0.cols - shift_x - Haux0.cols % bin, Haux0.rows - shift_y - Haux0.rows % bin);
+      Haux0(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out(copyToRect));
       Haux0 = out;
 
       // shift the Haux1 matrix bin/2 pixels up and to the left.
-      cv::Mat out2 = cv::Mat::zeros(Haux1.size(), Haux1.type());
-      Haux1(cv::Rect(shift_x, shift_y, Haux1.cols-shift_x, Haux1.rows-shift_y)).copyTo(out2(cv::Rect(0, 0, Haux1.cols-shift_x, Haux1.rows-shift_y)));
+      cv::Mat out2 = cv::Mat::zeros(sz_ajusted, Haux1.type());
+      width_copy = Haux1.cols - shift_x - Haux1.cols % bin;
+      height_copy = Haux1.rows - shift_y - Haux1.rows % bin;
+      cv::Rect copyToRect2(0, 0, width_copy, height_copy);
+      Haux1(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out2(copyToRect2));
       Haux1 = out2;
 
       cv::resize(Haux0, H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);

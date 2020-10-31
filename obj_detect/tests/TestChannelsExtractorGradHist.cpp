@@ -125,29 +125,29 @@ TestChannelsExtractorGradHist::compareGradientOrientationHistogram
     int num_pixels_ok = cv::sum(lessThanThr)[0];
 
 #ifdef DEBUG
-//    std::cout << "MatlabMat(cv::Range(0,8), cv::Range(0,8)) = " << std::endl;
-//    std::cout << MatlabMat(cv::Range(0,8), cv::Range(0,8)) << std::endl;
-//    std::cout << "gradHistExtractVector[i](cv::Range(0,8), cv::Range(0,8)) = " << std::endl;
-//    std::cout << gradHistExtractVector[i](cv::Range(0,8), cv::Range(0,8))  << std::endl;
-    std::cout << "MatlabMat = " << std::endl;
-    std::cout << MatlabMat << std::endl;
-    std::cout << "gradHistExtractVector[i] = " << std::endl;
-    std::cout << gradHistExtractVector[i]  << std::endl;
+////    std::cout << "MatlabMat(cv::Range(0,8), cv::Range(0,8)) = " << std::endl;
+////    std::cout << MatlabMat(cv::Range(0,8), cv::Range(0,8)) << std::endl;
+////    std::cout << "gradHistExtractVector[i](cv::Range(0,8), cv::Range(0,8)) = " << std::endl;
+////    std::cout << gradHistExtractVector[i](cv::Range(0,8), cv::Range(0,8))  << std::endl;
+//    std::cout << "MatlabMat = " << std::endl;
+//    std::cout << MatlabMat << std::endl;
+//    std::cout << "gradHistExtractVector[i] = " << std::endl;
+//    std::cout << gradHistExtractVector[i]  << std::endl;
 
-    std::cout << "num_pixels_ok = " << num_pixels_ok;
-    std::cout << " of " << absDiff.rows * absDiff.cols << std::endl;
+//    std::cout << "num_pixels_ok = " << num_pixels_ok;
+//    std::cout << " of " << absDiff.rows * absDiff.cols << std::endl;
 
-    cv::minMaxIdx(gradHistExtractVector[i], &min_val, &max_val, min_ind, max_ind, cv::Mat());
-    std::cout << "max value gradHist = " << max_val << std::endl;
-    std::cout << "min value gradHist = " << min_val << std::endl;
+//    cv::minMaxIdx(gradHistExtractVector[i], &min_val, &max_val, min_ind, max_ind, cv::Mat());
+//    std::cout << "max value gradHist = " << max_val << std::endl;
+//    std::cout << "min value gradHist = " << min_val << std::endl;
 
-    cv::minMaxIdx(MatlabMat, &min_val, &max_val, min_ind, max_ind, cv::Mat());
-    std::cout << "max value MatlabMat = " << max_val << std::endl;
-    std::cout << "min value MatlabMat = " << min_val << std::endl;
+//    cv::minMaxIdx(MatlabMat, &min_val, &max_val, min_ind, max_ind, cv::Mat());
+//    std::cout << "max value MatlabMat = " << max_val << std::endl;
+//    std::cout << "min value MatlabMat = " << min_val << std::endl;
 
-    cv::minMaxIdx(absDiff, &min_val, &max_val, min_ind, max_ind, cv::Mat());
-    std::cout << "max value absDiff = " << max_val << std::endl;
-    std::cout << "min value absDiff = " << min_val << std::endl;
+//    cv::minMaxIdx(absDiff, &min_val, &max_val, min_ind, max_ind, cv::Mat());
+//    std::cout << "max value absDiff = " << max_val << std::endl;
+//    std::cout << "min value absDiff = " << min_val << std::endl;
 
     cv::imshow("absDiff", absDiff);
     cv::imshow("cpp-Mat", gradHistExtractVector[i]);
@@ -155,7 +155,7 @@ TestChannelsExtractorGradHist::compareGradientOrientationHistogram
     cv::waitKey();
 #endif
 
-    ASSERT_TRUE(num_pixels_ok > 0.8 * absDiff.rows * absDiff.cols);
+    ASSERT_TRUE(num_pixels_ok > 0.7 * absDiff.rows * absDiff.cols);
   }
   fs.release();
 }
@@ -361,6 +361,8 @@ TestChannelsExtractorGradHist::compareGradHistSyntheticImgOpenCvPDollar
 //    cv::waitKey();
 #endif
 
+    // Keep the 0.7 as the pixels in the borders of the image do not get the values as in P.Dollar. In this
+    // case the images are small and the border is quite a big proportion of them.
     ASSERT_TRUE(num_pixels_ok > 0.7 * absDiff.rows * absDiff.cols);
   }
 }
@@ -590,8 +592,8 @@ TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistRandomOrie
 
 TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistRandomOrientationsSequentialMagSoftBin1binSize3)
 {
-  cv::Mat gradMag = cv::Mat::ones(20, 30, CV_32F);
-  cv::Mat gradQuantizedOrient = cv::Mat::zeros(20, 30, CV_32F);
+  cv::Mat gradMag = cv::Mat::ones(43, 61, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(43, 61, CV_32F);
 
   float low = 0;
   float high = M_PI;
@@ -619,8 +621,8 @@ TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistRandomOrie
 
 TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistRandomOrientationsSequentialMagSoftBin1binSize5)
 {
-  cv::Mat gradMag = cv::Mat::ones(20, 30, CV_32F);
-  cv::Mat gradQuantizedOrient = cv::Mat::zeros(20, 30, CV_32F);
+  cv::Mat gradMag = cv::Mat::ones(43, 61, CV_32F);
+  cv::Mat gradQuantizedOrient = cv::Mat::zeros(43, 61, CV_32F);
 
   float low = 0;
   float high = M_PI;
