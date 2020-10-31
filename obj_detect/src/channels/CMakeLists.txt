@@ -7,6 +7,8 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVPDollar.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVPDollar.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVOpenCV.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVOpenCV.cpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.cpp

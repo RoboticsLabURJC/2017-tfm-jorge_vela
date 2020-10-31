@@ -6,7 +6,7 @@
  *
  *  ------------------------------------------------------------------------ */
 #include <channels/ChannelsExtractorLUV.h>
-//#include <channels/ChannelsExtractorLUVOpenCV.h>
+#include <channels/ChannelsExtractorLUVOpenCV.h>
 #include <channels/ChannelsExtractorLUVPDollar.h>
 
 std::shared_ptr<ChannelsExtractorLUV>
@@ -18,14 +18,14 @@ ChannelsExtractorLUV::createExtractor
   )
 {
   std::shared_ptr<ChannelsExtractorLUV> pExtractor;
-//  if (extractor_type == "opencv")
-//  {
-//    pExtractor.reset(new ChannelsExtractorLUVOpenCV(normRad, normConst));
-//  }
-//  else // if (extractor_type == "pdollar")
-//  {
+  if (extractor_type == "opencv")
+  {
+    pExtractor.reset(new ChannelsExtractorLUVOpenCV(smooth, smooth_kernel_size));
+  }
+  else // if (extractor_type == "pdollar")
+  {
     pExtractor.reset(new ChannelsExtractorLUVPDollar(smooth, smooth_kernel_size));
-//  }
+  }
 
   return pExtractor;
 }
