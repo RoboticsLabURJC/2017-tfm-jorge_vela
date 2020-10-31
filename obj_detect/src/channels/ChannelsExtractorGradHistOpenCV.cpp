@@ -12,8 +12,8 @@
 #include <opencv2/opencv.hpp>
 #include "sse.hpp"
 
-#undef USE_SEPARABLE_CONVOLUTION
-//#define USE_SEPARABLE_CONVOLUTION
+//#undef USE_SEPARABLE_CONVOLUTION
+#define USE_SEPARABLE_CONVOLUTION
 
 //#define DEBUG
 
