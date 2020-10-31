@@ -15,7 +15,8 @@
 ChannelsExtractorLDCF::ChannelsExtractorLDCF
   (
     std::vector<cv::Mat> filters,
-    ClassifierConfig clf
+    ClassifierConfig clf,
+    std::string acf_impl_type
   )
 { 
     m_filters = filters;  
@@ -29,6 +30,8 @@ ChannelsExtractorLDCF::ChannelsExtractorLDCF
       cv::flip(f, f_flipped, -1);
       m_flipped_filters.push_back(f);
     }
+
+    m_acf_impl_type = acf_impl_type;
 };
 
 std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
@@ -37,7 +40,7 @@ std::vector<cv::Mat> ChannelsExtractorLDCF::extractFeatures
   )
 {
   // Extract the ACF channels
-  ChannelsExtractorACF acfExtractor(m_clf, true);
+  ChannelsExtractorACF acfExtractor(m_clf, true, m_acf_impl_type);
   std::vector<cv::Mat> acf_channels = acfExtractor.extractFeatures(img);
 
   if (m_filters.empty())
@@ -55,29 +58,29 @@ ChannelsExtractorLDCF::extractFeaturesFromACF
     const std::vector<cv::Mat>& acf_channels
   )
 {
-    // Now use convolution over the preprocessed ACF channels with the LDCF filters.
-    std::vector<cv::Mat> ldcf_channels;
-    int num_filters_per_channel = m_flipped_filters.size() / acf_channels.size();
-    assert(m_flipped_filters.size() % acf_channels.size() == 0);
-    int num_acf_channels = acf_channels.size();
-    for(int j = 0; j < num_filters_per_channel; j++)
+  // Now use convolution over the preprocessed ACF channels with the LDCF filters.
+  std::vector<cv::Mat> ldcf_channels;
+  int num_filters_per_channel = m_flipped_filters.size() / acf_channels.size();
+  assert(m_flipped_filters.size() % acf_channels.size() == 0);
+  int num_acf_channels = acf_channels.size();
+  for(int j = 0; j < num_filters_per_channel; j++)
+  {
+    for(int i = 0; i < num_acf_channels; i++)
     {
-      for(int i = 0; i < num_acf_channels; i++)
-      {
-        cv::Mat out_image;
+      cv::Mat out_image;
 
-        // NOTE: filter2D is not making real convolution as conv2 in matlab, it makes performs correlation.
-        // Thus we have to flip the kernel and change the anchor point. We have already flipped the filters
-        // when added them to the constructor!!
-        filter2D( acf_channels[i], out_image, CV_32FC1 ,
-                  m_flipped_filters[i+(num_acf_channels*j)],
-                  cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
+      // NOTE: filter2D is not making real convolution as conv2 in matlab, it makes performs correlation.
+      // Thus we have to flip the kernel and change the anchor point. We have already flipped the filters
+      // when added them to the constructor!!
+      filter2D( acf_channels[i], out_image, CV_32FC1 ,
+                m_flipped_filters[i+(num_acf_channels*j)],
+                cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
 
-        out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
-        ldcf_channels.push_back(out_image);
-      }
+      out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
+      ldcf_channels.push_back(out_image);
     }
+  }
 
-    return ldcf_channels;
+  return ldcf_channels;
 }
 

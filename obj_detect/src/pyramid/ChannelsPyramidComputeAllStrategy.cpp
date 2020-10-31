@@ -10,12 +10,6 @@
 #undef DEBUG
 //#define DEBUG
 
-ChannelsPyramidComputeAllStrategy::ChannelsPyramidComputeAllStrategy
-  () {};
-
-ChannelsPyramidComputeAllStrategy::~ChannelsPyramidComputeAllStrategy
-  () {};
-
 std::vector<std::vector<cv::Mat>>
 ChannelsPyramidComputeAllStrategy::compute
   (
@@ -43,7 +37,7 @@ ChannelsPyramidComputeAllStrategy::compute
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, clf);// clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full);
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf, m_channels_impl_type);// clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full);
   for(int i=0; i< nScales; i++)
   {
     double s = scales[i];

@@ -29,10 +29,12 @@ class ChannelsPyramidComputeAllStrategy: public ChannelsPyramid
 {
 public:
   ChannelsPyramidComputeAllStrategy
-    ();
+    (
+    std::string channels_impl_type
+    ): ChannelsPyramid(channels_impl_type) {}
 
   virtual ~ChannelsPyramidComputeAllStrategy
-    ();
+  () {}
 
   virtual std::vector<std::vector<cv::Mat>> compute
     (

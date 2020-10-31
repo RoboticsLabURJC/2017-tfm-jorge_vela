@@ -34,10 +34,12 @@ class ChannelsPyramidApproximatedParallelStrategy: public ChannelsPyramid
 {
 public:
   ChannelsPyramidApproximatedParallelStrategy
-   ();
+    (
+    std::string channels_impl_type
+    ): ChannelsPyramid(channels_impl_type) {}
 
   virtual ~ChannelsPyramidApproximatedParallelStrategy
-    ();
+  () {}
 
   virtual std::vector<std::vector<cv::Mat>> compute
     (

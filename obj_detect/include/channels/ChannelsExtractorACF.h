@@ -30,14 +30,14 @@ public:
    /**
     * This constructor sets the parameters for computing the ACF features.
     *
-    * @param padding
-    * @param shrink
+    * @param clf Configuration variables for ACF computation.
+    * @param postprocess_channels postprocess or not the ACF channels (to be used in ChannelsPyramid).
+    * @param impl_type By now the implementations are "pdollar" and "opencv".
     */
   ChannelsExtractorACF
     (
       ClassifierConfig clf,
       bool postprocess_channels = true,
-//    std::string impl_type = "opencv"
       std::string impl_type = "pdollar"
     );
 

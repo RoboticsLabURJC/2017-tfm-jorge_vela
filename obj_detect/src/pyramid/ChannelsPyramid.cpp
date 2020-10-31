@@ -1,5 +1,9 @@
 
 #include <pyramid/ChannelsPyramid.h>
+#include <pyramid/ChannelsPyramidComputeAllStrategy.h>
+#include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
+#include <pyramid/ChannelsPyramidApproximatedStrategy.h>
+#include <pyramid/ChannelsPyramidApproximatedParallelStrategy.h>
 #include <channels/Utils.h>
 #include <channels/ChannelsExtractorLDCF.h>
 #include <opencv2/opencv.hpp>
@@ -9,49 +13,6 @@
 
 #undef DEBUG
 //#define DEBUG
-
-ChannelsPyramid::ChannelsPyramid
-  () {};
-
-ChannelsPyramid::~ChannelsPyramid
-  () {};
-
-/*
-bool
-ChannelsPyramid::load(std::string opts)
-{
-  cv::FileStorage pPyramid;
-  bool existOpts = pPyramid.open(opts, cv::FileStorage::READ);
-
-  if (existOpts)
-  {
-    m_padding.width = pPyramid["pad"]["data"][1]; //6; //
-    m_padding.height = pPyramid["pad"]["data"][0]; //4; //
-    m_nOctUp = pPyramid["nOctUp"]["data"][0]; //0; //
-    m_nPerOct = pPyramid["nPerOct"]["data"][0]; //3; //
-    m_nApprox = pPyramid["nApprox"]["data"][0]; //2; //
-    m_shrink = pPyramid["pChns.shrink"]["data"];
-
-    m_gradientMag_normRad = pPyramid["pChns.pGradMag"]["normRad"]; //5;
-    m_gradientMag_normConst = pPyramid["pChns.pGradMag"]["normConst"]; //0.005;
-
-
-    m_gradientHist_binSize =  pPyramid["pChns.pGradHist"]["enabled"]; //2;
-    m_gradientHist_nOrients =  pPyramid["pChns.pGradHist"]["nOrients"]; //6;
-    m_gradientHist_softBin =  pPyramid["pChns.pGradHist"]["softBin"]; //1;
-    m_gradientHist_full =  false ; //pPyramid["pChns.pGradHist"]["full"]; //0;
-
-
-    int lambdasSize = pPyramid["lambdas"]["cols"];
-    for(int i = 0; i < lambdasSize; i++)
-      m_lambdas.push_back((float)pPyramid["lambdas"]["data"][i]);
-
-    // TODO: Cargar del fichero!!
-    m_minDs.width = pPyramid["minDs"]["data"][1]; //84; // <--- TODO: JM: Esto debería de venir del fichero del detector.
-    m_minDs.height = pPyramid["minDs"]["data"][0]; // 48; // <--- TODO: JM: Esto debería de venir de fichero del detector
-  }
-  return existOpts;
-}*/
 
 /**
  * Funcion getScales. En funcion de los parámetros de entrada retorna un vector con los distintos valores
@@ -134,6 +95,34 @@ ChannelsPyramid::getScales
   }
 
   return 0;
+}
+
+std::shared_ptr<ChannelsPyramid>
+ChannelsPyramid::createChannelsPyramid
+  (
+  std::string pyramid_impl_type,
+  std::string channels_impl_type
+  )
+{
+  std::shared_ptr<ChannelsPyramid> pPyramid;
+  if (pyramid_impl_type == "all")
+  {
+    pPyramid.reset(new ChannelsPyramidComputeAllStrategy(channels_impl_type));
+  }
+  else if (pyramid_impl_type == "all_parallel")
+  {
+    pPyramid.reset(new ChannelsPyramidComputeAllParallelStrategy(channels_impl_type));
+  }
+  else if (pyramid_impl_type == "approximated")
+  {
+    pPyramid.reset(new ChannelsPyramidApproximatedStrategy(channels_impl_type));
+  }
+  else //if (pyramid_impl_type == "approximated_parallel")
+  {
+    pPyramid.reset(new ChannelsPyramidApproximatedParallelStrategy(channels_impl_type));
+  }
+
+  return pPyramid;
 }
 
 

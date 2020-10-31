@@ -24,30 +24,17 @@
 
 BadacostDetector::BadacostDetector
   (
-  ChannelsPyramid* pChnsPyramidStrategy
+  std::string channels_pyramid_impl,
+  std::string channels_impl
   )
   {
     m_classifierIsLoaded = false;
-
-    // By defult the strategy is computing all channels in all scales (none is approximated).
-    if  (!pChnsPyramidStrategy)
-    {
-      m_pChnsPyramidStrategy = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
-    }
-    else
-    {
-      m_pChnsPyramidStrategy = pChnsPyramidStrategy;
-    }
+    m_pChnsPyramidStrategy = ChannelsPyramid::createChannelsPyramid(channels_pyramid_impl, channels_impl);
   };
 
 BadacostDetector::~BadacostDetector
   ()
-{
-  if (m_pChnsPyramidStrategy)
-  {
-    delete m_pChnsPyramidStrategy;
-  }
-}
+{}
 
 bool BadacostDetector::load
   (

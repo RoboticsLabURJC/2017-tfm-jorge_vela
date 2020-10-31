@@ -12,18 +12,13 @@
 class TestChannelsPyramid: public testing::Test
 {
 public:
-  ChannelsPyramid* pChnsPyramid;
+  std::shared_ptr<ChannelsPyramid> pChnsPyramid;
   virtual void SetUp()
     {
-      pChnsPyramid = nullptr;
     }
 
   virtual void TearDown()
     {
-      if (pChnsPyramid)
-      {
-        delete pChnsPyramid;
-      }
     }
 };
 
@@ -42,12 +37,7 @@ TEST_F(TestChannelsPyramid, TestGetScales)
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
 
-  if (pChnsPyramid)
-  {
-    delete pChnsPyramid;
-  }
-  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
-
+  pChnsPyramid = ChannelsPyramid::createChannelsPyramid("all", "pdollar");
   pChnsPyramid->getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
   std::vector<float> check = {2.1463, 1.8537, 1.6589, 1.4632, 1.2684, 1.0737, 0.8779};
 
@@ -70,11 +60,7 @@ TEST_F(TestChannelsPyramid, TestGetScalesChangeVals)
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
 
-  if (pChnsPyramid)
-  {
-    delete pChnsPyramid;
-  }
-  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
+  pChnsPyramid = ChannelsPyramid::createChannelsPyramid("all", "pdollar");
 
   pChnsPyramid->getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
   pChnsPyramid->getScales(nPerOct, nOctUp, minDS, shrink, size, scales, scaleshw);
@@ -90,11 +76,6 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllStrategy)
   cv::Mat image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
 
   std::string nameOpts = "yaml/pPyramid_badacost.yml";
-
-  if (pChnsPyramid)
-  {
-    delete pChnsPyramid;
-  }
 
   ClassifierConfig clfData;
 
@@ -122,8 +103,8 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllStrategy)
   clfData.minDs.width = 48; 
   clfData.minDs.height = 84; 
 
+  pChnsPyramid = ChannelsPyramid::createChannelsPyramid("all", "pdollar");
 
-  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllStrategy() );
 
   //bool loadOk = pChnsPyramid->load(nameOpts.c_str());
   //ASSERT_TRUE(loadOk);
@@ -141,11 +122,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidComputeAllParallelStrategy)
 
   std::string nameOpts = "yaml/pPyramid_badacost.yml";
 
-  if (pChnsPyramid)
-  {
-    delete pChnsPyramid;
-  }
-  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidComputeAllParallelStrategy() );
+  pChnsPyramid = ChannelsPyramid::createChannelsPyramid("all_parallel", "pdollar");
 
   ClassifierConfig clfData;
 
@@ -188,11 +165,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedParallelStrategy)
 
   std::string nameOpts = "yaml/pPyramid_badacost.yml";
 
-  if (pChnsPyramid)
-  {
-    delete pChnsPyramid;
-  }
-  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedParallelStrategy() );
+  pChnsPyramid = ChannelsPyramid::createChannelsPyramid("approximated_parallel", "pdollar");
 
   ClassifierConfig clfData;
 
@@ -239,11 +212,7 @@ TEST_F(TestChannelsPyramid, channelsPyramidApproximatedStrategy)
 
   std::string nameOpts = "yaml/pPyramid_badacost.yml";
 
-  if (pChnsPyramid)
-  {
-    delete pChnsPyramid;
-  }
-  pChnsPyramid = dynamic_cast<ChannelsPyramid*>( new ChannelsPyramidApproximatedStrategy() );
+  pChnsPyramid = ChannelsPyramid::createChannelsPyramid("approximated", "pdollar");
 
   ClassifierConfig clfData;
 

@@ -28,13 +28,14 @@ public:
     * the ones needed for LDCF.
     *
     * @param filters LDCF filters to be applied over the ACF channels.
-    * @param padding for the ACF channels before filtering for LDCF
-    * @param shrink
+    * @param clf is the configuration of the detector
+    * @param acf_impl_type See ChannelsExtractorACF for the allowed types.
     */
   ChannelsExtractorLDCF
     (
       std::vector<cv::Mat> filters,
-      ClassifierConfig clf
+      ClassifierConfig clf,
+      std::string acf_impl_type = "pdollar"
     );
 
   /**
@@ -65,6 +66,7 @@ public:
     );
 
 private:
+  std::string m_acf_impl_type;
   int m_shrink;
   std::string m_color_space;
   cv::Size m_padding;

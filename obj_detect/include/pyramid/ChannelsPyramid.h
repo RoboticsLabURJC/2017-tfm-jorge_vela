@@ -25,10 +25,12 @@ class ChannelsPyramid
 {
 public:
   ChannelsPyramid
-    ();
+    (
+    std::string channels_impl_type
+    ) { m_channels_impl_type = channels_impl_type; }
 
   virtual ~ChannelsPyramid
-    ();
+  () {};
 
   /*virtual bool load
     (
@@ -55,7 +57,27 @@ public:
     std::vector<cv::Size2d>& scaleshw
     );
 
+  /**
+   * @brief createChannelsPyramid Factory class method for channel pyramid computation algorithms
+   *
+   * The implementation strings for different strategies are:
+   *   - "all" for ChannelsPyramidComputeAllStrategy
+   *   - "all_parallel" for ChannelsPyramidComputeAllParallelStrategy
+   *   - "approximated" for ChannelsPyramidApproximatedtrategy
+   *   - "approximated_parallel" for ChannelsPyramidApproximatedParallelStrategy
+   *
+   * @param pyramid_impl_type std::string with the name of the strategy.
+   * @return shared_ptr to a ChannelsPyramid implementation.
+   */
+  static std::shared_ptr<ChannelsPyramid>
+  createChannelsPyramid
+    (
+    std::string pyramid_impl_type = "approximated_parallel",
+    std::string channels_impl_type = "pdollar"
+    );
+
 protected:
+  std::string m_channels_impl_type;
   int m_nOctUp;
   int m_nPerOct;
   int m_nApprox;
@@ -68,7 +90,6 @@ protected:
   int m_gradientHist_nOrients;
   int m_gradientHist_softBin;
   int m_gradientHist_full;
-
 
   std::vector<float> m_lambdas;
   cv::Size m_padding;

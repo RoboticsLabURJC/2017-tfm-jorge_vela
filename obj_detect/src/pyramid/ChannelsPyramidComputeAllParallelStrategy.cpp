@@ -12,12 +12,6 @@
 #undef DEBUG
 //#define DEBUG
 
-ChannelsPyramidComputeAllParallelStrategy::ChannelsPyramidComputeAllParallelStrategy
-  () {};
-
-ChannelsPyramidComputeAllParallelStrategy::~ChannelsPyramidComputeAllParallelStrategy
-  () {};
-
 std::vector<std::vector<cv::Mat>>
 ChannelsPyramidComputeAllParallelStrategy::compute
   (
@@ -44,7 +38,7 @@ ChannelsPyramidComputeAllParallelStrategy::compute
 
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
-  ChannelsExtractorLDCF ldcfExtractor(filters, clf);// clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full); //clf.padding, clf.shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf, m_channels_impl_type);
 
   // It is more efficient to compute the
   cv::parallel_for_(cv::Range( 0, nScales ), [&](const cv::Range& r)

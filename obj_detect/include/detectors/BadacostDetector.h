@@ -24,7 +24,8 @@ class BadacostDetector
 public:
   BadacostDetector
     (
-    ChannelsPyramid* pChnsPyramidStrategy = nullptr
+    std::string channels_pyramid_impl = "all_parallel",
+    std::string channels_impl = "pdollar"
     );
 
   ~BadacostDetector
@@ -95,7 +96,7 @@ protected:
 
   // After load it contains the variables for build the pyramid of channel features
   // "fids", "thrs", "child", "hs", "weights", "depth"
-  ChannelsPyramid* m_pChnsPyramidStrategy;
+  std::shared_ptr<ChannelsPyramid> m_pChnsPyramidStrategy;
   ClassifierConfig m_clfData;
 
   std::vector<cv::Mat> m_filters;

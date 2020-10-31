@@ -7,21 +7,11 @@
 #include <channels/Utils.h>
 #include <cmath>
 #include <iostream>
-#include <omp.h>
-#undef DEBUG
-//#define DEBUG
 #include <chrono>
 
-#define USEOMP
+#undef DEBUG
+//#define DEBUG
 
-#ifdef USEOMP
-#include <omp.h>
-#endif
-ChannelsPyramidApproximatedStrategy::ChannelsPyramidApproximatedStrategy
-  ()  {};
-
-ChannelsPyramidApproximatedStrategy::~ChannelsPyramidApproximatedStrategy
-  () {};
 
 std::vector<std::vector<cv::Mat>>
 ChannelsPyramidApproximatedStrategy::compute
@@ -71,17 +61,8 @@ ChannelsPyramidApproximatedStrategy::compute
 
 
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
-  //std::vector<cv::Mat> pChnsCompute;
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
-  ChannelsExtractorACF acfExtractor(clf, postprocess_acf_channels);/*(clf.padding,
-                                    clf.shrink,
-                                    postprocess_acf_channels,
-                                    clf.gradMag.normRad,
-                                    clf.gradMag.normConst,
-                                    clf.gradHist.binSize,
-                                    clf.gradHist.nOrients,
-                                    clf.gradHist.softBin,
-                                    clf.gradHist.full);*/
+  ChannelsExtractorACF acfExtractor(clf, postprocess_acf_channels, m_channels_impl_type);
 
   // Full computation for the real scales (ImResample+extractFeatures)
   for (const auto& i : isR)
@@ -141,15 +122,7 @@ ChannelsPyramidApproximatedStrategy::compute
 
 
   // Now we can filter the channels to get the LDCF ones.
-  ChannelsExtractorLDCF ldcfExtractor(filters, clf);/*
-                                      clf.padding,
-                                      clf.shrink,
-                                      clf.gradMag.normRad,
-                                      clf.gradMag.normConst,
-                                      clf.gradHist.binSize,
-                                      clf.gradHist.nOrients,
-                                      clf.gradHist.softBin,
-                                      clf.gradHist.full);*/
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf);
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
 
   for (uint i=0; i < chnsPyramidDataACF.size(); i++)

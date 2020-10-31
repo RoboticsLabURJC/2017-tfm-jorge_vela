@@ -9,17 +9,8 @@
 #include <iostream>
 #include <omp.h>
 #undef DEBUG
-//#define DEBUG
 #include <chrono>
-//#include <functional>
-//#include <numeric>
 #include <random>
-
-ChannelsPyramidApproximatedParallelStrategy::ChannelsPyramidApproximatedParallelStrategy
-  () {};
-
-ChannelsPyramidApproximatedParallelStrategy::~ChannelsPyramidApproximatedParallelStrategy
-  () {};
 
 std::vector<std::vector<cv::Mat>>
 ChannelsPyramidApproximatedParallelStrategy::compute
@@ -32,10 +23,9 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   )
 {
   cv::Size sz = img.size();
-  //cv::Mat imageUse = img;
 
   // GET SCALES AT WHICH TO COMPUTE FEATURES ---------------------------------
-  getScales(clf.nPerOct, clf.nOctUp, clf.minDs, clf.shrink, sz, scales, scaleshw);//getScales(m_nPerOct, m_nOctUp, m_minDs, m_shrink, sz, scales, scaleshw);
+  getScales(clf.nPerOct, clf.nOctUp, clf.minDs, clf.shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
   std::cout << "--> scales = ";
@@ -69,10 +59,8 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   }
 
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
-  //std::vector<cv::Mat> pChnsCompute;
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
-  ChannelsExtractorACF acfExtractor(clf, postprocess_acf_channels);//clf.padding, clf.shrink, postprocess_acf_channels, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
-  //ChannelsExtractorACF acfExtractor(clf.padding, clf.shrink, postprocess_acf_channels, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full);  
+  ChannelsExtractorACF acfExtractor(clf, postprocess_acf_channels, m_channels_impl_type);
 
   //uint i;
   cv::parallel_for_(cv::Range( 0, isR.size() ), [&](const cv::Range& r)
@@ -93,14 +81,6 @@ ChannelsPyramidApproximatedParallelStrategy::compute
       {
         I1 = ImgResample(img, sz1.width , sz1.height);
       }
-
-     // JM: Esto no tiene mucho sentido ... si se hace en paralelo
-     // ¡img es una variable compartida pero no se sabe en qué orden de iteraciones se ejecuta el bucle!
-//      if ((s == 0.5) && (m_nApprox > 0 || m_nPerOct == 1))
-//      {
-//        img = I1;
-//      }
-
       chnsPyramidDataACF[isR[i]-1] = acfExtractor.extractFeatures(I1);
     }
   });
@@ -115,7 +95,6 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   auto isAIndex = isA;
   std::shuffle(isAIndex.begin(), isAIndex.end(), std::mt19937(std::random_device()()));
 
-//  cv::parallel_for_(cv::Range( 0, isA.size() ), [&](const cv::Range& r)
   cv::parallel_for_(cv::Range( 0, int(isAIndex.size()) ), [&](const cv::Range& r)
   {
     for (int i = r.start; i < r.end; i++)
