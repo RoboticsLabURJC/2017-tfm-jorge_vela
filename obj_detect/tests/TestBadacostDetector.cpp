@@ -187,7 +187,7 @@ TestBadacostDetector::testDetector
   std::cout << detections;
   std::cout << "gt_detections = " << std::endl;
   std::cout << gt_detections << std::endl;
-  badacost.showResults(image, detections);
+  detector.showResults(image, detections);
   cv::imshow("image", image);
   cv::waitKey();
 #endif

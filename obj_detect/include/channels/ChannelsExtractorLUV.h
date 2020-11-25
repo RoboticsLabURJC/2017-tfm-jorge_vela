@@ -35,11 +35,6 @@ public:
       cv::Mat img
     ) = 0;
 
-  virtual std::vector<cv::Mat> bgr2luv
-    (
-      cv::Mat bgr_img
-    ) = 0;
-
   static std::shared_ptr<ChannelsExtractorLUV>
   createExtractor
     (

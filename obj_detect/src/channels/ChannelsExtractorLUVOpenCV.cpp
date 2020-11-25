@@ -28,7 +28,7 @@ ChannelsExtractorLUVOpenCV::ChannelsExtractorLUVOpenCV
     bgr2luvSetup(m_scaling_factor, m_mr, m_mg, m_mb, m_minu, m_minv, m_un, m_vn, m_L_LUT);
 }
 
-// Constants for rgb2luv conversion and lookup table for y-> l conversion
+//// Constants for rgb2luv conversion and lookup table for y-> l conversion
 void
 ChannelsExtractorLUVOpenCV::bgr2luvSetup
   (
@@ -163,9 +163,9 @@ ChannelsExtractorLUVOpenCV::extractFeatures
   return channelsLUV;
 }
 
-// Not equivalent at all to the P. Dollar's one :-(.
+//// Not equivalent at all to the P. Dollar's one :-(.
 //std::vector<cv::Mat>
-// ChannelsExtractorLUVOpenCV::extractFeaturesOpenCV
+//ChannelsExtractorLUVOpenCV::extractFeatures
 //  (
 //  cv::Mat img
 //  )
@@ -185,10 +185,12 @@ ChannelsExtractorLUVOpenCV::extractFeatures
 //  channelsLUV[2].convertTo(channelsLUV_normalized[2], CV_32FC3, 256.0/255.0, -140.0);
 
 //////  // Add some constants in order to do it more similar to P. Dollar's Luv conversion:
-////  channelsLUV[1] += 0.325926;
-////  channelsLUV[2] += 0.496296;
+//  channelsLUV[1] += 0.325926;
+//  channelsLUV[2] += 0.496296;
 
 //  return channelsLUV_normalized;
 ////  return channelsLUV;
 //}
+
+
 
