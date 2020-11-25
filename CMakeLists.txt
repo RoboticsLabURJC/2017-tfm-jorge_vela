@@ -48,3 +48,18 @@ TARGET_LINK_LIBRARIES(
 )
 
 
+add_executable(computeDetFaces computeDetectionFaces.cpp)
+
+target_include_directories(computeDetFaces PUBLIC
+  obj_detect/include 
+)
+
+add_executable(computeDetCars computeDetectionCars.cpp)
+
+target_include_directories(computeDetCars PUBLIC
+  obj_detect/include 
+)
+
+target_link_libraries(app ${PROJECT_NAME}) 
+target_link_libraries(computeDetFaces ${PROJECT_NAME})
+target_link_libraries(computeDetCars ${PROJECT_NAME})

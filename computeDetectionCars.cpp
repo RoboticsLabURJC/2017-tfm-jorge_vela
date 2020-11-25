@@ -7,6 +7,11 @@
 #include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
 #include <pyramid/ChannelsPyramidApproximatedParallelStrategy.h>
 
+#include <bits/stdc++.h> 
+#include <iostream> 
+#include <sys/stat.h> 
+#include <sys/types.h> 
+
 using namespace std;
 
 //#undef DEBUG
@@ -22,7 +27,7 @@ int main
     {
         cout << "Error en la introducción de argumentos." << endl;
         //cout << "[Estrategia ChannelsPyramid] [Imagen entrada] [Fichero de salida de detecciones .yml] [Fichero salida estadísticas velocidad]" << endl;
-        cout << "[Estrategia ChannelsPyramid] [Estrategia obtención características] [Fichero de salida de detecciones .yml] [Fichero salida estadísticas velocidad]" << endl;
+        cout << "[Estrategia ChannelsPyramid] [Estrategia obtención características] [Carpeta de entrada] [Carpeta de salida]" << endl;
         return 1;
     }
 
@@ -54,7 +59,35 @@ int main
     std::string clfPath = "obj_detect/tests/yaml/detectorComplete_2.yml";
     std::string filtersPath = "obj_detect/tests/yaml/filterTest.yml";
 
-    cv::Mat image = cv::imread(argv[3], cv::IMREAD_COLOR);
+    BadacostDetector badacost(detect_strategy_str, acf_channels_impl_str);
+    bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
+    float angle[20] = {-0.0785 ,-0.3142 ,-0.6283 ,-0.9425 ,-1.2566 ,-1.5708 ,-1.8850 ,-2.1991 ,-2.5133 ,-2.8274, -3.1416, 2.8274, 2.5133, 2.1991, 1.8850, 1.5708, 1.2566, 0.9425, 0.6283, 0.3142};
+
+    std::string folder = argv[3];
+    std::string folderOut = argv[4];
+
+    if (mkdir(folderOut.c_str(), 0777) == -1) 
+        cerr << "Error :  " << strerror(errno) << endl;
+
+    for(int i = 6733; i < 7481; i++){
+      std::string nameImg = folder + "/00" + to_string(i) + ".png";
+      printf("%s\n",nameImg.c_str() );
+      cv::Mat image = cv::imread(nameImg, cv::IMREAD_COLOR);
+      std::vector<DetectionRectangle> detections = badacost.detect(image);
+      std::cout << detections << std::endl;
+      ofstream myfile;
+      std::string nameFile = folderOut + "/00" + to_string(i) + ".txt";
+      myfile.open(nameFile);
+      for(int i = 0; i < detections.size(); i++){
+        float ang = angle[detections[i].class_index - 2];
+        myfile << "Car -1 -1 " + to_string(ang) + " "  + to_string(detections[i].bbox.x) + " " + to_string(detections[i].bbox.y) + " " + to_string(detections[i].bbox.x + detections[i].bbox.width)
+        + " "  + to_string(detections[i].bbox.y + detections[i].bbox.height) + " -1 -1 -1 -1000 -1000 -1000 -10 "+ to_string(detections[i].score) << endl;
+      }
+      myfile.close();
+    }
+
+
+/*  cv::Mat image = cv::imread(argv[3], cv::IMREAD_COLOR);
 
     BadacostDetector badacost(detect_strategy_str, acf_channels_impl_str);
     bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
@@ -86,7 +119,7 @@ int main
     badacost.showResults(image, detections);
     cv::imshow("image", image);
     cv::waitKey();
-#endif
+#endif*/
     return 0;
 }
 
