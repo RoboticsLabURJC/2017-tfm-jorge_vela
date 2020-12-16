@@ -9,6 +9,9 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVPDollar.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVOpenCV.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVOpenCV.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVOpenCL.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorLUVOpenCL.cpp
+
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHist.cpp
@@ -16,6 +19,9 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHistPDollar.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHistOpenCV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHistOpenCV.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHistOpenCL.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradHistOpenCL.h
+
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMag.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMag.cpp
@@ -23,6 +29,8 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagPDollar.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagOpenCV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagsOpenCV.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagOpenCL.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagsOpenCL.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorACF.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorACF.h
