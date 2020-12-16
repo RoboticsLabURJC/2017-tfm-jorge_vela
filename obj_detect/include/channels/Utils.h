@@ -28,6 +28,12 @@ cv::Mat convTri
   int kernel_size
   );
 
+cv::UMat convTri
+  (
+  cv::UMat input_image,
+  int kernel_size
+  );
+
 float
 readScalarFromFileNode
   (

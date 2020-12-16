@@ -8,6 +8,7 @@
 
 #include <channels/ChannelsExtractorGradMag.h>
 #include <channels/ChannelsExtractorGradMagOpenCV.h>
+#include <channels/ChannelsExtractorGradMagOpenCL.h>
 #include <channels/ChannelsExtractorGradMagPDollar.h>
 
 std::shared_ptr<ChannelsExtractorGradMag>
@@ -22,6 +23,10 @@ ChannelsExtractorGradMag::createExtractor
   if (extractor_type == "opencv")
   {
     pExtractor.reset(new ChannelsExtractorGradMagOpenCV(normRad, normConst));
+  }
+  else if (extractor_type == "opencl")
+  {
+    pExtractor.reset(new ChannelsExtractorGradMagOpenCL(normRad, normConst));
   }
   else // if (extractor_type == "pdollar")
   {

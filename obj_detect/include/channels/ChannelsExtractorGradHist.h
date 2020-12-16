@@ -40,6 +40,14 @@ public:
       std::vector<cv::Mat> gradMag
     ) = 0;
 
+
+  std::vector<cv::UMat> extractFeatures
+    (
+      cv::UMat img, 
+      std::vector<cv::UMat> gradMag
+    );
+
+
   static std::shared_ptr<ChannelsExtractorGradHist>
   createExtractor
     (
