@@ -9,6 +9,7 @@
 #include <channels/ChannelsExtractorGradHist.h>
 #include <channels/ChannelsExtractorGradHistOpenCV.h>
 #include <channels/ChannelsExtractorGradHistPDollar.h>
+#include <channels/ChannelsExtractorGradHistOpenCL.h>
 
 std::shared_ptr<ChannelsExtractorGradHist>
 ChannelsExtractorGradHist::createExtractor
@@ -24,6 +25,10 @@ ChannelsExtractorGradHist::createExtractor
   if (extractor_type == "opencv")
   {
     pExtractor.reset(new ChannelsExtractorGradHistOpenCV(binSize, nOrients, softBin, full));
+  }
+  else if (extractor_type == "opencl")
+  {
+    pExtractor.reset(new ChannelsExtractorGradHistOpenCL(binSize, nOrients, softBin, full));
   }
   else // if (extractor_type == "pdollar")
   {
