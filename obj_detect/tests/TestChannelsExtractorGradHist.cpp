@@ -9,11 +9,15 @@
 #include <channels/ChannelsExtractorGradHistPDollar.h>
 #include <channels/ChannelsExtractorGradMagPDollar.h>
 #include <channels/ChannelsExtractorGradHistOpenCV.h>
+#include <channels/ChannelsExtractorGradHistOpenCL.h>
 #include <channels/ChannelsExtractorGradMagOpenCV.h>
+#include <channels/ChannelsExtractorGradMagOpenCL.h>
+
 #include <channels/Utils.h>
 
 #include "gtest/gtest.h"
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/ocl.hpp>
 
 #include <iostream>
 #include <chrono>
@@ -81,6 +85,12 @@ TestChannelsExtractorGradHist::compareGradientOrientationHistogram
 //    pExtractorMag = dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagOpenCV(normRad, normConst));
     pExtractorHist = dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistOpenCV(binSize, nOrients, softBin, full));
   }  
+   else if (impl_type == "opencl")
+  {
+//    pExtractorMag = dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagOpenCV(normRad, normConst));
+    pExtractorHist = dynamic_cast<ChannelsExtractorGradHist*>(new ChannelsExtractorGradHistOpenCL(binSize, nOrients, softBin, full));
+  }  
+
   else // "pdollar"
   {
 //    pExtractorMag = dynamic_cast<ChannelsExtractorGradMag*>(new ChannelsExtractorGradMagPDollar(normRad, normConst));
@@ -226,6 +236,89 @@ TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColorNormRad0PDollar)
                                       "yaml/index_jpeg_GradientChannels_normRad_0.yaml");
 }
 
+
+TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColor1OpenCL)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  compareGradientOrientationHistogram(image,
+                                      "yaml/index_jpeg_GradientChannels.yaml",
+                                      "opencl");
+}
+
+TEST_F(TestChannelsExtractorGradHist, TestCompleteImageGrayOpenCL)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_GRAYSCALE);
+  ASSERT_TRUE(image.data);
+  compareGradientOrientationHistogram(image,
+                                      "yaml/index_jpeg_gray_GradientChannels.yaml",
+                                      "opencl");
+}
+
+
+TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColorSoftBinNeg4OpenCL)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+
+  cv::ocl::Context context;
+  if (!context.create(cv::ocl::Device::TYPE_GPU))
+  {
+    std::cout << "Failed creating the context..." << std::endl;
+  }
+  cv::ocl::Device(context.device(0));
+  cv::ocl::setUseOpenCL(true);
+  auto startLoad = std::chrono::system_clock::now();
+
+  for(int i = 0; i < 60; i++)
+  compareGradientOrientationHistogram(image,
+                                      "yaml/index_jpeg_GradientChannels.yaml",
+                                      "opencl");
+
+  auto endLoad = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+  std::cout << durationLoad.count() << "ms gradHistOpenCL " << std::endl;
+}
+
+
+TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColorNormRad0OpenCL)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  auto startLoad = std::chrono::system_clock::now();
+
+  for(int i = 0; i < 60; i++)
+  compareGradientOrientationHistogram(image,
+                                      "yaml/index_jpeg_GradientChannels.yaml",
+                                      "opencl");
+
+  auto endLoad = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+  std::cout << durationLoad.count() << "ms gradHistOpenCL " << std::endl;
+}
+
+
+TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColorNormConst0_07OpenCL)
+{
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+  ASSERT_TRUE(image.data);
+  auto startLoad = std::chrono::system_clock::now();
+
+  compareGradientOrientationHistogram(image,
+                                      "yaml/index_jpeg_GradientChannels.yaml",
+                                      "opencl");
+
+  auto endLoad = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+  std::cout << durationLoad.count() << "ms gradHistOpenCL " << std::endl;
+}
+
+
 TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColor1OpenCV)
 {
   cv::Mat image;
@@ -242,9 +335,21 @@ TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColorSoftBinNeg4OpenCV)
   cv::Mat image;
   image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
   ASSERT_TRUE(image.data);
+
+  auto startLoad = std::chrono::system_clock::now();
+
+  for(int i = 0; i < 60; i++)
   compareGradientOrientationHistogram(image,
-                                      "yaml/index_jpeg_GradientChannels_softBin_negative_4.yaml",
+                                      "yaml/index_jpeg_GradientChannels.yaml",
                                       "opencv");
+
+  auto endLoad = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+  std::cout << durationLoad.count() << "ms gradHistOpenCL " << std::endl;
+
+  /*compareGradientOrientationHistogram(image,
+                                      "yaml/index_jpeg_GradientChannels_softBin_negative_4.yaml",
+                                      "opencv");*/
 }
 
 TEST_F(TestChannelsExtractorGradHist, TestCompleteImageColorBinSize5OpenCV)
@@ -647,9 +752,134 @@ TEST_F(TestChannelsExtractorGradHist, TestCompareOpenCvPdollarGradHistRandomOrie
     0); // full
 }
 
+TEST_F(TestChannelsExtractorGradHist, TestCompareFloats){
+    /*cv::ocl::Context context;
+    if (!context.create(cv::ocl::Device::TYPE_GPU))
+    {
+        std::cout << "Failed creating the context..." << std::endl;
+    }
+    // In OpenCV 3.0.0 beta, only a single device is detected.
+    std::cout << context.ndevices() << " GPU devices are detected." << std::endl;
+    for (int i = 0; i < context.ndevices(); i++)
+    {
+        cv::ocl::Device device = context.device(i);
+        std::cout << "name                 : " << device.name() << std::endl;
+        std::cout << "available            : " << device.available() << std::endl;
+        std::cout << "imageSupport         : " << device.imageSupport() << std::endl;
+        std::cout << "OpenCL_C_Version     : " << device.OpenCL_C_Version() << std::endl;
+        std::cout << std::endl;
+    }
+    /*cout << "OpenCV version : " << CV_VERSION << endl;
+    cout << "Major version : " << CV_MAJOR_VERSION << endl;
+    cout << "Minor version : " << CV_MINOR_VERSION << endl;
+    cout << "Subminor version : " << CV_SUBMINOR_VERSION << endl;* /
+    // Select the first device
+    cv::ocl::Device(context.device(0));
+    cv::ocl::setUseOpenCL(true); */
+    // Transfer Mat data to the device
+    /*cv::Mat mat_src = cv::imread("006733.png", cv::IMREAD_GRAYSCALE);
+    mat_src.convertTo(mat_src, CV_32F, 1.0 / 255);
+    cv::UMat umat_src = mat_src.getUMat(cv::ACCESS_READ, cv::USAGE_ALLOCATE_DEVICE_MEMORY);
+    cv::UMat umat_dst(mat_src.size(), CV_32F, cv::ACCESS_WRITE, cv::USAGE_ALLOCATE_DEVICE_MEMORY);
+
+    cv::Mat mat_dst = umat_dst.getMat(cv::ACCESS_READ);
+
+    cv::imshow("src", mat_src);
+    cv::waitKey(0);
+    std::cout << "FINALIZA" << std::endl;*/
+    cv::UMat img, gray;
+    img = cv::imread( "images/006733.png", cv::IMREAD_COLOR  ).getUMat( cv::ACCESS_READ);
+    img.convertTo(img, CV_8UC1);
+    //cv::Mat img, gray;
+    //img = cv::imread( "images/006733.png", cv::IMREAD_COLOR );//.getUMat(cv::ACCESS_READ);
+    //img.convertTo(img, CV_32FC1);
+    //cv::UMat img, gray;
+    //img = img2.getUMat(cv::ACCESS_READ, cv::USAGE_ALLOCATE_DEVICE_MEMORY);  
+
+    auto startLoad = std::chrono::system_clock::now(); 
+    for(int i = 0; i < 100; i++){
+        cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+        cv::GaussianBlur(gray, gray,cv::Size(7, 7), 1.5);
+        //Canny(gray, gray, 0, 50);
+    }
+    auto endLoad = std::chrono::system_clock::now();
+    std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+    std::cout << durationLoad.count() << "ms " << std::endl;
+
+}
+/*
+TEST_F(TestChannelsExtractorGradHist, TestOpenCLImage)
+{
+  cv::FileStorage fs;
+  bool file_exists = fs.open("yaml/index_jpeg_gray_GradientChannels.yaml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
+  float normConst = readScalarFromFileNode(fs["normConst"]);
+  float normRad = readScalarFromFileNode(fs["normRad"]);
 
 
+  file_exists = fs.open("yaml/index_jpeg_GradientChannels.yaml", cv::FileStorage::READ);
+  ASSERT_TRUE(file_exists);
 
+  float nOrients = readScalarFromFileNode(fs["nOrients"]);
+  float binSize = readScalarFromFileNode(fs["binSize"]);
+  float softBin = readScalarFromFileNode(fs["softBin"]);
+  float full = readScalarFromFileNode(fs["full"]);
+
+
+  cv::Mat image;
+  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
+
+  cv::Mat img_float;
+  image.convertTo(img_float, CV_32FC1); // important to have continuous memory in img_aux.ptr<float>
+  cv::UMat IM = img_float.getUMat(cv::ACCESS_READ);
+
+  ChannelsExtractorGradMagOpenCL chanExtractOpenCL(normRad, normConst);
+  std::vector<cv::UMat> gradMagExtractVector; 
+
+  gradMagExtractVector = chanExtractOpenCL.extractFeatures(IM);
+
+  std::vector<cv::UMat> gradHistExtractVector;
+  ChannelsExtractorGradHistOpenCL ChannelsExtractrGradHistOpenCL(binSize, nOrients, softBin, full);
+
+  auto startLoad = std::chrono::system_clock::now();
+  for(int i = 0; i < 50; i++)
+    gradHistExtractVector = ChannelsExtractrGradHistOpenCL.extractFeatures(IM, gradMagExtractVector);
+
+  auto endLoad = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+  std::cout << durationLoad.count() << "ms gradHistOpenCL " << std::endl;
+
+  std::vector<cv::Mat> gradHistExtractVectorOpenCV;
+
+  ChannelsExtractorGradHistOpenCV ChannelsExtractrGradHistOpenCV(binSize, nOrients, softBin, full);
+
+  std::vector<cv::Mat> gradMagExtractOpenCV;
+  gradMagExtractOpenCV.push_back(gradMagExtractVector[0].getMat(cv::ACCESS_READ));
+  gradMagExtractOpenCV.push_back(gradMagExtractVector[1].getMat(cv::ACCESS_READ));
+
+  startLoad = std::chrono::system_clock::now();
+  
+  for(int i = 0; i < 50; i++)
+    gradHistExtractVectorOpenCV = ChannelsExtractrGradHistOpenCV.extractFeatures(image, gradMagExtractOpenCV);
+
+  endLoad = std::chrono::system_clock::now();
+  durationLoad = endLoad - startLoad;
+  std::cout << durationLoad.count() << "ms gradHistOpenCL " << std::endl;
+
+
+  for(int i = 0; i < 6; i++)
+  {
+    cv::Mat diff =  gradHistExtractVectorOpenCV[i] - gradHistExtractVector[i].getMat(cv::ACCESS_READ);
+    double minVal; double maxVal; 
+    minMaxLoc( diff, &minVal, &maxVal);
+
+    ASSERT_TRUE(minVal < 0.0001);
+    ASSERT_TRUE(maxVal < 0.0001);
+  }
+  //std::cout << minVal << maxVal << std::endl;
+
+}
+*/
 
 
 
