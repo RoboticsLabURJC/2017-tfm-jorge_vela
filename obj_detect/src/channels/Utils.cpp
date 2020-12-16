@@ -93,6 +93,53 @@ cv::Mat convTri(cv::Mat input_image, int kernel_size)
   return output_image;
 }
 
+
+/**
+ * Funcion convTri. Convoluciona una imagen por un filtro de triangulo 2D. 
+ *
+ * @param input_image: Imagen de entrada la cual se quiere convolucionar.
+ * @param kernel_size: Tamaño del kernel (radio) que se quiere para el filtro.
+ *
+ * @return cv::Mat: Imagen de retorno despues del filtro.
+ */
+cv::UMat convTri(cv::UMat input_image, int kernel_size)
+{
+  cv::UMat dst;
+  cv::copyMakeBorder(input_image, dst, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_REFLECT, 0);
+
+  //FUNCION CONVTRI
+  int widthSize = input_image.size().width;
+  int heightSize = input_image.size().height;
+  float valReduce = (kernel_size + 1)*(kernel_size + 1);
+  cv::Mat kernel = cv::Mat::zeros(1, kernel_size*2+1, CV_32FC1);
+    
+  for(int i = 1; i <= kernel_size + 1; i++)
+  {
+    kernel.at<float>(0, i-1) = static_cast<float>(i);
+  }
+
+  for(int j = kernel_size + 1; j < kernel.size().width ; j++)
+  {
+    kernel.at<float>(0, j) = kernel.at<float>(0, j-1)-1;
+  }
+
+  kernel /= valReduce;
+
+  cv::UMat output_image;
+  cv::UMat help_image;
+  filter2D(dst, help_image, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+
+  int heightHelp = help_image.size().height;
+  cv::Rect myRoi(kernel_size, 0, widthSize, heightHelp);
+  help_image = help_image(myRoi);
+
+  filter2D(help_image, output_image, CV_32FC1 , kernel.t(), cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  cv::Rect myRoi2(0, kernel_size, widthSize, heightSize);
+  output_image = output_image(myRoi2);
+  return output_image;
+}
+
+
 std::vector<int>
 create_random_indices
   (
