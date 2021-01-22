@@ -1,27 +1,41 @@
+#include <opencv2/core/core.hpp>
+#include <opencv2/core/ocl.hpp>
 #include <opencv2/opencv.hpp>
+#include <chrono>
 
 using namespace cv;
 
 int main(int argc, char** argv)
 {
-    Mat img1 = imread("obj_detect/tests/images/coches10.jpg", IMREAD_COLOR);
-    resize(img1, img1, Size(0,0), 5, 5, cv::INTER_LINEAR);
+  cv::ocl::Context context;
+  if (!context.create(cv::ocl::Device::TYPE_GPU))
+  {
+    std::cout << "Failed creating the context..." << std::endl;
+  }
+  cv::ocl::Device(context.device(0));
+  cv::ocl::setUseOpenCL(true);
 
-    auto start = std::chrono::system_clock::now();
-    UMat img, gray;
-    img1.copyTo(img);
+  Mat img1 = imread("obj_detect/tests/images/coches10.jpg", IMREAD_COLOR);
+  Mat gray_cpu;
+  resize(img1, img1, Size(0,0), 5, 5, INTER_LINEAR);
 
-    cvtColor(img, gray, COLOR_BGR2GRAY);
-    GaussianBlur(gray, gray,Size(7, 7), 1.5);
-    Canny(gray, gray, 0, 50);
+  auto start = std::chrono::system_clock::now();
+  UMat img, gray;
+  img1.copyTo(img); // include time to upload image from CPU -> GPU
 
-    auto end = std::chrono::system_clock::now();
-    std::chrono::duration<float,std::milli> duration = end - start;
-    std::cout << duration.count() << "ms" << std::endl;
+  cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+  cv::GaussianBlur(gray, gray,Size(7, 7), 1.5);
+  cv::Canny(gray, gray, 0, 50);
 
-//    imshow("edges", gray);
-//    waitKey();
-    return 0;
+  gray.copyTo(gray_cpu); // include time to download result from GPU -> CPU
+
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<float,std::milli> duration = end - start;
+  std::cout << duration.count() << "ms" << std::endl;
+
+//  imshow("edges",   gray_cpu);
+//  waitKey();
+  return 0;
 }
 
 
