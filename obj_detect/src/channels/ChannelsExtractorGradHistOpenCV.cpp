@@ -17,6 +17,96 @@
 
 //#define DEBUG
 
+ChannelsExtractorGradHistOpenCV::ChannelsExtractorGradHistOpenCV
+  (
+    int binSize,
+    int nOrients,
+    int softBin,
+    int full
+  ): ChannelsExtractorGradHist(binSize,
+                               nOrients,
+                               softBin,
+                               full)
+{
+  createKernel(m_binSize,
+               m_nOrients,
+               m_softBin,
+               m_full);
+}
+
+void
+ChannelsExtractorGradHistOpenCV::createKernel
+  (
+  int bin,
+  int nOrients,
+  int softBin,
+  bool full
+  )
+{
+  // We use convolution with a special kernel to perform a weighted sum over a window of
+  // bin x bin pixels using also the sum over bin x bin upper, upper left and left windows.
+  // We are doing more computation than needed in the histogram. We sum over more windows
+  // that are overlaping. We should be doing convolution with stride = bin to do it on not
+  // overlapping windows. On the other hand, filter2D do not support stride.
+  float xb, yb, xd, yd;
+  int xb0, yb0;
+  float sInv = 1.0/static_cast<float>(bin);
+  float init = (0+.5f)*sInv - 0.5f;
+
+  int klength = 2*bin;
+  m_kernel = cv::Mat::zeros(klength, klength, CV_32F);
+
+  xb = init + sInv*(bin/2);
+  for (int x=0 ; x < klength; x++)
+  {
+    xb0 = (int)xb;
+    xd = xb - xb0;
+    xb += sInv;
+
+    yb = init + sInv*(bin/2);
+    for (int y = 0; y < klength; y++)
+    {
+      yb0 = (int)yb;
+      yd = yb - yb0;
+      yb += sInv;
+
+      if ((y < bin) && (x < bin)) // 0 -> ms[3]
+      {
+        m_kernel.at<float>(y, x) = xd*yd;
+      }
+      else if ((y < bin) && (x >= bin)) // 2 -> ms[1]
+      {
+        m_kernel.at<float>(y, x) = yd - xd*yd;
+      }
+      else if ((y >= bin) && (x < bin)) // 1 -> ms[2]
+      {
+        m_kernel.at<float>(y, x) = xd - xd*yd;
+      }
+      else // if ((y >= bin) && (x >= bin)) // 3 -> ms[0]
+      {
+        m_kernel.at<float>(y, x) = 1.0 - xd - yd + xd*yd;
+      }
+    }
+  }
+
+  int kcenter = bin;
+  if (bin % 2 == 1)
+  {
+    m_kernel = m_kernel(cv::Range(1,klength), cv::Range(1,klength));
+    kcenter -= 1;
+  }
+
+//  kernel.copyTo(m_kernel);
+
+#ifdef USE_SEPARABLE_CONVOLUTION
+  // The kernel is separable so we get the 1d kernel to speed up convolution using SVD
+  cv::SVD svd;
+  svd(m_kernel);
+  m_kernel1d = svd.u(cv::Range::all(), cv::Range(0,1)).clone(); // get first column of U as kernel 1d
+  m_kernel1d *= sqrt(svd.w.at<float>(0,0)); // Muliply by the square root of the corresponding singular value.
+#endif
+}
+
 void
 ChannelsExtractorGradHistOpenCV::gradHist
   (
@@ -63,8 +153,9 @@ ChannelsExtractorGradHistOpenCV::gradHist
     for (int i=0; i<nOrients; i++)
     {
       O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
-      O0_eq_i.convertTo(O0_eq_i, CV_32F);
-      cv::multiply(O0_eq_i, M0, M0_orient_i);
+//      O0_eq_i.convertTo(O0_eq_i, CV_32F);
+//      cv::multiply(O0_eq_i, M0, M0_orient_i);
+      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
 
       // We use convolution with a full of ones kernel to sum over a window of
       // bin x bin pixels. We are doing more computation than needed as the
@@ -94,11 +185,13 @@ ChannelsExtractorGradHistOpenCV::gradHist
     for (int i=0; i<nOrients; i++)
     {
       O0_eq_i = (O0 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
-      O0_eq_i.convertTo(O0_eq_i, CV_32F);
-      cv::multiply(O0_eq_i, M0, M0_orient_i);
+//      O0_eq_i.convertTo(O0_eq_i, CV_32F);
+//      cv::multiply(O0_eq_i, M0, M0_orient_i);
+      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
       O1_eq_i = (O1 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
-      O1_eq_i.convertTo(O1_eq_i, CV_32F);
-      cv::multiply(O1_eq_i, M1, M1_orient_i);
+//      O1_eq_i.convertTo(O1_eq_i, CV_32F);
+//      cv::multiply(O1_eq_i, M1, M1_orient_i);
+      cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
 
       // We use convolution with a full of ones kernel to sum over a window of
       // bin x bin pixels. We are doing more computation than needed as the
@@ -136,65 +229,20 @@ ChannelsExtractorGradHistOpenCV::gradHist
     for (int i=0; i<nOrients; i++)
     {
       O0_eq_i = (O0 == i)/255;
-      O0_eq_i.convertTo(O0_eq_i, CV_32F);
-      cv::multiply(O0_eq_i, M0, M0_orient_i);
+//      O0_eq_i.convertTo(O0_eq_i, CV_32F);
+//      cv::multiply(O0_eq_i, M0, M0_orient_i);
+      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
       if (m_softBin >= 0)
       {
         O1_eq_i = (O1 == i)/255;
-        O1_eq_i.convertTo(O1_eq_i, CV_32F);
-        cv::multiply(O1_eq_i, M1, M1_orient_i);
-      }
-
-      // We use convolution with a special kernel to perform a weighted sum over a window of
-      // bin x bin pixels using also the sum over bin x bin upper, upper left and left windows.
-      // We are doing more computation than needed in the histogram. We sum over more windows
-      // that are overlaping. We should be doing convolution with stride = bin to do it on not
-      // overlapping windows. On the other hand, filter2D do not support stride.
-      float xb, yb, xd, yd;
-      int xb0, yb0;
-      float sInv = 1.0/static_cast<float>(bin);
-      float init = (0+.5f)*sInv - 0.5f;
-
-      int klength = 2*bin;
-      cv::Mat kernel = cv::Mat::zeros(klength, klength, CV_32F);
-
-      xb = init + sInv*(bin/2);
-      for (int x=0 ; x < klength; x++)
-      {
-        xb0 = (int)xb;
-        xd = xb - xb0;
-        xb += sInv;
-
-        yb = init + sInv*(bin/2);
-        for (int y = 0; y < klength; y++)
-        {
-          yb0 = (int)yb;
-          yd = yb - yb0;
-          yb += sInv;
-
-          if ((y < bin) && (x < bin)) // 0 -> ms[3]
-          {
-            kernel.at<float>(y, x) = xd*yd;
-          }
-          else if ((y < bin) && (x >= bin)) // 2 -> ms[1]
-          {
-            kernel.at<float>(y, x) = yd - xd*yd;
-          }
-          else if ((y >= bin) && (x < bin)) // 1 -> ms[2]
-          {
-            kernel.at<float>(y, x) = xd - xd*yd;
-          }
-          else // if ((y >= bin) && (x >= bin)) // 3 -> ms[0]
-          {
-            kernel.at<float>(y, x) = 1.0 - xd - yd + xd*yd;
-          }
-        }
+//        O1_eq_i.convertTo(O1_eq_i, CV_32F);
+//        cv::multiply(O1_eq_i, M1, M1_orient_i);
+        cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
       }
 
       int kcenter = bin;
       if (bin % 2 == 1)
       {
-        kernel = kernel(cv::Range(1,klength), cv::Range(1,klength));
         kcenter -= 1;
       }
 
@@ -221,24 +269,19 @@ ChannelsExtractorGradHistOpenCV::gradHist
 #endif
 
 #ifdef USE_SEPARABLE_CONVOLUTION
-      // The kernel is saparable so we get the 1d kernel to speed up convolution using SVD
-      cv::SVD svd;
-      svd(kernel);
-      cv::Mat kernel1d = svd.u(cv::Range::all(), cv::Range(0,1)).clone(); // get first column of U as kernel 1d
-      kernel1d *= sqrt(svd.w.at<float>(0,0)); // Muliply by the square root of the corresponding singular value.
-
-      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel1d, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux0, Haux0, CV_32F, kernel1d.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+      // The kernel is separable so we get the 1d kernel to speed up convolution using SVD
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel1d, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux0, Haux0, CV_32F, m_kernel1d.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
       if (m_softBin >= 0)
       {
-        cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel1d, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
-        cv::filter2D(Haux1, Haux1, CV_32F, kernel1d.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel1d, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+        cv::filter2D(Haux1, Haux1, CV_32F, m_kernel1d.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
       }
 #else
-      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
       if (m_softBin >= 0)
       {
-        cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
+        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
       }
 #endif
 
