@@ -10,7 +10,7 @@
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using namespace cv;
 using namespace std;

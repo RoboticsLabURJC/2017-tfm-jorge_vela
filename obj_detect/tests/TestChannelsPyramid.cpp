@@ -7,7 +7,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class TestChannelsPyramid: public testing::Test
 {

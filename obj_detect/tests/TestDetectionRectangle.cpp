@@ -9,7 +9,7 @@
 #include <detectors/DetectionRectangle.h>
 #include <opencv2/opencv.hpp>
 #include <cmath>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
 

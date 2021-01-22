@@ -7,7 +7,7 @@
  *  ------------------------------------------------------------------------ */
 
 #include <channels/ChannelsExtractorLUVPDollar.h>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 
 #undef VISUALIZE_RESULTS
