@@ -53,9 +53,8 @@ target_link_libraries(
         ${OpenCV_LIBS}
 )
 
-file(COPY ${PROJECT_SOURCE_DIR}/tests/images DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${PROJECT_SOURCE_DIR}/tests/yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
+file(COPY ${PROJECT_SOURCE_DIR}/obj_detect/tests/images DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${PROJECT_SOURCE_DIR}/obj_detect/tests/yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_test(
         NAME ${TESTS_REGRESSION_NAME}

@@ -14,10 +14,10 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllParallelStrategy.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedStrategy.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximated`Strategy.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedStrategy.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedParallelStrategy.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedParallel`Strategy.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidApproximatedParallelStrategy.h
   )
 
 # Set the sources for the main target

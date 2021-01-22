@@ -7,15 +7,15 @@
 
 # ----------------- PRELIMINARIES ---------------------------------------------
 
-cmake_minimum_required(VERSION 3.13)
+#cmake_minimum_required(VERSION 3.13)
 
 # jmbuena: Set this variable to the dir containing include/gtest/getst.h file.
 set(GTEST_ROOT_DIR /usr/local/include/gtest)
 
-project(objdetect)
+#project(objdetect)
 
 # Build with tests
-option(WITH_TESTS "Build tests senabled" ON)
+option(WITH_TESTS "Build tests enabled" ON)
 
 # ----------------- BUILD A LIBRARY -------------------------------------------
 
@@ -31,15 +31,15 @@ target_include_directories(
 
 # ----------------- OTHER LIBRARIES -------------------------------------------
 
-## OpenCV
+# OpenCV
 find_package(OpenCV REQUIRED)
-MESSAGE(STATUS "OpenCV_VERSION=${OpenCV_VERSION}")
-MESSAGE(STATUS "OpenCV_INCLUDE_DIRS=${OpenCV_INCLUDE_DIRS}")
-MESSAGE(STATUS "OpenCV_LIBS=${OpenCV_LIBS}")
-MESSAGE(STATUS "OpenCV_DIR=${OpenCV_DIR}")
+message(STATUS "OpenCV_VERSION=${OpenCV_VERSION}")
+message(STATUS "OpenCV_INCLUDE_DIRS=${OpenCV_INCLUDE_DIRS}")
+message(STATUS "OpenCV_LIBS=${OpenCV_LIBS}")
+message(STATUS "OpenCV_DIR=${OpenCV_DIR}")
 
 # OpenCV headers
-TARGET_INCLUDE_DIRECTORIES(
+target_include_directories(
         ${PROJECT_NAME}
         PUBLIC
         ${OpenCV_INCLUDE_DIRS}
@@ -59,7 +59,6 @@ target_link_libraries(
         ${CMAKE_DL_LIBS}
 )
 
-
 find_package(OpenMP)
 if(OPENMP_FOUND)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -68,7 +67,7 @@ if(OPENMP_FOUND)
 endif(OPENMP_FOUND)
 
 
-# ----------------- CPP CONFIGURATION -----------------------------------------
+## ----------------- CPP CONFIGURATION -----------------------------------------
 
 # Allows generated files in the current directed to be found by the compiler
 # SET(CMAKE_INCLUDE_CURRENT_DIR ON)

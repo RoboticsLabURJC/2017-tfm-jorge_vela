@@ -30,7 +30,7 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagOpenCV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagsOpenCV.h
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagOpenCL.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagsOpenCL.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorGradMagOpenCL.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorACF.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsExtractorACF.h
