@@ -74,8 +74,8 @@ ChannelsExtractorGradMagOpenCV::extractFeatures
 
   cv::Size orig_sz = img.size();
   std::vector<cv::Mat> channelsGradMag(2);
-  channelsGradMag[0] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1); // M
-  channelsGradMag[1] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1); // O
+//  channelsGradMag[0] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1); // M
+//  channelsGradMag[1] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1); // O
   if (nChannels == 1)
   {
     cv::Mat img_float;
@@ -92,8 +92,6 @@ ChannelsExtractorGradMagOpenCV::extractFeatures
     for (int i=0; i<3; i++)
     {
       image_split[i].convertTo(image_split[i], CV_32FC1); // important to have continuous memory in img_aux.ptr<float>
-//      M_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
-//      O_split[i] = cv::Mat::zeros(orig_sz.height, orig_sz.width, CV_32FC1);
       gradMagOpenCV(image_split[i], M_split[i], O_split[i], false);
     }
 
