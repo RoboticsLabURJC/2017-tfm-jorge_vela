@@ -15,7 +15,6 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-
 class ChannelsExtractorGradHistOpenCL: public ChannelsExtractorGradHist
 {
 
@@ -26,11 +25,11 @@ public:
       int nOrients = 8,
       int softBin = 1,
       int full = 0
-    ): ChannelsExtractorGradHist(binSize,
+    ); /*: ChannelsExtractorGradHist(binSize,
                                nOrients,
                                softBin,
                                full = 0)
-    {};
+    {};*/
 
   virtual std::vector<cv::Mat> extractFeatures
     (
@@ -38,14 +37,25 @@ public:
       std::vector<cv::Mat> gradMag
     );
 
-  std::vector<cv::UMat> extractFeatures
-    (
-      cv::UMat img,
-      std::vector<cv::UMat> gradMag
-    );
+//  std::vector<cv::UMat> extractFeatures
+//    (
+//      cv::UMat img,
+//      std::vector<cv::UMat> gradMag
+//    );
 
 
 private:
+  cv::UMat m_kernel_umat;
+  cv::UMat m_kernel1d_umat;
+
+  void
+  createKernel
+    (
+    int bin,
+    int nOrients,
+    int softBin,
+    bool full
+    );
 
   void
   gradQuantize
@@ -65,9 +75,9 @@ private:
   void
   gradHist
     (
-      cv::UMat M,
-      cv::UMat O,
-      std::vector<cv::UMat>& H,
+      cv::Mat M,
+      cv::Mat O,
+      std::vector<cv::Mat>& H,
       int bin,
       int nOrients,
       int softBin,

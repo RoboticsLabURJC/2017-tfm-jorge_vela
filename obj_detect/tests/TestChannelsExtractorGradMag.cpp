@@ -10,7 +10,7 @@
 #include <channels/ChannelsExtractorGradMagOpenCV.h>
 #include <channels/ChannelsExtractorGradMagOpenCL.h>
 #include <channels/Utils.h>
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <iostream>
@@ -25,6 +25,13 @@ class TestChannelsExtractorGradMag: public testing::Test
 public:
   virtual void SetUp()
     {
+      cv::ocl::Context context;
+      if (!context.create(cv::ocl::Device::TYPE_GPU))
+      {
+        std::cout << "Failed creating OpenCL context..." << std::endl;
+      }
+      cv::ocl::Device(context.device(0));
+      cv::ocl::setUseOpenCL(true);
     }
 
   virtual void TearDown()
@@ -123,7 +130,6 @@ TestChannelsExtractorGradMag::compareGradientMagnitudeAndOrientation
 #endif
 
   ASSERT_TRUE(num_pixels_ok > 0.9 * absDiff.rows * absDiff.cols);
-
 }
 
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1PDollar)
@@ -172,53 +178,6 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1OpenCV)
                                          "yaml/index_jpeg_GradientChannels.yaml",
                                          "opencv");
 }
-/*
-TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColor1OpenCL)
-{
-  cv::Mat image;
-  image = cv::imread("images/index.jpeg", cv::IMREAD_COLOR);
-  ASSERT_TRUE(image.data);
-  compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_GradientChannels.yaml",
-                                         "opencl");
-}
-
-TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGrayOpenCL)
-{
-  //cv::Mat mat1 = cv::Mat::zeros(1,1, CV_32FC1);
-  //cv::Mat mat2 = cv::Mat::zeros(1,1, CV_32FC1);
-
-  //mat1.at<float>(0,0) = 2;
-  //mat2.at<float>(0,0) = 2;
-
-  //at1.at<float>(0,1) = 28;
-  //mat2.at<float>(0,1) = 11;
-
-  //mat1.at<float>(1,0) = 24;
-  //mat2.at<float>(1,0) = 23;
-
-  //mat1.at<float>(1,1) = 1;
-  //mat2.at<float>(1,1) = 1;
-  //mat1.release();
-  //mat2.release();
-  //cv::Mat M0isMaximum = (mat1 & mat2);///255.0;
-  //M0isMaximum.convertTo(M0isMaximum, CV_32F);
-  //std::cout << M0isMaximum << std::endl;
-  cv::ocl::Context context;
-  if (!context.create(cv::ocl::Device::TYPE_GPU))
-  {
-    std::cout << "Failed creating the context..." << std::endl;
-  }
-  cv::ocl::Device(context.device(0));
-  cv::ocl::setUseOpenCL(true);
-
-  cv::Mat image;
-  image = cv::imread("images/index.jpeg", cv::IMREAD_GRAYSCALE);
-  ASSERT_TRUE(image.data);
-  compareGradientMagnitudeAndOrientation(image,
-                                         "yaml/index_jpeg_gray_GradientChannels.yaml",
-                                         "opencl");
-}*/
 
 TEST_F(TestChannelsExtractorGradMag, TestCompleteImageGrayOpenCV)
 {
@@ -252,157 +211,107 @@ TEST_F(TestChannelsExtractorGradMag, TestCompleteImageColorNormRad0OpenCV)
 
 TEST_F(TestChannelsExtractorGradMag, TestGradMagGrayOpenCL)
 {
-
   cv::FileStorage fs;
   bool file_exists = fs.open("yaml/index_jpeg_gray_GradientChannels.yaml", cv::FileStorage::READ);
   ASSERT_TRUE(file_exists);
   float normConst = readScalarFromFileNode(fs["normConst"]);
   float normRad = readScalarFromFileNode(fs["normRad"]);
+
+
+  // First compare with P.Dollar -------------------------------------------
+  cv::Mat img = cv::imread( "images/index.jpeg", cv::IMREAD_GRAYSCALE);
+  std::cout << "img.size() = " << img.size() << std::endl;
+//  img.convertTo(img, CV_32F);
+  compareGradientMagnitudeAndOrientation(img,
+                                         "yaml/index_jpeg_gray_GradientChannels.yaml",
+                                         "opencl");
+
+  // Transparent API tests (only speed test) --------------------------------
+  std::vector<cv::Mat> gradMagExtractVector;
+  //  img = cv::imread( "images/006733.png", cv::IMREAD_GRAYSCALE);
+  //  img = cv::imread( "images/index.jpeg", cv::IMREAD_GRAYSCALE);
+  img = cv::imread( "images/coches3.jpg", cv::IMREAD_GRAYSCALE);
+  std::cout << "img.size() = " << img.size() << std::endl;
+
+//  img.convertTo(img, CV_32F);
   ChannelsExtractorGradMagOpenCL chanExtractOpenCL(normRad, normConst);
-
-  std::vector<cv::UMat> gradMagExtractVector; 
-
-  cv::Mat img0;
-  img0 = cv::imread( "images/006733.png", cv::IMREAD_GRAYSCALE);
-
-  img0.convertTo(img0, CV_32F);
-  cv::UMat img, gray;
-  img = img0.getUMat(cv::ACCESS_READ);
-
-  cv::Mat splitted[3];
-  split(img0, splitted);
-
-  auto startLoad = std::chrono::system_clock::now();
-  //for(int i = 0; i < 100; i++)
+  for (int i = 0; i < 10; i++)
+  {
+    auto startLoad = std::chrono::system_clock::now();
     gradMagExtractVector = chanExtractOpenCL.extractFeatures(img);
-  
-  auto endLoad = std::chrono::system_clock::now();
-  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
-  std::cout << durationLoad.count() << "ms extractOpenCL " << std::endl;
+    auto endLoad = std::chrono::system_clock::now();
+    std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+    std::cout << durationLoad.count() << "ms extractOpenCL " << std::endl;
+  }
 
-  //cv::imshow("A",gradMagExtractVector[0]);
-}
+  std::cout << "---------------" << std::endl;
 
-
-
-TEST_F(TestChannelsExtractorGradMag, TestGradMagGrayOpenCV)
-{
-
-  cv::FileStorage fs;
-  bool file_exists = fs.open("yaml/index_jpeg_gray_GradientChannels.yaml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-  float normConst = readScalarFromFileNode(fs["normConst"]);
-  float normRad = readScalarFromFileNode(fs["normRad"]);
+  // OpenCV tests ----------------------------------------------------------
   ChannelsExtractorGradMagOpenCV chanExtractOpenCV(normRad, normConst);
-
-  std::vector<cv::Mat> gradMagExtractVector; 
-
-  cv::Mat img2;
-  img2 = cv::imread( "images/006733.png", cv::IMREAD_GRAYSCALE );//.getUMat(cv::ACCESS_READ);
-
-  auto startLoad = std::chrono::system_clock::now();
-  //for(int i = 0; i < 100; i++)
-    gradMagExtractVector = chanExtractOpenCV.extractFeatures(img2);
-
-  auto endLoad = std::chrono::system_clock::now();
-  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
-  std::cout << durationLoad.count() << "ms extractOpenCV " << std::endl;
-
-  //cv::imshow("B",gradMagExtractVector[0]);
-  //cv::waitKey(0);
+  for (int i = 0; i < 10; i++)
+  {
+    auto startLoad = std::chrono::system_clock::now();
+    gradMagExtractVector = chanExtractOpenCV.extractFeatures(img);
+    auto endLoad = std::chrono::system_clock::now();
+    std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+    std::cout << durationLoad.count() << "ms extractOpenCV " << std::endl;
+  }
 }
-
-
 
 TEST_F(TestChannelsExtractorGradMag, TestGradMagColorOpenCL)
-{
-
+{   
   cv::FileStorage fs;
   bool file_exists = fs.open("yaml/index_jpeg_gray_GradientChannels.yaml", cv::FileStorage::READ);
   ASSERT_TRUE(file_exists);
   float normConst = readScalarFromFileNode(fs["normConst"]);
   float normRad = readScalarFromFileNode(fs["normRad"]);
+
+  // First compare with P.Dollar -------------------------------------------
+  //  cv::Mat img = cv::imread( "images/006733.png", cv::IMREAD_COLOR);
+  cv::Mat img = cv::imread( "images/coches3.jpg", cv::IMREAD_COLOR);
+  std::cout << "img.size() = " << img.size() << std::endl;
+//  compareGradientMagnitudeAndOrientation(img,
+//                                         "yaml/index_jpeg_GradientChannels.yaml",
+//                                         "opencl");
+
+  // Transparent API tests (only speed test) --------------------------------
+  std::vector<cv::Mat> gradMagExtractVector;
   ChannelsExtractorGradMagOpenCL chanExtractOpenCL(normRad, normConst);
 
-  std::vector<cv::UMat> gradMagExtractVector; 
-
-  cv::Mat img0;
-  img0 = cv::imread( "images/006733.png", cv::IMREAD_COLOR);
-
-  img0.convertTo(img0, CV_32F);
-  cv::UMat img, gray;
-  img = img0.getUMat(cv::ACCESS_READ);
-
-
-  cv::ocl::Context context;
-  if (!context.create(cv::ocl::Device::TYPE_GPU))
+  for (int i = 0; i < 10; i++)
   {
-    std::cout << "Failed creating the context..." << std::endl;
-  }
-  cv::ocl::Device(context.device(0));
-  cv::ocl::setUseOpenCL(true);
-
-
-
-  auto startLoad = std::chrono::system_clock::now();
-  for(int i = 0; i < 10; i++)
+    auto startLoad = std::chrono::system_clock::now();
     gradMagExtractVector = chanExtractOpenCL.extractFeatures(img);
+    auto endLoad = std::chrono::system_clock::now();
+    std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+    std::cout << durationLoad.count() << "ms extractOpenCL " << std::endl;
+  }
+#ifdef DEBUG
+  cv::imshow("M - OpenCL",gradMagExtractVector[0]);
+  cv::imshow("O - OpenCL",gradMagExtractVector[1]);
+#endif
 
-  auto endLoad = std::chrono::system_clock::now();
-  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
-  std::cout << durationLoad.count() << "ms extractOpenCL " << std::endl;
+  std::cout << "---------------" << std::endl;
+  //cv::imshow("A",gradMagExtractVector[0]);
 
-
+  // OpenCV tests ----------------------------------------------------------
   ChannelsExtractorGradMagOpenCV chanExtractOpenCV(normRad, normConst);
-  std::vector<cv::Mat> gradMagExtractVector2; 
-  cv::Mat img2 = cv::imread( "images/006733.png", cv::IMREAD_COLOR );//.getUMat(cv::ACCESS_READ);
-  auto startLoad2 = std::chrono::system_clock::now();
+//  cv::Mat img = cv::imread( "images/006733.png", cv::IMREAD_COLOR );//.getUMat(cv::ACCESS_READ);
+//  cv::Mat img = cv::imread( "images/index.jpeg", cv::IMREAD_COLOR);
+  img = cv::imread( "images/coches3.jpg", cv::IMREAD_COLOR);
 
-  for(int i = 0; i < 10; i++)
-    gradMagExtractVector2 = chanExtractOpenCV.extractFeatures(img2);
+  for (int i = 0; i < 10; i++)
+  {
+    auto startLoad2 = std::chrono::system_clock::now();
+    gradMagExtractVector = chanExtractOpenCV.extractFeatures(img);
+    auto endLoad2 = std::chrono::system_clock::now();
+    std::chrono::duration<float,std::milli> durationLoad2 = endLoad2 - startLoad2;
+    std::cout << durationLoad2.count() << "ms extractOpenCV " << std::endl;
+  }
 
-  auto endLoad2 = std::chrono::system_clock::now();
-  std::chrono::duration<float,std::milli> durationLoad2 = endLoad2 - startLoad2;
-  std::cout << durationLoad2.count() << "ms extractOpenCV " << std::endl;
-
-  //cv::UMat diff;
-  //cv::subtract(gradMagExtractVector[0],gradMagExtractVector2[0],diff);
-  cv::imshow("A",gradMagExtractVector[0]);
-
-  cv::imshow("B",gradMagExtractVector2[0]);
-  //cv::imshow("diff",diff);
-
+#ifdef DEBUG
+  cv::imshow("M - OpenCV",gradMagExtractVector[0]);
+  cv::imshow("O - OpenCV",gradMagExtractVector[1]);
   cv::waitKey(0);
-
-
+#endif
 }
-
-/*
-TEST_F(TestChannelsExtractorGradMag, TestGradMagColorOpenCV)
-{
-
-  cv::FileStorage fs;
-  bool file_exists = fs.open("yaml/index_jpeg_gray_GradientChannels.yaml", cv::FileStorage::READ);
-  ASSERT_TRUE(file_exists);
-  float normConst = readScalarFromFileNode(fs["normConst"]);
-  float normRad = readScalarFromFileNode(fs["normRad"]);
-  ChannelsExtractorGradMagOpenCV chanExtractOpenCV(normRad, normConst);
-
-  std::vector<cv::Mat> gradMagExtractVector; 
-
-  cv::Mat img2;
-  img2 = cv::imread( "images/006733.png", cv::IMREAD_GRAYSCALE );//.getUMat(cv::ACCESS_READ);
-
-  auto startLoad = std::chrono::system_clock::now();
-  gradMagExtractVector = chanExtractOpenCV.extractFeatures(img2);
-
-  auto endLoad = std::chrono::system_clock::now();
-  std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
-  std::cout << durationLoad.count() << "ms extractOpenCV " << std::endl;
-
-  cv::imshow("B",gradMagExtractVector[0]);
-  cv::waitKey(0);
-}
-*/
-
-
