@@ -35,10 +35,10 @@ public:
       cv::Mat img 
     ) = 0;
 
-  std::vector<cv::UMat> extractFeatures
-    (
-      cv::UMat img 
-    );
+//  std::vector<cv::UMat> extractFeatures
+//    (
+//      cv::UMat img
+//    );
 
   static std::shared_ptr<ChannelsExtractorGradMag>
   createExtractor
