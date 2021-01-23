@@ -58,7 +58,4 @@ create_random_indices
   int n
   );
 
-
-
-
 #endif
