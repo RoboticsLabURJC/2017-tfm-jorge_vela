@@ -33,8 +33,6 @@ int main(int argc, char** argv)
   std::chrono::duration<float,std::milli> duration = end - start;
   std::cout << duration.count() << "ms" << std::endl;
 
-//  imshow("edges",   gray_cpu);
-//  waitKey();
   return 0;
 }
 
