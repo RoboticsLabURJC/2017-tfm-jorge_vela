@@ -32,8 +32,6 @@ class TestChannelsExtractorLUV: public testing::Test
   }
 };
 
-
-
 // -------------------------------------------------------------------------------
 // Test LUV OpenCV.
 // -------------------------------------------------------------------------------
@@ -324,7 +322,6 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalRGBImageOpenCV)
   }
 }
 
-
 TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImageOpenCV)
 {  
   cv::Mat img_natural;
@@ -344,7 +341,6 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImageOpenCV)
 
   ASSERT_FALSE(img_natural.empty());
   std::vector<cv::Mat> channels = channExtractSmoothOpenCV.extractFeatures(img_natural);
-
 
 #ifdef VISUALIZE_RESULTS
   cv::imshow("L,gt", vec_luv_gt[0]);
@@ -375,7 +371,6 @@ TEST_F(TestChannelsExtractorLUV, TestNaturalSmoothRGBImageOpenCV)
       ASSERT_TRUE(abs(channels[0].at<float>(j,i) - static_cast<float>(smoothMatlab[i*static_cast<int>(rows)+j])) < 1.e-4f);
     }
   }
-
 }
 
 // -------------------------------------------------------------------------------
