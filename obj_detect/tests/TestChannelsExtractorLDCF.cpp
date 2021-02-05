@@ -20,7 +20,6 @@
 
 #include <iostream>
 
-
 class TestChannelsExtractorLDCF: public testing::Test
 {
 public:

@@ -1,4 +1,3 @@
-
 /** ------------------------------------------------------------------------
  *
  *  @brief Channel feature extractors for LUV color space.
@@ -12,8 +11,8 @@
 #define CHANNELS_EXTRACTOR_LUV_OPENCV
 
 #include <channels/ChannelsExtractorLUV.h>
-#include <opencv2/opencv.hpp>
-#include <vector>
+//#include <opencv2/opencv.hpp>
+//#include <vector>
 
 class ChannelsExtractorLUVOpenCV: public ChannelsExtractorLUV
 {

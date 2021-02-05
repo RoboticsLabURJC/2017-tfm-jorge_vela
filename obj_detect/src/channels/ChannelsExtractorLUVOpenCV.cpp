@@ -48,16 +48,18 @@ ChannelsExtractorLUVOpenCV::extractFeatures
   std::vector<cv::Mat> channelsLUV_normalized(3);
   cv::Mat img_float;
   img.convertTo(img_float, CV_32F, 1./255.); // Important to have raw Luv conversion in OpenCV (and not to get it scaled by 255 to fit in 8 bits).
-  cv::Mat imgLUV = cv::Mat(img.size(), CV_32F);
+  cv::Mat imgLUV; // = cv::Mat::zeros(img.size(), CV_32F);
 
   // (see https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html)
   cv::cvtColor(img_float, imgLUV, cv::COLOR_BGR2Luv);
   cv::split(imgLUV, channelsLUV);
 
   // Make the same "normalizations" that P. Dollar's Luv conversion does:
-  channelsLUV[0] *= 1.0f/270.0;
-  channelsLUV[1] -= 0.197833f; // -88.0/270.0
-  channelsLUV[2] -= 0.468331f; // -134.0/270.0
+  channelsLUV[0] /= 270.0;
+  channelsLUV[1] += 88.0;
+  channelsLUV[1] /= 270.0;
+  channelsLUV[2] += 134.0;
+  channelsLUV[2] /= 270.0;
 
   if (m_smooth)
   {

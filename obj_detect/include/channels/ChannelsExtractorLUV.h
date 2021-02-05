@@ -24,7 +24,7 @@ public:
     )
   {
     m_smooth = smooth;
-    m_smooth_kernel_size = m_smooth_kernel_size;
+    m_smooth_kernel_size = smooth_kernel_size;
   };
 
   ~ChannelsExtractorLUV
@@ -32,15 +32,15 @@ public:
 
   virtual std::vector<cv::Mat> extractFeatures
     (
-      cv::Mat img
+    cv::Mat img
     ) = 0;
 
   static std::shared_ptr<ChannelsExtractorLUV>
   createExtractor
     (
-      std::string extractor_type = "pdollar",
-      bool smooth = true,
-      int smooth_kernel_size = 1
+    std::string extractor_type = "pdollar",
+    bool smooth = true,
+    int smooth_kernel_size = 1
     );
 
 protected:

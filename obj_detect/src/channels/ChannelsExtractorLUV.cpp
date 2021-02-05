@@ -7,6 +7,7 @@
  *  ------------------------------------------------------------------------ */
 #include <channels/ChannelsExtractorLUV.h>
 #include <channels/ChannelsExtractorLUVOpenCV.h>
+#include <channels/ChannelsExtractorLUVOpenCL.h>
 #include <channels/ChannelsExtractorLUVPDollar.h>
 
 std::shared_ptr<ChannelsExtractorLUV>
@@ -21,6 +22,10 @@ ChannelsExtractorLUV::createExtractor
   if (extractor_type == "opencv")
   {
     pExtractor.reset(new ChannelsExtractorLUVOpenCV(smooth, smooth_kernel_size));
+  }
+  else if (extractor_type == "opencl")
+  {
+    pExtractor.reset(new ChannelsExtractorLUVOpenCL(smooth, smooth_kernel_size));
   }
   else // if (extractor_type == "pdollar")
   {

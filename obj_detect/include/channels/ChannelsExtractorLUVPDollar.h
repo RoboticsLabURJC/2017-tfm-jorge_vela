@@ -12,8 +12,8 @@
 #define CHANNELS_EXTRACTOR_LUV_PDOLLAR
 
 #include <channels/ChannelsExtractorLUV.h>
-#include <opencv2/opencv.hpp>
-#include <vector>
+//#include <opencv2/opencv.hpp>
+//#include <vector>
 
 class ChannelsExtractorLUVPDollar: public ChannelsExtractorLUV
 {

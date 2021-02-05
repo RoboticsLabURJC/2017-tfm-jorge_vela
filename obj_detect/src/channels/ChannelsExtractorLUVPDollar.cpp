@@ -13,7 +13,6 @@
 #include <opencv2/opencv.hpp>
 
 // ------------------- Adapted from Piotr Dollar Matlab Toolbox --------------------
-
 ChannelsExtractorLUVPDollar::ChannelsExtractorLUVPDollar
   (
   bool smooth,
@@ -191,32 +190,4 @@ ChannelsExtractorLUVPDollar::extractFeatures
 
   return channelsLUV;
 }
-
-// Not equivalent at all to the P. Dollar's one :-(.
-//std::vector<cv::Mat> ChannelsExtractorLUV::extractFeaturesOpenCV
-//  (
-//  cv::Mat img
-//  )
-//{
-//  assert(img.type() == CV_8UC3); // TODO: Make it an error check + throw exception
-
-//  std::vector<cv::Mat> channelsLUV(3);
-//  std::vector<cv::Mat> channelsLUV_normalized(3);
-//  cv::Mat imgLUV = cv::Mat(img.size(), img.type());
-
-//  // (see https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html)
-//  cv::cvtColor(img, imgLUV, cv::COLOR_BGR2Luv);
-//  cv::split(imgLUV, channelsLUV);
-
-//  channelsLUV[0].convertTo(channelsLUV_normalized[0], CV_32FC3, 100.0/255.0);
-//  channelsLUV[1].convertTo(channelsLUV_normalized[1], CV_32FC3, 354.0/255.0, -134.0);
-//  channelsLUV[2].convertTo(channelsLUV_normalized[2], CV_32FC3, 256.0/255.0, -140.0);
-
-//////  // Add some constants in order to do it more similar to P. Dollar's Luv conversion:
-////  channelsLUV[1] += 0.325926;
-////  channelsLUV[2] += 0.496296;
-
-//  return channelsLUV_normalized;
-////  return channelsLUV;
-//}
 
