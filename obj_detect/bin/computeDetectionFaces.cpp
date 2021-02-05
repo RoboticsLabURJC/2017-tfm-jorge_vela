@@ -8,12 +8,12 @@
 #include <pyramid/ChannelsPyramidApproximatedParallelStrategy.h>
 
 #include <chrono>
-using namespace std;
 
 #include <iostream>
 #include <dirent.h>
 #include <sys/types.h>
 
+using namespace std;
 
 std::string getFileExt(const string& s) {
 

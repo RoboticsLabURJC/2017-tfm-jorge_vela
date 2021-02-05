@@ -6,7 +6,7 @@ using namespace cv;
 
 int main(int argc, char** argv)
 {
-    Mat img1 = imread("obj_detect/tests/images/coches10.jpg", IMREAD_COLOR);
+    Mat img1 = imread("../tests/images/coches10.jpg", IMREAD_COLOR);
     resize(img1, img1, Size(0,0), 5, 5, cv::INTER_LINEAR);
 
     cv::ocl::setUseOpenCL(false);

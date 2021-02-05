@@ -38,6 +38,8 @@ get_target_property(
         ${PROJECT_NAME} INCLUDE_DIRECTORIES
 )
 
+message(STATUS "${PROJECT_NAME}_INCLUDE_DIRS = ${${PROJECT_NAME}_INCLUDE_DIRS}")
+
 # tests headers
 target_include_directories(
         ${TESTS_REGRESSION_NAME}
@@ -58,7 +60,7 @@ file(COPY ${PROJECT_SOURCE_DIR}/obj_detect/tests/yaml DESTINATION ${CMAKE_CURREN
 
 add_test(
         NAME ${TESTS_REGRESSION_NAME}
-        COMMAND ${PROJECT_BINARY_DIR}/tests/${TESTS_REGRESSION_NAME}
+        COMMAND ${PROJECT_BINARY_DIR}/obj_detect/tests/${TESTS_REGRESSION_NAME}
 )
 
 

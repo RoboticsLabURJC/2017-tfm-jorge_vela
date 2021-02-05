@@ -7,12 +7,8 @@
 
 # ----------------- PRELIMINARIES ---------------------------------------------
 
-#cmake_minimum_required(VERSION 3.13)
-
 # jmbuena: Set this variable to the dir containing include/gtest/getst.h file.
-set(GTEST_ROOT_DIR /usr/local/include/gtest)
-
-#project(objdetect)
+set(GTEST_ROOT_DIR "/usr/include/gtest")
 
 # Build with tests
 option(WITH_TESTS "Build tests enabled" ON)
@@ -28,6 +24,9 @@ target_include_directories(
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
+#message(STATUS  "PROJECT_NAME=${PROJECT_NAME}")
+#message(STATUS  "INCLUDE_DIRECTORIES=${CMAKE_CURRENT_SOURCE_DIR}/include")
+##message(STATUS  "INCLUDE_DIRECTORIES = $<TARGET_PROPERTY:${PROJECT_NAME},INCLUDE_DIRECTORIES>")
 
 # ----------------- OTHER LIBRARIES -------------------------------------------
 
@@ -67,10 +66,10 @@ if(OPENMP_FOUND)
 endif(OPENMP_FOUND)
 
 
-## ----------------- CPP CONFIGURATION -----------------------------------------
+### ----------------- CPP CONFIGURATION -----------------------------------------
 
 # Allows generated files in the current directed to be found by the compiler
-# SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+#SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Remove deprecation warnings
 set(CMAKE_WARN_DEPRECATED FALSE)
 # Full compiler output
@@ -85,7 +84,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Library source files
 add_subdirectory(src)
 
-# Build the library with tests.
+# Some binaries to build
+add_subdirectory(bin)
+
+## Build the library with tests.
 if( WITH_TESTS )
   # Enable test-dependent macros
   add_definitions(-DWITH_TESTS)

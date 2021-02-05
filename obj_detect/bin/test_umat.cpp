@@ -15,7 +15,7 @@ int main(int argc, char** argv)
   cv::ocl::Device(context.device(0));
   cv::ocl::setUseOpenCL(true);
 
-  Mat img1 = imread("obj_detect/tests/images/coches10.jpg", IMREAD_COLOR);
+  Mat img1 = imread("../tests/images/coches10.jpg", IMREAD_COLOR);
   Mat gray_cpu;
   resize(img1, img1, Size(0,0), 5, 5, INTER_LINEAR);
 

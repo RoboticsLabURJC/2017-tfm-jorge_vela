@@ -5,13 +5,13 @@ FILE(
   DETECTORS_EXTRACTION_SRC
 
   ${CMAKE_CURRENT_SOURCE_DIR}/BadacostDetector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/BadacostDetector.h
+  ${PROJECT_SOURCE_DIR}/obj_detect/include/detectors/BadacostDetector.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/DetectionRectangle.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/DetectionRectangle.h
+  ${PROJECT_SOURCE_DIR}/obj_detect/include/detectors/DetectionRectangle.h
 
   ${CMAKE_CURRENT_SOURCE_DIR}/ClassifierConfig.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ClassifierConfig.h
+  ${PROJECT_SOURCE_DIR}/obj_detect/include/detectors/ClassifierConfig.h
   )
 
 # Set the sources for the main target
