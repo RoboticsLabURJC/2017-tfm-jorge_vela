@@ -41,6 +41,11 @@ private:
     (
     std::vector<cv::Mat> channelsLUV_input
     );
+
+  cv::Mat smoothImage
+    (
+    cv::Mat imgLUV
+    );
 };
 
 #endif

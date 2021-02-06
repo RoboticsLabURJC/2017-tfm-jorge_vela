@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/ocl.hpp>
 
 #include <iostream>
 
@@ -65,6 +66,15 @@ public:
       d4.score = 15.3124;
       d4.class_index = 7;
       gt_detections.push_back(d4);
+
+
+      cv::ocl::Context context;
+      if (!context.create(cv::ocl::Device::TYPE_GPU))
+      {
+        std::cout << "Failed creating OpenCL context..." << std::endl;
+      }
+      cv::ocl::Device(context.device(0));
+      cv::ocl::setUseOpenCL(true);
     }
 
   virtual void TearDown()
@@ -328,6 +338,73 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategyOpen
 
   testDetector(image, badacost);
 }
+
+
+
+// --------------------------------------------------------------------------
+//  OpenCL ACF implementation
+// --------------------------------------------------------------------------
+
+TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategyOpenCL)
+{
+  std::string clfPath = "yaml/detectorComplete_2.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  BadacostDetector badacost("all", "opencl");
+  bool loadVal = badacost.load(clfPath, filtersPath);
+  ASSERT_TRUE(loadVal);
+
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  testDetector(image, badacost);
+}
+
+TEST_F(TestBadacostDetector, TestDetectoryramidComputeAllParallelStrategyOpenCL)
+{
+  std::string clfPath = "yaml/detectorComplete_2.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  BadacostDetector badacost("all_parallel", "opencl");
+  bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
+  ASSERT_TRUE(loadVal);
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  testDetector(image, badacost);
+}
+
+
+TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedStrategyOpenCL)
+{
+  std::string clfPath = "yaml/detectorComplete_2.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  BadacostDetector badacost("approximated", "opencl");
+  bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
+  ASSERT_TRUE(loadVal);
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  testDetector(image, badacost);
+}
+
+
+TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategyOpenCL)
+{
+  std::string clfPath = "yaml/detectorComplete_2.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  BadacostDetector badacost("approximated_parallel", "opencl");
+  bool loadVal = badacost.load(clfPath, filtersPath); //, pyrPath (segundo parametro)
+  ASSERT_TRUE(loadVal);
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  testDetector(image, badacost);
+}
+
+
+
+
+
+
 
 
 

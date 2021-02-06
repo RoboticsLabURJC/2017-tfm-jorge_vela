@@ -161,8 +161,6 @@ ChannelsExtractorGradHistOpenCL::gradHist
       //O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
       cv::compare(O0, i, O0_eq_i, cv::CMP_EQ);
       cv::divide(O0_eq_i, 255.0, O0_eq_i);
-//      O0_eq_i.convertTo(O0_eq_i, CV_32F);
-//      cv::multiply(O0_eq_i, M0, M0_orient_i);
       cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
 
       // We use convolution with a full of ones kernel to sum over a window of

@@ -153,8 +153,6 @@ ChannelsExtractorGradHistOpenCV::gradHist
     for (int i=0; i<nOrients; i++)
     {
       O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
-//      O0_eq_i.convertTo(O0_eq_i, CV_32F);
-//      cv::multiply(O0_eq_i, M0, M0_orient_i);
       cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
 
       // We use convolution with a full of ones kernel to sum over a window of
@@ -185,12 +183,8 @@ ChannelsExtractorGradHistOpenCV::gradHist
     for (int i=0; i<nOrients; i++)
     {
       O0_eq_i = (O0 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
-//      O0_eq_i.convertTo(O0_eq_i, CV_32F);
-//      cv::multiply(O0_eq_i, M0, M0_orient_i);
       cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
       O1_eq_i = (O1 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
-//      O1_eq_i.convertTo(O1_eq_i, CV_32F);
-//      cv::multiply(O1_eq_i, M1, M1_orient_i);
       cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
 
       // We use convolution with a full of ones kernel to sum over a window of
@@ -229,14 +223,10 @@ ChannelsExtractorGradHistOpenCV::gradHist
     for (int i=0; i<nOrients; i++)
     {
       O0_eq_i = (O0 == i)/255;
-//      O0_eq_i.convertTo(O0_eq_i, CV_32F);
-//      cv::multiply(O0_eq_i, M0, M0_orient_i);
       cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
       if (m_softBin >= 0)
       {
         O1_eq_i = (O1 == i)/255;
-//        O1_eq_i.convertTo(O1_eq_i, CV_32F);
-//        cv::multiply(O1_eq_i, M1, M1_orient_i);
         cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
       }
 
