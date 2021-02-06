@@ -37,11 +37,6 @@ private:
   float m_smooth;
   int m_smooth_kernel_size;
 
-  std::vector<cv::Mat> smoothImage
-    (
-    std::vector<cv::Mat> channelsLUV_input
-    );
-
   cv::Mat smoothImage
     (
     cv::Mat imgLUV

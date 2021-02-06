@@ -32,11 +32,6 @@ public:
   virtual ~ChannelsPyramid
   () {};
 
-  /*virtual bool load
-    (
-    std::string opts
-    );*/
-
   virtual std::vector<std::vector<cv::Mat>> compute
     (
     cv::Mat img,

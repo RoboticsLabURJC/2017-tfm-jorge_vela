@@ -20,20 +20,6 @@ ChannelsExtractorLUVOpenCL::ChannelsExtractorLUVOpenCL
   m_smooth_kernel_size = smooth_kernel_size;
 }
 
-std::vector<cv::UMat>
-ChannelsExtractorLUVOpenCL::smoothImage
-  (
-  std::vector<cv::UMat> inputImg
-  )
-{
-  std::vector<cv::UMat> channelsLUV_output(3);
-  channelsLUV_output[0] = convTri(inputImg[0], m_smooth_kernel_size); //5
-  channelsLUV_output[1] = convTri(inputImg[1], m_smooth_kernel_size); //5
-  channelsLUV_output[2] = convTri(inputImg[2], m_smooth_kernel_size); //5
-
-  return channelsLUV_output;
-}
-
 cv::UMat
 ChannelsExtractorLUVOpenCL::smoothImage
   (
@@ -73,26 +59,6 @@ ChannelsExtractorLUVOpenCL::extractFeatures
   // GPU -> CPU
   imgLUV.copyTo(imgLUV_cpu);
   cv::split(imgLUV_cpu, channelsLUV_cpu);
-
-  return channelsLUV_cpu;
-
-//  cv::split(imgLUV, channelsLUV);
-
-//  // Make the same "normalizations" that P. Dollar's Luv conversion does:
-//  cv::multiply(channelsLUV[0], 1.0f/270.0, channelsLUV[0]);
-//  cv::add(channelsLUV[1], 88.0, channelsLUV[1]);
-//  cv::multiply(channelsLUV[1], 1.0f/270.0, channelsLUV[1]);
-//  cv::add(channelsLUV[2], 134.0, channelsLUV[2]);
-//  cv::multiply(channelsLUV[2], 1.0f/270.0, channelsLUV[2]);
-
-//  if (m_smooth)
-//  {
-//    channelsLUV = smoothImage(channelsLUV);
-//  }
-
-//  channelsLUV[0].copyTo(channelsLUV_cpu[0]);
-//  channelsLUV[1].copyTo(channelsLUV_cpu[1]);
-//  channelsLUV[2].copyTo(channelsLUV_cpu[2]);
 
   return channelsLUV_cpu;
 }

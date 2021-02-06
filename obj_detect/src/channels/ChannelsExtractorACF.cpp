@@ -39,9 +39,10 @@ ChannelsExtractorACF::ChannelsExtractorACF
                                                                     m_clf.gradHist.softBin,
                                                                     m_clf.gradHist.full);
 
-  m_pLUVExtractor = ChannelsExtractorLUV::createExtractor(m_impl_type, m_clf.luv.smooth, m_clf.luv.smooth_kernel_size);
+  m_pLUVExtractor = ChannelsExtractorLUV::createExtractor(m_impl_type,
+                                                          m_clf.luv.smooth,
+                                                          m_clf.luv.smooth_kernel_size);
 };
-
 
 cv::Mat
 ChannelsExtractorACF::processChannels
@@ -77,16 +78,8 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
 
   cv::Mat luv_image;
   std::vector<cv::Mat> luvImage;
-//  if (m_color_space != "LUV")
-//  {
-    luvImage = m_pLUVExtractor->extractFeatures(imageCropped);
-    merge(luvImage, luv_image);
-//  }
-//  else
-//  {
-//    luv_image = imageCropped;
-//    split(luv_image, luvImage);
-//  }
+  luvImage = m_pLUVExtractor->extractFeatures(imageCropped);
+  merge(luvImage, luv_image);
 
   luv_image = convTri(luv_image,  m_clf.luv.smooth_kernel_size);
   int x = round(m_clf.padding.width / m_clf.shrink);
@@ -104,7 +97,6 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
       resampleLuv = processChannels(resampleLuv, cv::BORDER_REFLECT,x,y);
 
     chnsCompute.push_back(resampleLuv);
-
   }
 
   cv::Mat resampleMag = ImgResample(gMagOrient[0], wResample, hResample);
@@ -140,7 +132,7 @@ ChannelsExtractorACF::postProcessChannels
   {
     cv::Mat c_padded;
     c_padded = convTri(acf_channels_no_postprocessed[i], 1);
-    if (i < 3) // LIV channels
+    if (i < 3) // LUV channels
     {
       copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
     }
