@@ -25,11 +25,13 @@
 BadacostDetector::BadacostDetector
   (
   std::string channels_pyramid_impl,
-  std::string channels_impl
+  std::string channels_impl,
+  float minScore
   )
   {
     m_classifierIsLoaded = false;
     m_pChnsPyramidStrategy = ChannelsPyramid::createChannelsPyramid(channels_pyramid_impl, channels_impl);
+    m_minScore = minScore;
   };
 
 BadacostDetector::~BadacostDetector
@@ -94,9 +96,11 @@ bool BadacostDetector::load
   clfData.modelDsPad.height = classifier["modelDsPad"]["data"][0];
 
   clfData.stride = classifier["stride"]["data"][0];
-  clfData.cascThr = float(classifier["cascThr"]["data"][0])*0.1;
+  clfData.cascThr = float(classifier["cascThr"]["data"][0]);//*0.1;
 
   clfData.luv.smooth = classifier["pChns.pColor"]["smooth"];
+  std::cout << "smooth: " << clfData.luv.smooth << std::endl;
+
   clfData.luv.smooth_kernel_size = 1;
 
   clfData.padding.width = classifier["pad"]["data"][1]; //6; //
@@ -105,6 +109,9 @@ bool BadacostDetector::load
   clfData.nPerOct = classifier["nPerOct"]["data"][0]; //3; //
   clfData.nApprox = classifier["nApprox"]["data"][0]; //2; //
   clfData.shrink = classifier["pChns.shrink"]["data"];
+
+  printf("%d %d %d \n", clfData.nOctUp, clfData.nPerOct, clfData.nApprox );
+  
   m_shrink = clfData.shrink*2;
 
   clfData.gradMag.normRad = classifier["pChns.pGradMag"]["normRad"]; 
@@ -236,6 +243,7 @@ BadacostDetector::detect(cv::Mat img)
     int shift_y = round((m_clfData.modelDsPad.height - m_clfData.modelDs.height)/2.0) - m_clfData.padding.height;
     for (uint j = 0; j < detections_i.size(); j++)
     {
+
       DetectionRectangle d = detections_i[j];
       d.bbox.x = (d.bbox.x + shift_x) / scaleshw[i].width;
       d.bbox.y = (d.bbox.y + shift_y) / scaleshw[i].height;
@@ -510,6 +518,7 @@ BadacostDetector::detectSingleScale
   {
     if (hs1[i] > 1) // hs1[i]>1 are object windows, hs1[i]==1 are background windows.
     {
+      if(scores[i] > m_minScore){
         DetectionRectangle det;
         det.bbox.x = cs[i] * m_clfData.stride;
         det.bbox.y = rs[i] * m_clfData.stride;
@@ -519,6 +528,7 @@ BadacostDetector::detectSingleScale
         det.class_index = hs1[i];
         
         detections.push_back(det);
+      }
     }
   }
 
@@ -534,32 +544,36 @@ BadacostDetector::showResults
 {
   for(DetectionRectangle d: detections)
   {
-    cv::rectangle(img, d.bbox, cv::Scalar(0, 255, 0), 2);
 
-    // score with 2 decimal positions
-    std::ostringstream out;
-    out.precision(2);
-    out << std::fixed << d.score;
-    std::string score_txt = out.str();
+    //if(d.score > 5.0)
+    //{
+      cv::rectangle(img, d.bbox, cv::Scalar(0, 255, 0), 2);
 
-    // The score is up left in the bbox rectangle
-    cv::putText(img, //target image
-                score_txt,
-                cv::Point(d.bbox.x, d.bbox.y-5),
-                cv::FONT_HERSHEY_DUPLEX,
-                0.5,
-                CV_RGB(255, 255, 0),
-                1);
+      // score with 2 decimal positions
+      std::ostringstream out;
+      out.precision(2);
+      out << std::fixed << d.score;
+      std::string score_txt = out.str();
 
-    // Class - 1 shown in the left bottom corner
-    cv::putText(img, //target image
-                std::to_string(d.class_index-1),
-                cv::Point(d.bbox.x, d.bbox.y+d.bbox.height+15),
-                cv::FONT_HERSHEY_DUPLEX,
-                0.5,
-                CV_RGB(255, 255, 0),
-                1);
+      // The score is up left in the bbox rectangle
+      cv::putText(img, //target image
+                  score_txt,
+                  cv::Point(d.bbox.x, d.bbox.y-5),
+                  cv::FONT_HERSHEY_DUPLEX,
+                  0.5,
+                  CV_RGB(255, 255, 0),
+                  1);
 
+      // Class - 1 shown in the left bottom corner
+      cv::putText(img, //target image
+                  std::to_string(d.class_index-1),
+                  cv::Point(d.bbox.x, d.bbox.y+d.bbox.height+15),
+                  cv::FONT_HERSHEY_DUPLEX,
+                  0.5,
+                  CV_RGB(255, 255, 0),
+                  1);
+
+    //}
   }
 }
 
