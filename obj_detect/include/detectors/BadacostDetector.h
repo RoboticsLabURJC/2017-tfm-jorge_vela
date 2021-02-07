@@ -25,7 +25,8 @@ public:
   BadacostDetector
     (
     std::string channels_pyramid_impl = "all_parallel",
-    std::string channels_impl = "pdollar"
+    std::string channels_impl = "pdollar",
+    float minScore = 0
     );
 
   ~BadacostDetector
@@ -71,7 +72,8 @@ protected:
     );
 
   bool m_classifierIsLoaded;
-    
+  float m_minScore;  
+
   int m_shrink;
   int m_stride;
   float m_cascThr;
