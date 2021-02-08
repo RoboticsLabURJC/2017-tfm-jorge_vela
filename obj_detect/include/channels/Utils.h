@@ -22,6 +22,15 @@ cv::Mat ImgResample
     float norm = 1
   );
 
+cv::UMat ImgResample
+  (
+    cv::UMat src,
+    int width,
+    int height,
+    std::string method = "antialiasing",
+    float norm = 1
+  );
+
 cv::Mat convTri
   (
   cv::Mat input_image,

@@ -21,28 +21,25 @@ class ChannelsExtractorGradHistOpenCL: public ChannelsExtractorGradHist
 public:
   ChannelsExtractorGradHistOpenCL
     (
-      int binSize = 8,
-      int nOrients = 8,
-      int softBin = 1,
-      int full = 0
-    ); /*: ChannelsExtractorGradHist(binSize,
-                               nOrients,
-                               softBin,
-                               full = 0)
-    {};*/
-
-  virtual std::vector<cv::Mat> extractFeatures
-    (
-      cv::Mat img,
-      std::vector<cv::Mat> gradMag
+    int binSize = 8,
+    int nOrients = 8,
+    int softBin = 1,
+    int full = 0
     );
 
-//  std::vector<cv::UMat> extractFeatures
-//    (
-//      cv::UMat img,
-//      std::vector<cv::UMat> gradMag
-//    );
+  virtual std::vector<cv::Mat>
+  extractFeatures
+    (
+    cv::Mat img,
+    std::vector<cv::Mat> gradMag
+    );
 
+  std::vector<cv::UMat>
+  extractFeatures
+    (
+    cv::UMat img,
+    std::vector<cv::UMat> gradMag
+    );
 
 private:
   cv::UMat m_kernel_umat;
@@ -60,28 +57,41 @@ private:
   void
   gradQuantize
     (
-      cv::UMat O,
-      cv::UMat M,
-      float norm,
-      int nOrients,
-      bool full,
-      bool interpolate,
-      cv::UMat& O0,
-      cv::UMat& O1,
-      cv::UMat& M0,
-      cv::UMat& M1
+    cv::UMat O,
+    cv::UMat M,
+    float norm,
+    int nOrients,
+    bool full,
+    bool interpolate,
+    cv::UMat& O0,
+    cv::UMat& O1,
+    cv::UMat& M0,
+    cv::UMat& M1
     );
 
+//  void
+//  gradHist
+//    (
+//    cv::Mat M,
+//    cv::Mat O,
+//    std::vector<cv::Mat>& H,
+//    int bin,
+//    int nOrients,
+//    int softBin,
+//    bool full
+//    );
+
+
   void
-  gradHist
+  gradHistUMat
     (
-      cv::Mat M,
-      cv::Mat O,
-      std::vector<cv::Mat>& H,
-      int bin,
-      int nOrients,
-      int softBin,
-      bool full
+    cv::UMat M,
+    cv::UMat O,
+    std::vector<cv::UMat>& H,
+    int bin,
+    int nOrients,
+    int softBin,
+    bool full
     );
 };
 

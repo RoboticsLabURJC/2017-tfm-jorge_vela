@@ -22,8 +22,7 @@ public:
     (
       int normRad = 0,
       float normConst = 0.005
-    ); /*: ChannelsExtractorGradMag(normRad, normConst)
-  {};*/
+    );
 
   //virtual ~ChannelsExtractorGradMagOpenCL() {};
     
@@ -32,10 +31,10 @@ public:
     cv::Mat img
     );
 
-//  std::vector<cv::UMat> extractFeatures
-//    (
-//    cv::UMat img
-//    );
+  std::vector<cv::UMat> extractFeatures
+    (
+    cv::UMat img
+    );
 
   void
   gradMagOpenCL
@@ -45,11 +44,6 @@ public:
     cv::UMat& O,
     bool full = true
     );
-
-  /*std::vector<cv::Mat> extractFeatures
-    (
-      cv::UMat img 
-    );*/
 
 protected:
     cv::UMat m_kernel_horiz;

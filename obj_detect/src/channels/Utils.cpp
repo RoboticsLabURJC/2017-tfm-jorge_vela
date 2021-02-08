@@ -18,8 +18,6 @@
 #include <numeric>
 #include <random>
 
-//using namespace cv;
-
 /**
  * Función Imgresample. Encargada de redimensionar una imagen de entrada, al tamaño de ancho y alto 
  * que se le pase por parámetros. 
@@ -31,19 +29,64 @@
  * @return cv::Mat: Imagen redimensionada
  * 
  */
-cv::Mat ImgResample(cv::Mat src, int width, int height, std::string method, float norm)
+cv::Mat
+ImgResample
+  (
+  cv::Mat src,
+  int width,
+  int height,
+  std::string method,
+  float norm
+  )
 {
   cv::Mat dst;
   if (method == "antialiasing")
   {
-    resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
+    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
   }
   else
   {
-    resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
+    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
   }
 
   dst *= norm;
+
+  return dst;
+}
+
+/**
+ * Función Imgresample. Encargada de redimensionar una imagen de entrada, al tamaño de ancho y alto
+ * que se le pase por parámetros.
+ *
+ * @param src: Imagen que se quiere redimensionar
+ * @param width: Ancho de la imagen de salida
+ * @param height: Alto de la imagen de salida
+ * @param norm: [1] Valor por el que se multiplican los píxeles de salida
+ * @return cv::Mat: Imagen redimensionada
+ *
+ */
+cv::UMat
+ImgResample
+  (
+  cv::UMat src,
+  int width,
+  int height,
+  std::string method,
+  float norm
+  )
+{
+  cv::UMat dst;
+  if (method == "antialiasing")
+  {
+    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
+  }
+  else
+  {
+    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
+  }
+
+  cv::UMat norm_mat(dst.size(), dst.type(), cv::Scalar(norm));
+  cv::multiply(dst, norm_mat, dst);
 
   return dst;
 }
@@ -56,7 +99,12 @@ cv::Mat ImgResample(cv::Mat src, int width, int height, std::string method, floa
  *
  * @return cv::Mat: Imagen de retorno despues del filtro.
  */
-cv::Mat convTri(cv::Mat input_image, int kernel_size)
+cv::Mat
+convTri
+  (
+  cv::Mat input_image,
+  int kernel_size
+  )
 {
   cv::Mat dst;
   cv::copyMakeBorder(input_image, dst, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_REFLECT, 0);
@@ -102,7 +150,12 @@ cv::Mat convTri(cv::Mat input_image, int kernel_size)
  *
  * @return cv::Mat: Imagen de retorno despues del filtro.
  */
-cv::UMat convTri(cv::UMat input_image, int kernel_size)
+cv::UMat
+convTri
+  (
+  cv::UMat input_image,
+  int kernel_size
+  )
 {
   cv::UMat dst;
   cv::copyMakeBorder(input_image, dst, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_REFLECT, 0);

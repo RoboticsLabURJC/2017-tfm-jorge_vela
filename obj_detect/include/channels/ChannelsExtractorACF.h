@@ -36,9 +36,9 @@ public:
     */
   ChannelsExtractorACF
     (
-      ClassifierConfig clf,
-      bool postprocess_channels = true,
-      std::string impl_type = "pdollar"
+    ClassifierConfig clf,
+    bool postprocess_channels = true,
+    std::string impl_type = "pdollar"
     );
 
   /**
@@ -50,30 +50,65 @@ public:
    * @param src input image
    * @return std::vector<cv::Mat> vector with all the channels as cv:Mat.
    */    
-  std::vector<cv::Mat> extractFeatures
+  std::vector<cv::Mat>
+  extractFeatures
     (
-      cv::Mat img
+    cv::Mat img
+    );
+
+  /**
+   * This method computes all the Piotr Dollar's Aggregated Channels Features as cv::Mat from an input image:
+   *   - 3 color chanels in the LUV color space
+   *   - 1 Gradient Magnitude channel
+   *   - 6 HOG channels (6 orientations).
+   *
+   * @param src input image as UMat
+   * @return std::vector<cv::UMat> vector with all the channels as cv:Mat.
+   */
+  std::vector<cv::UMat>
+  extractFeatures
+    (
+    cv::UMat img
+    );
+
+  int getNumChannels() { return 10; }
+
+  void
+  postProcessChannels
+    (
+    const std::vector<cv::Mat>& acf_channels_no_postprocessed, // input
+    std::vector<cv::Mat>& postprocessedChannels // output
     );
 
   void
   postProcessChannels
     (
-      const std::vector<cv::Mat>& acf_channels_no_postprocessed, // input
-      std::vector<cv::Mat>& postprocessedChannels // output
+    const std::vector<cv::UMat>& acf_channels_no_postprocessed, // input
+    std::vector<cv::UMat>& postprocessedChannels // output
     );
 
-  cv::Mat 
-  processChannels
-    (
-      cv::Mat img,
-      cv::BorderTypes,
-      int x,
-      int y
-    );
-
-  int getNumChannels() { return 10; }
 
 private:
+
+  cv::Mat
+  processChannels
+    (
+    cv::Mat img,
+    cv::BorderTypes,
+    int x,
+    int y
+    );
+
+
+  cv::UMat
+  processChannels
+    (
+    cv::UMat img,
+    cv::BorderTypes,
+    int x,
+    int y
+    );
+
   std::string m_impl_type;
 
   int m_shrink;

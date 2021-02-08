@@ -77,6 +77,30 @@ ChannelsExtractorGradMagOpenCL::extractFeatures
   cv::Mat img
   )
 {
+  cv::UMat img_umat;
+  // CPU -> GPU
+  img.copyTo(img_umat);
+
+  std::vector<cv::UMat> channels_gpu = extractFeatures(img_umat);
+
+  // GPU -> CPU
+  std::vector<cv::Mat> channels_cpu;
+  for (auto chn: channels_gpu)
+  {
+    cv::Mat chn_cpu;
+    chn.copyTo(chn_cpu);
+    channels_cpu.push_back(chn_cpu);
+  }
+
+  return channels_cpu;
+}
+
+std::vector<cv::UMat>
+ChannelsExtractorGradMagOpenCL::extractFeatures
+  (
+  cv::UMat img
+  )
+{
   int nChannels = img.channels();
   if ((nChannels != 1) && (nChannels != 3))
   {
@@ -87,28 +111,22 @@ ChannelsExtractorGradMagOpenCL::extractFeatures
   std::vector<cv::UMat> channelsGradMag(2);
   if (nChannels == 1)
   {
-    cv::UMat I;
-    img.copyTo(I);
-    gradMagOpenCL(I, channelsGradMag[0], channelsGradMag[1], false);
+    gradMagOpenCL(img, channelsGradMag[0], channelsGradMag[1], false);
   }
   else if (nChannels == 3 )
   {
-    cv::UMat I_split[3];
     cv::UMat M_split[3];
     cv::UMat O_split[3];
     cv::UMat aux;
 
-    cv::Mat img_split[3];
-    split(img, img_split);
-    img_split[0].copyTo(I_split[0]);
-    img_split[1].copyTo(I_split[1]);
-    img_split[2].copyTo(I_split[2]);
+    std::vector<cv::UMat> img_split(3);
+    cv::split(img, img_split);
 
     // Compute O matrix (on each pixel we put the corresponding value on O_split[i] where
     // the M_split[i] has the maximum value across i=0,1,2).
-    gradMagOpenCL(I_split[0], M_split[0], O_split[0], false);
-    gradMagOpenCL(I_split[1], M_split[1], O_split[1], false);
-    gradMagOpenCL(I_split[2], M_split[2], O_split[2], false);
+    gradMagOpenCL(img_split[0], M_split[0], O_split[0], false);
+    gradMagOpenCL(img_split[1], M_split[1], O_split[1], false);
+    gradMagOpenCL(img_split[2], M_split[2], O_split[2], false);
 
     // Compute M matrix
     cv::max(M_split[0], M_split[1], M_split[0]);
@@ -133,7 +151,7 @@ ChannelsExtractorGradMagOpenCL::extractFeatures
     // cv::UMat M1isMaximum = (M0isLTM1 & ~M1isLTM2)/255.0;
     cv::UMat M1isMaximum_255, M1isMaximum;
     cv::bitwise_and(M0isLTM1, notM1isLTM2, M1isMaximum_255);
-    cv::divide(M1isMaximum_255, 255.0, M1isMaximum);    
+    cv::divide(M1isMaximum_255, 255.0, M1isMaximum);
     M1isMaximum.convertTo(M1isMaximum, CV_32F);
 
     // cv::UMat M2isMaximum = (M0isLTM2 & M1isLTM2)/255.0;
@@ -156,11 +174,10 @@ ChannelsExtractorGradMagOpenCL::extractFeatures
     cv::add(S, m_normConst, S);
     cv::UMat T;
     cv::divide(channelsGradMag[0], S, T);
-//    T.copyTo(channelsGradMag[0]);
     channelsGradMag[0] = T;
   }
 
-  std::vector<cv::Mat> gMag(2);
+  std::vector<cv::UMat> gMag(2);
   channelsGradMag[0].copyTo(gMag[0]);
   channelsGradMag[1].copyTo(gMag[1]);
 
@@ -172,5 +189,4 @@ ChannelsExtractorGradMagOpenCL::extractFeatures
 
   return gMag;
 }
-
 

@@ -9,10 +9,11 @@
 #include <iostream>
 #include <channels/ChannelsExtractorACF.h>
 #include <channels/ChannelsExtractorLUV.h>
-#include <channels/ChannelsExtractorGradMagOpenCV.h>
-#include <channels/ChannelsExtractorGradMagPDollar.h>
-#include <channels/ChannelsExtractorGradHistOpenCV.h>
-#include <channels/ChannelsExtractorGradHistPDollar.h>
+#include <channels/ChannelsExtractorGradMag.h>
+#include <channels/ChannelsExtractorGradHist.h>
+#include <channels/ChannelsExtractorLUVOpenCL.h>
+#include <channels/ChannelsExtractorGradMagOpenCL.h>
+#include <channels/ChannelsExtractorGradHistOpenCL.h>
 #include <channels/ChannelsExtractorGradHist.h>
 #include <channels/Utils.h>
 #include <opencv2/opencv.hpp>
@@ -58,12 +59,12 @@ ChannelsExtractorACF::processChannels
   return image;
 }
 
-std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
+std::vector<cv::Mat>
+ChannelsExtractorACF::extractFeatures
   (
   cv::Mat img
   )
 {
-  //int dChan = img.channels();
   int h = img.size().height;
   int w = img.size().width;
 
@@ -76,32 +77,37 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   cv::Rect cropImage = cv::Rect(0, 0, w, h);
   cv::Mat imageCropped = img(cropImage);
 
-  cv::Mat luv_image;
-  std::vector<cv::Mat> luvImage;
-  luvImage = m_pLUVExtractor->extractFeatures(imageCropped);
-  merge(luvImage, luv_image);
+  cv::Mat luvImage;
+  std::vector<cv::Mat> luvChannels(3);
 
-  luv_image = convTri(luv_image,  m_clf.luv.smooth_kernel_size);
+  luvChannels = m_pLUVExtractor->extractFeatures(imageCropped);
+  merge(luvChannels, luvImage);
+
+  luvImage = convTri(luvImage,  m_clf.luv.smooth_kernel_size);
   int x = round(m_clf.padding.width / m_clf.shrink);
   int y = round(m_clf.padding.height / m_clf.shrink);
-  std::vector<cv::Mat> gMagOrient = m_pGradMagExtractor->extractFeatures(luv_image);
-  std::vector<cv::Mat> gMagHist = m_pGradHistExtractor->extractFeatures(luv_image, gMagOrient);
+  std::vector<cv::Mat> gMagOrient = m_pGradMagExtractor->extractFeatures(luvImage);
+  std::vector<cv::Mat> gMagHist = m_pGradHistExtractor->extractFeatures(luvImage, gMagOrient);
 
   int wResample = w/m_clf.shrink;
   int hResample = h/m_clf.shrink;
   std::vector<cv::Mat> chnsCompute;
-  for (cv::Mat luv_i: luvImage)
+  for (cv::Mat luv_i: luvChannels)
   {
     cv::Mat resampleLuv = ImgResample(luv_i, wResample, hResample);
     if (m_postprocess_channels)
+    {
       resampleLuv = processChannels(resampleLuv, cv::BORDER_REFLECT,x,y);
+    }
 
     chnsCompute.push_back(resampleLuv);
   }
 
   cv::Mat resampleMag = ImgResample(gMagOrient[0], wResample, hResample);
   if (m_postprocess_channels)
-      resampleMag = processChannels(resampleMag, cv::BORDER_CONSTANT,x,y);
+  {
+    resampleMag = processChannels(resampleMag, cv::BORDER_CONSTANT,x,y);
+  }
 
   chnsCompute.push_back(resampleMag);
 
@@ -109,7 +115,9 @@ std::vector<cv::Mat> ChannelsExtractorACF::extractFeatures
   {
     cv::Mat resampleHist = ImgResample(mh_c, wResample, hResample);
     if (m_postprocess_channels)
+    {
       resampleHist = processChannels(resampleHist, cv::BORDER_CONSTANT,x,y);
+    }
 
     chnsCompute.push_back(resampleHist);
   }
@@ -132,15 +140,138 @@ ChannelsExtractorACF::postProcessChannels
   {
     cv::Mat c_padded;
     c_padded = convTri(acf_channels_no_postprocessed[i], 1);
-    if (i < 3) // LUV channels
-    {
+//    if (i < 3) // LUV channels
+//    {
       copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
-    }
-    else
-    {
-      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
-    }
+//    }
+//    else
+//    {
+//      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
+//    }
 
     postprocessedChannels.push_back(c_padded);
   }
 }
+
+// -----------------------------------------------------------
+// ------ UMat as input and outputs
+// -----------------------------------------------------------
+cv::UMat
+ChannelsExtractorACF::processChannels
+(
+  cv::UMat image,
+  cv::BorderTypes borderType,
+  int x,
+  int y
+  )
+{
+  image = convTri(image, 1);
+  copyMakeBorder(image, image, y, y, x, x, borderType, 0 );
+  return image;
+}
+
+std::vector<cv::UMat>
+ChannelsExtractorACF::extractFeatures
+  (
+  cv::UMat img
+  )
+{
+  ChannelsExtractorGradMagOpenCL gradMagExtractor(m_clf.gradMag.normRad,
+                                                  m_clf.gradMag.normConst);
+
+  ChannelsExtractorGradHistOpenCL gradHistExtractor(m_clf.gradHist.binSize,
+                                                    m_clf.gradHist.nOrients,
+                                                    m_clf.gradHist.softBin,
+                                                    m_clf.gradHist.full);
+
+  ChannelsExtractorLUVOpenCL LUVExtractor(m_clf.luv.smooth,
+                                          m_clf.luv.smooth_kernel_size);
+
+
+  int h = img.size().height;
+  int w = img.size().width;
+
+  int crop_h = h % m_clf.shrink;
+  int crop_w = w % m_clf.shrink;
+
+  h = h - crop_h;
+  w = w - crop_w;
+
+  cv::Rect cropImage = cv::Rect(0, 0, w, h);
+  cv::UMat imageCropped = img(cropImage);
+
+  cv::UMat luvImage;
+  std::vector<cv::UMat> luvChannels(3);
+  luvChannels = LUVExtractor.extractFeatures(imageCropped);
+  merge(luvChannels, luvImage);
+  luvImage = convTri(luvImage,  m_clf.luv.smooth_kernel_size);
+  int x = round(m_clf.padding.width / m_clf.shrink);
+  int y = round(m_clf.padding.height / m_clf.shrink);
+  std::vector<cv::UMat> gMagOrient = gradMagExtractor.extractFeatures(luvImage);
+  std::vector<cv::UMat> gMagHist = gradHistExtractor.extractFeatures(luvImage, gMagOrient);
+
+  int wResample = w/m_clf.shrink;
+  int hResample = h/m_clf.shrink;
+  std::vector<cv::UMat> chnsCompute;
+  for (cv::UMat luv_i: luvChannels)
+  {
+    cv::UMat resampleLuv = ImgResample(luv_i, wResample, hResample);
+    if (m_postprocess_channels)
+    {
+      resampleLuv = processChannels(resampleLuv, cv::BORDER_REFLECT,x,y);
+    }
+
+    chnsCompute.push_back(resampleLuv);
+  }
+
+  cv::UMat resampleMag = ImgResample(gMagOrient[0], wResample, hResample);
+  if (m_postprocess_channels)
+  {
+      resampleMag = processChannels(resampleMag, cv::BORDER_CONSTANT,x,y);
+  }
+
+  chnsCompute.push_back(resampleMag);
+
+  for(cv::UMat mh_c: gMagHist)
+  {
+    cv::UMat resampleHist = ImgResample(mh_c, wResample, hResample);
+    if (m_postprocess_channels)
+    {
+      resampleHist = processChannels(resampleHist, cv::BORDER_CONSTANT,x,y);
+    }
+
+    chnsCompute.push_back(resampleHist);
+  }
+
+  return chnsCompute;
+}
+
+
+void
+ChannelsExtractorACF::postProcessChannels
+  (
+  const std::vector<cv::UMat>& acf_channels_no_postprocessed,
+  std::vector<cv::UMat>& postprocessedChannels
+  )
+{
+  // Postprocessing of the ACF channels
+  int x = round(m_clf.padding.width / m_clf.shrink);
+  int y = round(m_clf.padding.height / m_clf.shrink);
+
+  for (uint i=0; i < acf_channels_no_postprocessed.size(); i++)
+  {
+    cv::UMat c_padded;
+    c_padded = convTri(acf_channels_no_postprocessed[i], 1);
+//    if (i < 3) // LUV channels
+//    {
+      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_REFLECT, 0 );
+//    }
+//    else
+//    {
+//      copyMakeBorder( c_padded, c_padded, y, y, x, x, cv::BORDER_CONSTANT, 0 );
+//    }
+
+    postprocessedChannels.push_back(c_padded);
+  }
+}
+

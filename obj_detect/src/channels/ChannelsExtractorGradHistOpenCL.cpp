@@ -18,10 +18,10 @@
 
 ChannelsExtractorGradHistOpenCL::ChannelsExtractorGradHistOpenCL
   (
-    int binSize,
-    int nOrients,
-    int softBin,
-    int full
+  int binSize,
+  int nOrients,
+  int softBin,
+  int full
   ): ChannelsExtractorGradHist(binSize,
                              nOrients,
                              softBin,
@@ -109,263 +109,263 @@ ChannelsExtractorGradHistOpenCL::createKernel
 #endif
 }
 
-void
-ChannelsExtractorGradHistOpenCL::gradHist
-  (
-  cv::Mat M,
-  cv::Mat O,
-  std::vector<cv::Mat>& H,
-  int bin,
-  int nOrients,
-  int softBin,
-  bool full
-  )
-{
-  cv::Size sz = M.size();
-  const int hb = sz.height/bin; // Number of bins in height
-  const int wb = sz.width/bin;  // Number of bins in width
-  const float s = static_cast<float>(bin);   // number of pixels per bin in float
-  const float sInv2 = 1.0/s/s;
+//void
+//ChannelsExtractorGradHistOpenCL::gradHist
+//  (
+//  cv::Mat M,
+//  cv::Mat O,
+//  std::vector<cv::Mat>& H,
+//  int bin,
+//  int nOrients,
+//  int softBin,
+//  bool full
+//  )
+//{
+//  cv::Size sz = M.size();
+//  const int hb = sz.height/bin; // Number of bins in height
+//  const int wb = sz.width/bin;  // Number of bins in width
+//  const float s = static_cast<float>(bin);   // number of pixels per bin in float
+//  const float sInv2 = 1.0/s/s;
 
-  std::vector<cv::UMat> H_UMat(H.size());
-  cv::UMat O0, M0, O0_eq_i;
-  cv::UMat O1, M1, O1_eq_i;
+//  std::vector<cv::UMat> H_UMat(H.size());
+//  cv::UMat O0, M0, O0_eq_i;
+//  cv::UMat O1, M1, O1_eq_i;
 
-  // CPU -> GPU
-  cv::UMat O_UMat, M_UMat;
-  O.copyTo(O_UMat);
-  M.copyTo(M_UMat);
+//  // CPU -> GPU
+//  cv::UMat O_UMat, M_UMat;
+//  O.copyTo(O_UMat);
+//  M.copyTo(M_UMat);
 
-  // Quantize the orientations into the nOrients bins.
-  gradQuantize(O_UMat, M_UMat, sInv2, nOrients, full, softBin>=0, O0, O1, M0, M1);
-  // Actually compute the nOrients histogram images. In this case there are
-  // bin x bin squares where each pixels adds the magnitude of the gradient
-  // to the image of the corresponding quantized gradient orientation index.
+//  // Quantize the orientations into the nOrients bins.
+//  gradQuantize(O_UMat, M_UMat, sInv2, nOrients, full, softBin>=0, O0, O1, M0, M1);
+//  // Actually compute the nOrients histogram images. In this case there are
+//  // bin x bin squares where each pixels adds the magnitude of the gradient
+//  // to the image of the corresponding quantized gradient orientation index.
 
-  // The P0[i] has the gradient magnitudes of all pixels with orientation i and
-  // 0's if the orientation is different from i.
-  cv::UMat M0_orient_i;
-  cv::UMat M1_orient_i;
+//  // The P0[i] has the gradient magnitudes of all pixels with orientation i and
+//  // 0's if the orientation is different from i.
+//  cv::UMat M0_orient_i;
+//  cv::UMat M1_orient_i;
 
-  if ( (softBin < 0) && (softBin % 2 == 0) )
-  {
-    // no interpolation w.r.t. either orientation or spatial bin
-    cv::UMat Haux;
+//  if ( (softBin < 0) && (softBin % 2 == 0) )
+//  {
+//    // no interpolation w.r.t. either orientation or spatial bin
+//    cv::UMat Haux;
 
-    // First we obtain te images with gradient magnitude of the pixels
-    // with a given quantized orientation and 0 in the rest of pixels.
-    cv::UMat kernel = cv::UMat::ones(bin, 1, CV_32F);
-    cv::UMat kernel_t = kernel.t();
-    for (int i=0; i<nOrients; i++)
-    {
-      //O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
-      cv::compare(O0, i, O0_eq_i, cv::CMP_EQ);
-      cv::divide(O0_eq_i, 255.0, O0_eq_i);
-      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
+//    // First we obtain te images with gradient magnitude of the pixels
+//    // with a given quantized orientation and 0 in the rest of pixels.
+//    cv::UMat kernel = cv::UMat::ones(bin, 1, CV_32F);
+//    cv::UMat kernel_t = kernel.t();
+//    for (int i=0; i<nOrients; i++)
+//    {
+//      //O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
+//      cv::compare(O0, i, O0_eq_i, cv::CMP_EQ);
+//      cv::divide(O0_eq_i, 255.0, O0_eq_i);
+//      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
 
-      // We use convolution with a full of ones kernel to sum over a window of
-      // bin x bin pixels. We are doing more computation than needed as the
-      // histogram, do not need overlaping windows and we should be doing convolution with
-      // stride = bin. On the other hand, filter2D do not support stride.
-      // For speed, we perform computation with two kernels as the box filter is separable.
-      cv::filter2D(M0_orient_i, Haux, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux, Haux, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+//      // We use convolution with a full of ones kernel to sum over a window of
+//      // bin x bin pixels. We are doing more computation than needed as the
+//      // histogram, do not need overlaping windows and we should be doing convolution with
+//      // stride = bin. On the other hand, filter2D do not support stride.
+//      // For speed, we perform computation with two kernels as the box filter is separable.
+//      cv::filter2D(M0_orient_i, Haux, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+//      cv::filter2D(Haux, Haux, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
 
-      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
-      // (keep the right values of the Haux matrix).
-      //cv::UMat H_UMat = H[i].getUMat(cv::ACCESS_READ);
-      cv::resize(Haux, H_UMat[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
-    }
-  }
-  else if ( (softBin % 2 == 0) || (bin == 1) )
-  {
-    // interpolate w.r.t. orientation only, not spatial bin
-    cv::UMat Haux0, Haux1, Hi1;
-    // First we obtain   te images with gradient magnitude of the pixels
-    // with a given quantized orientation and 0 in the rest of pixels.
-    cv::UMat kernel = cv::UMat::ones(bin, 1, CV_32F);
-    cv::UMat kernel_t = kernel.t();
-    for (int i=0; i<nOrients; i++)
-    {
-      //O0_eq_i = (O0 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
-      cv::compare(O0,i,O0_eq_i,cv::CMP_EQ);
-      cv::divide(O0_eq_i, 255, O0_eq_i);
-      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
-      //O1_eq_i = (O1 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
-      cv::compare(O1,i,O1_eq_i,cv::CMP_EQ);
-      cv::divide(O1_eq_i, 255, O1_eq_i);
-      cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
+//      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
+//      // (keep the right values of the Haux matrix).
+//      //cv::UMat H_UMat = H[i].getUMat(cv::ACCESS_READ);
+//      cv::resize(Haux, H_UMat[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+//    }
+//  }
+//  else if ( (softBin % 2 == 0) || (bin == 1) )
+//  {
+//    // interpolate w.r.t. orientation only, not spatial bin
+//    cv::UMat Haux0, Haux1, Hi1;
+//    // First we obtain   te images with gradient magnitude of the pixels
+//    // with a given quantized orientation and 0 in the rest of pixels.
+//    cv::UMat kernel = cv::UMat::ones(bin, 1, CV_32F);
+//    cv::UMat kernel_t = kernel.t();
+//    for (int i=0; i<nOrients; i++)
+//    {
+//      //O0_eq_i = (O0 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
+//      cv::compare(O0,i,O0_eq_i,cv::CMP_EQ);
+//      cv::divide(O0_eq_i, 255, O0_eq_i);
+//      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
+//      //O1_eq_i = (O1 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
+//      cv::compare(O1,i,O1_eq_i,cv::CMP_EQ);
+//      cv::divide(O1_eq_i, 255, O1_eq_i);
+//      cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
      
-      // We use convolution with a full of ones kernel to sum over a window of
-      // bin x bin pixels. We are doing more computation than needed as the
-      // histogram, do not need overlaping windows and we should be doing convolution with
-      // stride = bin. On the other hand, filter2D do not support stride.
-      // For speed, we perform computation with two kernels as the box filter is separable.
-      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux0, Haux0, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux1, Haux1, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+//      // We use convolution with a full of ones kernel to sum over a window of
+//      // bin x bin pixels. We are doing more computation than needed as the
+//      // histogram, do not need overlaping windows and we should be doing convolution with
+//      // stride = bin. On the other hand, filter2D do not support stride.
+//      // For speed, we perform computation with two kernels as the box filter is separable.
+//      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+//      cv::filter2D(Haux0, Haux0, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+//      cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+//      cv::filter2D(Haux1, Haux1, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
 
-      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
-      // (keep the right values of the Haux matrix).
-      //cv::UMat H_UMat = H[i].getUMat(cv::ACCESS_READ);
-      cv::resize(Haux0, H_UMat[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
-      cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
-      cv::add(H_UMat[i], Hi1, H_UMat[i]); // H[i] += Hi1;
-    }
-  }
-  else
-  {
-    //------------------------------------------------------------------------------
-    // interpolate using trilinear interpolation:
-    //   bilinear spatially, linear in the orientation
+//      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
+//      // (keep the right values of the Haux matrix).
+//      //cv::UMat H_UMat = H[i].getUMat(cv::ACCESS_READ);
+//      cv::resize(Haux0, H_UMat[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+//      cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
+//      cv::add(H_UMat[i], Hi1, H_UMat[i]); // H[i] += Hi1;
+//    }
+//  }
+//  else
+//  {
+//    //------------------------------------------------------------------------------
+//    // interpolate using trilinear interpolation:
+//    //   bilinear spatially, linear in the orientation
 
-    // First we obtain te images with gradient magnitude of the pixels
-    // with a given quantized orientation and 0 in the rest of pixels.
-    cv::UMat Haux0;
-    cv::UMat Haux1;
-    for (int i=0; i<nOrients; i++)
-    {
-      //auto startLoad = std::chrono::system_clock::now();
+//    // First we obtain te images with gradient magnitude of the pixels
+//    // with a given quantized orientation and 0 in the rest of pixels.
+//    cv::UMat Haux0;
+//    cv::UMat Haux1;
+//    for (int i=0; i<nOrients; i++)
+//    {
+//      //auto startLoad = std::chrono::system_clock::now();
 
-      //O0_eq_i = (O0 == i)/255;
-      cv::compare(O0,i,O0_eq_i,cv::CMP_EQ);
-      cv::divide(O0_eq_i, 255, O0_eq_i);
-      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
+//      //O0_eq_i = (O0 == i)/255;
+//      cv::compare(O0,i,O0_eq_i,cv::CMP_EQ);
+//      cv::divide(O0_eq_i, 255, O0_eq_i);
+//      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
 
-      if (m_softBin >= 0)
-      {
-        //O1_eq_i = (O1 == i)/255;
-        cv::compare(O1,i,O1_eq_i,cv::CMP_EQ);
-        cv::divide(O1_eq_i, 255, O1_eq_i);
-        cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
-      }
+//      if (m_softBin >= 0)
+//      {
+//        //O1_eq_i = (O1 == i)/255;
+//        cv::compare(O1,i,O1_eq_i,cv::CMP_EQ);
+//        cv::divide(O1_eq_i, 255, O1_eq_i);
+//        cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
+//      }
 
-      /*auto endLoad = std::chrono::system_clock::now();
-      std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
-      std::cout << durationLoad.count() << "ms  compare" << std::endl;*/
+//      /*auto endLoad = std::chrono::system_clock::now();
+//      std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+//      std::cout << durationLoad.count() << "ms  compare" << std::endl;*/
 
-#ifdef DEBUG
-      if (i == 0)
-      {
-        std::cout << "ChannelsExtractorGradHistOpenCV::gradHist -->" << std::endl;
-        std::cout << "=============================" << std::endl;
-        std::cout << "wb, hb = " << wb << ", " << hb << std::endl;
-        std::cout << "sInv2 = " << sInv2;
-        std::cout << ", nOrients = " << nOrients;
-        std::cout << ", full = " << full;
-        std::cout << ", interpolate = " << (softBin>=0) << std::endl;
+//#ifdef DEBUG
+//      if (i == 0)
+//      {
+//        std::cout << "ChannelsExtractorGradHistOpenCV::gradHist -->" << std::endl;
+//        std::cout << "=============================" << std::endl;
+//        std::cout << "wb, hb = " << wb << ", " << hb << std::endl;
+//        std::cout << "sInv2 = " << sInv2;
+//        std::cout << ", nOrients = " << nOrients;
+//        std::cout << ", full = " << full;
+//        std::cout << ", interpolate = " << (softBin>=0) << std::endl;
 
-        std::cout << "O0 =" << std::endl;
-        std::cout << O0 << std::endl;
-        std::cout << "O0 == i ->" << std::endl;
-        std::cout << (O0 == i) << std::endl;
-        std::cout << "O0_eq_i = " << std::endl;
-        std::cout << O0_eq_i << std::endl;
-        std::cout << "M0_orient_i = " << std::endl;
-        std::cout << M0_orient_i << std::endl;
-      }
-#endif
+//        std::cout << "O0 =" << std::endl;
+//        std::cout << O0 << std::endl;
+//        std::cout << "O0 == i ->" << std::endl;
+//        std::cout << (O0 == i) << std::endl;
+//        std::cout << "O0_eq_i = " << std::endl;
+//        std::cout << O0_eq_i << std::endl;
+//        std::cout << "M0_orient_i = " << std::endl;
+//        std::cout << M0_orient_i << std::endl;
+//      }
+//#endif
 
-      int kcenter = bin;
-      if (bin % 2 == 1)
-      {
-        kcenter -= 1;
-      }
+//      int kcenter = bin;
+//      if (bin % 2 == 1)
+//      {
+//        kcenter -= 1;
+//      }
 
-#ifdef USE_SEPARABLE_CONVOLUTION
-      // The kernel is separable so we get the 1d kernel to speed up convolution using SVD
-      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel1d_umat, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
-      cv::filter2D(Haux0, Haux0, CV_32F, m_kernel1d_umat.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
-      if (m_softBin >= 0)
-      {
-        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel1d_umat, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
-        cv::filter2D(Haux1, Haux1, CV_32F, m_kernel1d_umat.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
-      }
-#else
-      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel_umat, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
-      if (m_softBin >= 0)
-      {
-        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel_umat, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
-      }
-#endif
+//#ifdef USE_SEPARABLE_CONVOLUTION
+//      // The kernel is separable so we get the 1d kernel to speed up convolution using SVD
+//      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel1d_umat, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+//      cv::filter2D(Haux0, Haux0, CV_32F, m_kernel1d_umat.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+//      if (m_softBin >= 0)
+//      {
+//        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel1d_umat, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+//        cv::filter2D(Haux1, Haux1, CV_32F, m_kernel1d_umat.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+//      }
+//#else
+//      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel_umat, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
+//      if (m_softBin >= 0)
+//      {
+//        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel_umat, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
+//      }
+//#endif
 
 
 
-#ifdef DEBUG
-      if (i == 0)
-      {
-        std::cout << "Haux0 + Haux1 = " << std::endl;
-        std::cout << Haux0 + Haux1 << std::endl;
-      }
-#endif
+//#ifdef DEBUG
+//      if (i == 0)
+//      {
+//        std::cout << "Haux0 + Haux1 = " << std::endl;
+//        std::cout << Haux0 + Haux1 << std::endl;
+//      }
+//#endif
 
-      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
-      // (keep the right values of the Haux matrix).
-      // The P.Dollar implementation:
-      //   - skips the first bin/2 columns and bin/2 rows althought they are added to the
-      //     orientation bin that is to the right (in the first two columns) or down (in the first two rows).
-      //   - We depart from the filtered images (H0 and H1) with the weighted sum of gradient magnitude on
-      //     each quantized orienation in 2bin x 2bin regions. The sums should be performed in a non-overlapping
-      //     fashiong starting at the bin/2 pixel (both in rows and columns). We use cv::resize with cv::INTER_NEAREST
-      //     to select the sums corresponding to non-overlaping regions. In order to do as in P.Dollar's implementation
-      //     we need to remove the last rows and columns in the image that makes the size not divisible by bin (are in
-      //     outside any of the wb or hb bins). That is the reason to substract Haux0.cols%bin and Haux0.rows%bin to
-      //     new_cols and new_rows, respectively.
+//      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
+//      // (keep the right values of the Haux matrix).
+//      // The P.Dollar implementation:
+//      //   - skips the first bin/2 columns and bin/2 rows althought they are added to the
+//      //     orientation bin that is to the right (in the first two columns) or down (in the first two rows).
+//      //   - We depart from the filtered images (H0 and H1) with the weighted sum of gradient magnitude on
+//      //     each quantized orienation in 2bin x 2bin regions. The sums should be performed in a non-overlapping
+//      //     fashiong starting at the bin/2 pixel (both in rows and columns). We use cv::resize with cv::INTER_NEAREST
+//      //     to select the sums corresponding to non-overlaping regions. In order to do as in P.Dollar's implementation
+//      //     we need to remove the last rows and columns in the image that makes the size not divisible by bin (are in
+//      //     outside any of the wb or hb bins). That is the reason to substract Haux0.cols%bin and Haux0.rows%bin to
+//      //     new_cols and new_rows, respectively.
 
-      // shift the Haux0 matrix bin/2 pixels up and to the left.
-      int new_rows = Haux0.rows - Haux0.rows % bin;
-      int new_cols = Haux0.cols - Haux0.cols % bin;
-      cv::Size sz_ajusted(new_cols, new_rows);
-      cv::UMat out = cv::UMat::zeros(sz_ajusted, Haux0.type());
-      int shift_x = bin/2.0;
-      int shift_y = bin/2.0;
-      int width_copy = Haux0.cols - shift_x - Haux0.cols % bin;
-      int height_copy = Haux0.rows - shift_y - Haux0.rows % bin;
-      cv::Rect copyToRect(0, 0, Haux0.cols - shift_x - Haux0.cols % bin, Haux0.rows - shift_y - Haux0.rows % bin);
-      Haux0(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out(copyToRect));
-      Haux0 = out;
+//      // shift the Haux0 matrix bin/2 pixels up and to the left.
+//      int new_rows = Haux0.rows - Haux0.rows % bin;
+//      int new_cols = Haux0.cols - Haux0.cols % bin;
+//      cv::Size sz_ajusted(new_cols, new_rows);
+//      cv::UMat out = cv::UMat::zeros(sz_ajusted, Haux0.type());
+//      int shift_x = bin/2.0;
+//      int shift_y = bin/2.0;
+//      int width_copy = Haux0.cols - shift_x - Haux0.cols % bin;
+//      int height_copy = Haux0.rows - shift_y - Haux0.rows % bin;
+//      cv::Rect copyToRect(0, 0, Haux0.cols - shift_x - Haux0.cols % bin, Haux0.rows - shift_y - Haux0.rows % bin);
+//      Haux0(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out(copyToRect));
+//      Haux0 = out;
 
-      // shift the Haux1 matrix bin/2 pixels up and to the left.
-      cv::UMat out2 = cv::UMat::zeros(sz_ajusted, Haux1.type());
-      width_copy = Haux1.cols - shift_x - Haux1.cols % bin;
-      height_copy = Haux1.rows - shift_y - Haux1.rows % bin;
-      cv::Rect copyToRect2(0, 0, width_copy, height_copy);
-      Haux1(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out2(copyToRect2));
-      Haux1 = out2;
+//      // shift the Haux1 matrix bin/2 pixels up and to the left.
+//      cv::UMat out2 = cv::UMat::zeros(sz_ajusted, Haux1.type());
+//      width_copy = Haux1.cols - shift_x - Haux1.cols % bin;
+//      height_copy = Haux1.rows - shift_y - Haux1.rows % bin;
+//      cv::Rect copyToRect2(0, 0, width_copy, height_copy);
+//      Haux1(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out2(copyToRect2));
+//      Haux1 = out2;
 
-      cv::resize(Haux0, H_UMat[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
-      if (m_softBin >= 0)
-      {
-        cv::UMat Hi1;
-        cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
-        cv::add(H_UMat[i], Hi1, H_UMat[i]); // H[i] += Hi1;
-      }
-    }
-  }
+//      cv::resize(Haux0, H_UMat[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+//      if (m_softBin >= 0)
+//      {
+//        cv::UMat Hi1;
+//        cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
+//        cv::add(H_UMat[i], Hi1, H_UMat[i]); // H[i] += Hi1;
+//      }
+//    }
+//  }
 
-  for (int i=0; i<nOrients; i++)
-  {
-    // GPU -> CPU
-    H_UMat[i].copyTo(H[i]);
-  }
+//  for (int i=0; i<nOrients; i++)
+//  {
+//    // GPU -> CPU
+//    H_UMat[i].copyTo(H[i]);
+//  }
 
-  // normalize boundary bins which only get 7/8 of weight of interior bins
-  if ( softBin%2!=0 )
-  {
-    for( int o=0; o<nOrients; o++ )
-    {
-      // first column
-      H[o](cv::Range::all(), cv::Range(0,1)) *= 8.f/7.f;
-      // first row
-      H[o](cv::Range(0,1), cv::Range::all()) *= 8.f/7.f;
-      // last column
-      H[o](cv::Range::all(), cv::Range(wb-1,wb)) *= 8.f/7.f;
-      // last row
-      H[o](cv::Range(hb-1,hb), cv::Range::all()) *= 8.f/7.f;
-    }
-  }
-}
+//  // normalize boundary bins which only get 7/8 of weight of interior bins
+//  if ( softBin%2!=0 )
+//  {
+//    for( int o=0; o<nOrients; o++ )
+//    {
+//      // first column
+//      H[o](cv::Range::all(), cv::Range(0,1)) *= 8.f/7.f;
+//      // first row
+//      H[o](cv::Range(0,1), cv::Range::all()) *= 8.f/7.f;
+//      // last column
+//      H[o](cv::Range::all(), cv::Range(wb-1,wb)) *= 8.f/7.f;
+//      // last row
+//      H[o](cv::Range(hb-1,hb), cv::Range::all()) *= 8.f/7.f;
+//    }
+//  }
+//}
 
 void
 ChannelsExtractorGradHistOpenCL::gradQuantize
@@ -456,21 +456,310 @@ ChannelsExtractorGradHistOpenCL::extractFeatures
   int hConv = h/m_binSize;
   int wConv = w/m_binSize;
 
-  std::vector<cv::Mat> Hs(m_nOrients);
+  std::vector<cv::UMat> Hs(m_nOrients);
   for (int i=0; i < m_nOrients; i++)
   {
-    Hs[i] = cv::Mat::zeros(hConv, wConv, CV_32FC1);
+    Hs[i] = cv::UMat::zeros(hConv, wConv, CV_32FC1);
   }
 
-  gradHist(gradMag[0],
-           gradMag[1],
-           Hs,
-           m_binSize,
-           m_nOrients,
-           m_softBin,
-           m_full);
+  cv::UMat O, M;
+  gradMag[0].copyTo(M);
+  gradMag[1].copyTo(O);
+
+  gradHistUMat(M,
+               O,
+               Hs,
+               m_binSize,
+               m_nOrients,
+               m_softBin,
+               m_full);
+
+  std::vector<cv::Mat> Hs_cpu(m_nOrients);
+  for (int i=0; i < m_nOrients; i++)
+  {
+    // GPU -> CPU
+    Hs[i].copyTo(Hs_cpu[i]);
+  }
+
+  return Hs_cpu;
+}
+
+
+// ----------------------------------------------------------
+// UMat as input version
+// ----------------------------------------------------------
+std::vector<cv::UMat>
+ChannelsExtractorGradHistOpenCL::extractFeatures
+  (
+  cv::UMat img,
+  std::vector<cv::UMat> gradMag
+  )
+{
+  int h = img.size().height;
+  int w = img.size().width;
+  int hConv = h/m_binSize;
+  int wConv = w/m_binSize;
+
+  std::vector<cv::UMat> Hs(m_nOrients);
+  for (int i=0; i < m_nOrients; i++)
+  {
+    Hs[i] = cv::UMat::zeros(hConv, wConv, CV_32FC1);
+  }
+
+  gradHistUMat(gradMag[0],
+               gradMag[1],
+               Hs,
+               m_binSize,
+               m_nOrients,
+               m_softBin,
+               m_full);
 
   return Hs;
 }
 
+void
+ChannelsExtractorGradHistOpenCL::gradHistUMat
+  (
+  cv::UMat M,
+  cv::UMat O,
+  std::vector<cv::UMat>& H,
+  int bin,
+  int nOrients,
+  int softBin,
+  bool full
+  )
+{
+  cv::Size sz = M.size();
+  const int hb = sz.height/bin; // Number of bins in height
+  const int wb = sz.width/bin;  // Number of bins in width
+  const float s = static_cast<float>(bin);   // number of pixels per bin in float
+  const float sInv2 = 1.0/s/s;
+
+  cv::UMat O0, M0, O0_eq_i;
+  cv::UMat O1, M1, O1_eq_i;
+
+  // Quantize the orientations into the nOrients bins.
+  gradQuantize(O, M, sInv2, nOrients, full, softBin>=0, O0, O1, M0, M1);
+  // Actually compute the nOrients histogram images. In this case there are
+  // bin x bin squares where each pixels adds the magnitude of the gradient
+  // to the image of the corresponding quantized gradient orientation index.
+
+  // The P0[i] has the gradient magnitudes of all pixels with orientation i and
+  // 0's if the orientation is different from i.
+  cv::UMat M0_orient_i;
+  cv::UMat M1_orient_i;
+
+  if ( (softBin < 0) && (softBin % 2 == 0) )
+  {
+    // no interpolation w.r.t. either orientation or spatial bin
+    cv::UMat Haux;
+
+    // First we obtain te images with gradient magnitude of the pixels
+    // with a given quantized orientation and 0 in the rest of pixels.
+    cv::UMat kernel = cv::UMat::ones(bin, 1, CV_32F);
+    cv::UMat kernel_t = kernel.t();
+    for (int i=0; i<nOrients; i++)
+    {
+      //O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
+      cv::compare(O0, i, O0_eq_i, cv::CMP_EQ);
+      cv::divide(O0_eq_i, 255.0, O0_eq_i);
+      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
+
+      // We use convolution with a full of ones kernel to sum over a window of
+      // bin x bin pixels. We are doing more computation than needed as the
+      // histogram, do not need overlaping windows and we should be doing convolution with
+      // stride = bin. On the other hand, filter2D do not support stride.
+      // For speed, we perform computation with two kernels as the box filter is separable.
+      cv::filter2D(M0_orient_i, Haux, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux, Haux, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+
+      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
+      // (keep the right values of the Haux matrix).
+      cv::resize(Haux, H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+    }
+  }
+  else if ( (softBin % 2 == 0) || (bin == 1) )
+  {
+    // interpolate w.r.t. orientation only, not spatial bin
+    cv::UMat Haux0, Haux1, Hi1;
+    // First we obtain   te images with gradient magnitude of the pixels
+    // with a given quantized orientation and 0 in the rest of pixels.
+    cv::UMat kernel = cv::UMat::ones(bin, 1, CV_32F);
+    cv::UMat kernel_t = kernel.t();
+    for (int i=0; i<nOrients; i++)
+    {
+      //O0_eq_i = (O0 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
+      cv::compare(O0,i,O0_eq_i,cv::CMP_EQ);
+      cv::divide(O0_eq_i, 255, O0_eq_i);
+      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
+      //O1_eq_i = (O1 == i)/255; // Matrix with values 0.0 (false) and 1.0 (true)
+      cv::compare(O1,i,O1_eq_i,cv::CMP_EQ);
+      cv::divide(O1_eq_i, 255, O1_eq_i);
+      cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
+
+      // We use convolution with a full of ones kernel to sum over a window of
+      // bin x bin pixels. We are doing more computation than needed as the
+      // histogram, do not need overlaping windows and we should be doing convolution with
+      // stride = bin. On the other hand, filter2D do not support stride.
+      // For speed, we perform computation with two kernels as the box filter is separable.
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux0, Haux0, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(M1_orient_i, Haux1, CV_32F, kernel, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux1, Haux1, CV_32F, kernel_t, cv::Point(0, 0), 0, cv::BORDER_CONSTANT);
+
+      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
+      // (keep the right values of the Haux matrix).
+      cv::resize(Haux0, H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+      cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
+      cv::add(H[i], Hi1, H[i]); // H[i] += Hi1;
+    }
+  }
+  else
+  {
+    //------------------------------------------------------------------------------
+    // interpolate using trilinear interpolation:
+    //   bilinear spatially, linear in the orientation
+
+    // First we obtain te images with gradient magnitude of the pixels
+    // with a given quantized orientation and 0 in the rest of pixels.
+    cv::UMat Haux0;
+    cv::UMat Haux1;
+    for (int i=0; i<nOrients; i++)
+    {
+      //auto startLoad = std::chrono::system_clock::now();
+
+      //O0_eq_i = (O0 == i)/255;
+      cv::compare(O0,i,O0_eq_i,cv::CMP_EQ);
+      cv::divide(O0_eq_i, 255, O0_eq_i);
+      cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
+
+      if (m_softBin >= 0)
+      {
+        //O1_eq_i = (O1 == i)/255;
+        cv::compare(O1,i,O1_eq_i,cv::CMP_EQ);
+        cv::divide(O1_eq_i, 255, O1_eq_i);
+        cv::multiply(O1_eq_i, M1, M1_orient_i, 1.0, CV_32F);
+      }
+
+      /*auto endLoad = std::chrono::system_clock::now();
+      std::chrono::duration<float,std::milli> durationLoad = endLoad - startLoad;
+      std::cout << durationLoad.count() << "ms  compare" << std::endl;*/
+
+#ifdef DEBUG
+      if (i == 0)
+      {
+        std::cout << "ChannelsExtractorGradHistOpenCV::gradHist -->" << std::endl;
+        std::cout << "=============================" << std::endl;
+        std::cout << "wb, hb = " << wb << ", " << hb << std::endl;
+        std::cout << "sInv2 = " << sInv2;
+        std::cout << ", nOrients = " << nOrients;
+        std::cout << ", full = " << full;
+        std::cout << ", interpolate = " << (softBin>=0) << std::endl;
+
+        std::cout << "O0 =" << std::endl;
+        std::cout << O0 << std::endl;
+        std::cout << "O0 == i ->" << std::endl;
+        std::cout << (O0 == i) << std::endl;
+        std::cout << "O0_eq_i = " << std::endl;
+        std::cout << O0_eq_i << std::endl;
+        std::cout << "M0_orient_i = " << std::endl;
+        std::cout << M0_orient_i << std::endl;
+      }
+#endif
+
+      int kcenter = bin;
+      if (bin % 2 == 1)
+      {
+        kcenter -= 1;
+      }
+
+#ifdef USE_SEPARABLE_CONVOLUTION
+      // The kernel is separable so we get the 1d kernel to speed up convolution using SVD
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel1d_umat, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+      cv::filter2D(Haux0, Haux0, CV_32F, m_kernel1d_umat.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+      if (m_softBin >= 0)
+      {
+        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel1d_umat, cv::Point(0, kcenter), 0, cv::BORDER_CONSTANT);
+        cv::filter2D(Haux1, Haux1, CV_32F, m_kernel1d_umat.t(), cv::Point(kcenter, 0), 0, cv::BORDER_CONSTANT);
+      }
+#else
+      cv::filter2D(M0_orient_i, Haux0, CV_32F, m_kernel_umat, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
+      if (m_softBin >= 0)
+      {
+        cv::filter2D(M1_orient_i, Haux1, CV_32F, m_kernel_umat, cv::Point(kcenter,kcenter), 0, cv::BORDER_CONSTANT);
+      }
+#endif
+
+#ifdef DEBUG
+      if (i == 0)
+      {
+        std::cout << "Haux0 + Haux1 = " << std::endl;
+        std::cout << Haux0 + Haux1 << std::endl;
+      }
+#endif
+
+      // Use nearest neighbour interpolation to keep every bin rows and cols from Haux
+      // (keep the right values of the Haux matrix).
+      // The P.Dollar implementation:
+      //   - skips the first bin/2 columns and bin/2 rows althought they are added to the
+      //     orientation bin that is to the right (in the first two columns) or down (in the first two rows).
+      //   - We depart from the filtered images (H0 and H1) with the weighted sum of gradient magnitude on
+      //     each quantized orienation in 2bin x 2bin regions. The sums should be performed in a non-overlapping
+      //     fashiong starting at the bin/2 pixel (both in rows and columns). We use cv::resize with cv::INTER_NEAREST
+      //     to select the sums corresponding to non-overlaping regions. In order to do as in P.Dollar's implementation
+      //     we need to remove the last rows and columns in the image that makes the size not divisible by bin (are in
+      //     outside any of the wb or hb bins). That is the reason to substract Haux0.cols%bin and Haux0.rows%bin to
+      //     new_cols and new_rows, respectively.
+
+      // shift the Haux0 matrix bin/2 pixels up and to the left.
+      int new_rows = Haux0.rows - Haux0.rows % bin;
+      int new_cols = Haux0.cols - Haux0.cols % bin;
+      cv::Size sz_ajusted(new_cols, new_rows);
+      cv::UMat out = cv::UMat::zeros(sz_ajusted, Haux0.type());
+      int shift_x = bin/2.0;
+      int shift_y = bin/2.0;
+      int width_copy = Haux0.cols - shift_x - Haux0.cols % bin;
+      int height_copy = Haux0.rows - shift_y - Haux0.rows % bin;
+      cv::Rect copyToRect(0, 0, Haux0.cols - shift_x - Haux0.cols % bin, Haux0.rows - shift_y - Haux0.rows % bin);
+      Haux0(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out(copyToRect));
+      Haux0 = out;
+
+      // shift the Haux1 matrix bin/2 pixels up and to the left.
+      cv::UMat out2 = cv::UMat::zeros(sz_ajusted, Haux1.type());
+      width_copy = Haux1.cols - shift_x - Haux1.cols % bin;
+      height_copy = Haux1.rows - shift_y - Haux1.rows % bin;
+      cv::Rect copyToRect2(0, 0, width_copy, height_copy);
+      Haux1(cv::Rect(shift_x, shift_y, width_copy, height_copy)).copyTo(out2(copyToRect2));
+      Haux1 = out2;
+
+      cv::resize(Haux0, H[i], H[i].size(), 0, 0, cv::INTER_NEAREST);
+      if (m_softBin >= 0)
+      {
+        cv::UMat Hi1;
+        cv::resize(Haux1, Hi1, H[i].size(), 0, 0, cv::INTER_NEAREST);
+        cv::add(H[i], Hi1, H[i]); //
+      }
+    }
+  }
+
+  // normalize boundary bins which only get 7/8 of weight of interior bins
+  if ( softBin%2!=0 )
+  {
+    for( int o=0; o<nOrients; o++ )
+    {
+      // first column
+      cv::UMat constant(H[o].rows, 1, CV_32F, cv::Scalar(8.f/7.f));
+      cv::multiply(H[o](cv::Range::all(), cv::Range(0,1)), constant, H[o](cv::Range::all(), cv::Range(0,1)));  ;
+      // first row
+      constant = cv::UMat(1, H[o].cols, CV_32F, cv::Scalar(8.f/7.f));
+      cv::divide(H[o](cv::Range(0,1), cv::Range::all()), constant, H[o](cv::Range(0,1), cv::Range::all()));  ;
+      // last column
+      constant = cv::UMat(H[o].rows, 1, CV_32F, cv::Scalar(8.f/7.f));
+      cv::divide(H[o](cv::Range::all(), cv::Range(wb-1,wb)), constant, H[o](cv::Range::all(), cv::Range(wb-1,wb)) );  ;
+      // last row
+      constant = cv::UMat(1, H[o].cols, CV_32F, cv::Scalar(8.f/7.f));
+      cv::divide(H[o](cv::Range(hb-1,hb), cv::Range::all()), constant, H[o](cv::Range(hb-1,hb), cv::Range::all()) );  ;
+    }
+  }
+}
 

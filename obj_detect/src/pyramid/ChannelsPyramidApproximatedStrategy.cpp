@@ -114,7 +114,7 @@ ChannelsPyramidApproximatedStrategy::compute
           type_of_channel_index = 0; // HoG channels.*/
       
       float ratio = pow((scales[i1]/scales[iR]),-clf.lambdas[type_of_channel_index]);
-      cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio); 
+      cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio);
       resampleVect[k] = resample;//.push_back(resample);
     }
     chnsPyramidDataACF[i1] = resampleVect;

@@ -13,7 +13,7 @@
 #include <detectors/ClassifierConfig.h>
 #include <detectors/DetectionRectangle.h>
 #include <pyramid/ChannelsPyramid.h>
-#include <pyramid/ChannelsPyramidComputeAllStrategy.h>
+#include <pyramid/ChannelsPyramidOpenCL.h>
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
@@ -89,7 +89,10 @@ protected:
   cv::Mat m_Y;
   cv::Mat m_wl_weights;
   cv::Mat m_aRatio;
-  
+
+  std::string m_channels_pyramid_impl;
+  std::string m_channels_impl;
+
   // After load it contains the cv::Mat variables: 
   // "fids", "thrs", "child", "hs", "weights", "depth"
   std::map<std::string, cv::Mat> m_classifier;
@@ -98,6 +101,9 @@ protected:
   // "fids", "thrs", "child", "hs", "weights", "depth"
   std::shared_ptr<ChannelsPyramid> m_pChnsPyramidStrategy;
   ClassifierConfig m_clfData;
+
+  // We use a completely different implementation of ChannelsPyramid for T-API (OpenCL)
+  ChannelsPyramidOpenCL m_chnsPyramidOpenCL;
 
   std::vector<cv::Mat> m_filters;
 };

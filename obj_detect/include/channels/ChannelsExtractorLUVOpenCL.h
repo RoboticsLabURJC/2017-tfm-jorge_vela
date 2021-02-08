@@ -28,7 +28,12 @@ public:
 
   virtual std::vector<cv::Mat> extractFeatures
     (
-      cv::Mat img
+    cv::Mat img
+    );
+
+  std::vector<cv::UMat> extractFeatures
+    (
+    cv::UMat img
     );
 
 private:

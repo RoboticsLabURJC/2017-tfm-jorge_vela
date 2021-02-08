@@ -4,6 +4,9 @@ FILE(
   GLOB
   PYRAMID_EXTRACTION_SRC
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidOpenCL.cpp
+  ${PROJECT_SOURCE_DIR}/obj_detect/include/pyramid/ChannelsPyramidOpenCL.h
+
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramid.cpp
   ${PROJECT_SOURCE_DIR}/obj_detect/include/pyramid/ChannelsPyramid.h
 

@@ -63,6 +63,32 @@ ChannelsExtractorLUVOpenCL::extractFeatures
   return channelsLUV_cpu;
 }
 
+std::vector<cv::UMat>
+ChannelsExtractorLUVOpenCL::extractFeatures
+  (
+  cv::UMat img
+  )
+{
+  std::vector<cv::UMat> channelsLUV(3);
+  cv::UMat imgLUV;
+  cv::UMat img_float;
+  img.convertTo(img_float, CV_32F, 1./255.); // Important to have raw Luv conversion in OpenCV (and not to get it scaled by 255 to fit in 8 bits).
+
+  // (see https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html)
+  cv::cvtColor(img_float, imgLUV, cv::COLOR_BGR2Luv);
+  cv::divide(imgLUV, 270., imgLUV);
+  cv::UMat incMat = cv::UMat(imgLUV.size(), CV_32FC3, cv::Scalar(0.,88./270.,134./270.));
+  cv::add(imgLUV, incMat, imgLUV);
+
+  if (m_smooth)
+  {
+    imgLUV = smoothImage(imgLUV);
+  }
+
+  cv::split(imgLUV, channelsLUV);
+
+  return channelsLUV;
+}
 
 
 

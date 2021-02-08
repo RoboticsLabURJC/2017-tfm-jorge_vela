@@ -67,7 +67,7 @@ public:
       d4.class_index = 7;
       gt_detections.push_back(d4);
 
-
+      // Use T-API OpenCL.
       cv::ocl::Context context;
       if (!context.create(cv::ocl::Device::TYPE_GPU))
       {
@@ -340,9 +340,8 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategyOpen
 }
 
 
-
 // --------------------------------------------------------------------------
-//  OpenCL ACF implementation
+//  OpenCL ACF implementation (per image call)
 // --------------------------------------------------------------------------
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategyOpenCL)
@@ -399,6 +398,25 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategyOpen
 
   testDetector(image, badacost);
 }
+
+
+// --------------------------------------------------------------------------
+//  OpenCL ACF implementation
+// --------------------------------------------------------------------------
+TEST_F(TestBadacostDetector, TestDetectorPyramidOpenCL)
+{
+  std::string clfPath = "yaml/detectorComplete_2.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  BadacostDetector badacost("opencl", "opencl");
+  bool loadVal = badacost.load(clfPath, filtersPath);
+  ASSERT_TRUE(loadVal);
+
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  testDetector(image, badacost);
+}
+
 
 
 

@@ -29,7 +29,12 @@ BadacostDetector::BadacostDetector
   )
   {
     m_classifierIsLoaded = false;
-    m_pChnsPyramidStrategy = ChannelsPyramid::createChannelsPyramid(channels_pyramid_impl, channels_impl);
+    m_channels_pyramid_impl = channels_pyramid_impl;
+    m_channels_impl = channels_impl;
+    if (m_channels_pyramid_impl != "opencl")
+    {
+      m_pChnsPyramidStrategy = ChannelsPyramid::createChannelsPyramid(channels_pyramid_impl, channels_impl);
+    }
   };
 
 BadacostDetector::~BadacostDetector
@@ -224,7 +229,20 @@ BadacostDetector::detect(cv::Mat img)
   std::vector<std::vector<cv::Mat>> pyramid;
   std::vector<double> scales;
   std::vector<cv::Size2d> scaleshw;
-  pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw,m_clfData);
+
+  if (m_channels_pyramid_impl != "opencl")
+  {
+    pyramid = m_pChnsPyramidStrategy->compute(img, m_filters, scales, scaleshw, m_clfData);
+  }
+  else
+  {
+    // CPU->GPU
+    cv::UMat img_gpu;
+    img.copyTo(img_gpu);
+
+    // Computation in GPU and GPU->CPU
+    pyramid = m_chnsPyramidOpenCL.compute(img_gpu, m_filters, scales, scaleshw, m_clfData);
+  }
 
   // Execute the detector over all the scales
   std::vector<DetectionRectangle> detections;
