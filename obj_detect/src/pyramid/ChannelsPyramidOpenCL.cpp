@@ -105,8 +105,6 @@ ChannelsPyramidOpenCL::compute
   )
 {
   cv::Size sz = img.size();
-//  cv::UMat imageUse = img;
-
   getScales(clf.nPerOct, clf.nOctUp, clf.minDs, clf.shrink, sz, scales, scaleshw);
 
 #ifdef DEBUG
@@ -137,17 +135,17 @@ ChannelsPyramidOpenCL::compute
   std::vector<std::vector<cv::Mat>> chnsPyramidData_cpu(nScales);
   for (int i=0; i < nScales; i++)
   {
+    std::vector<cv::Mat> chnsPyramidData_cpu_i(chnsPyramidData[i].size());
     for (int j=0; j < chnsPyramidData[i].size(); j++)
     {
       cv::Mat chn;
-      chnsPyramidData[i][j].copyTo(chn);
-      chnsPyramidData_cpu[i].push_back(chn);
+      chnsPyramidData[i][j].copyTo(chnsPyramidData_cpu_i[j]);
     }
+    chnsPyramidData_cpu[i] = chnsPyramidData_cpu_i;
   }
 
   return chnsPyramidData_cpu;
 }
-
 
 
 
