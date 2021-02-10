@@ -52,6 +52,20 @@ public:
     std::vector<cv::Size2d>& scaleshw,
     ClassifierConfig clf
     );
+
+protected:
+  cv::Size2i
+  computePackedImageSize
+    (
+    const std::vector<cv::Rect2i>& pyr_imgs_rois
+    );
+
+  std::vector<cv::Rect2i>
+  computePackedPyramidImageROIs
+    (
+    const std::vector<cv::Size2i>& pyramidImgsSizes
+    );
+
 };
 
 
