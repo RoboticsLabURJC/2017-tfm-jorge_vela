@@ -172,19 +172,18 @@ ChannelsPyramidOpenCL::compute
 
   int nScales = static_cast<int>(scales.size());
   ChannelsExtractorLDCF ldcfExtractor(filters, clf, "opencl");
-  std::vector<cv::UMat> chnsCompute;
 
   // Setup the ROIs within the packed image of every image in the pyramid
   std::vector<cv::Size> pyramid_imgs_sizes;
   std::vector<cv::Size> pyramid_chns_sizes;
-  for(int i=0; i< nScales; i++)
+  for (int i=0; i< nScales; i++)
   {
     double s = scales[i];
     pyramid_imgs_sizes.emplace_back(round((sz.width * s) / clf.shrink) * clf.shrink,
                                     round((sz.height * s) / clf.shrink) * clf.shrink);
 
-    pyramid_chns_sizes.emplace_back(round(0.5*(sz.width * s) / clf.shrink),
-                                    round(0.5*(sz.height * s) / clf.shrink));
+    pyramid_chns_sizes.emplace_back(round(round(0.5 * sz.width * s) / clf.shrink),
+                                    round(round(0.5 * sz.height * s) / clf.shrink));
 
   }
 
@@ -214,6 +213,7 @@ ChannelsPyramidOpenCL::compute
   }
 
   // We only need to compute the channels over the packed image
+  std::vector<cv::UMat> chnsCompute;
   chnsCompute = ldcfExtractor.extractFeatures(packed_img);
 
   // GPU -> CPU

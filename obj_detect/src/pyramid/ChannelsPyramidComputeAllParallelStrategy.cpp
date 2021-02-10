@@ -40,19 +40,28 @@ ChannelsPyramidComputeAllParallelStrategy::compute
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   ChannelsExtractorLDCF ldcfExtractor(filters, clf, m_channels_impl_type);
 
-  // It is more efficient to compute the
-  cv::parallel_for_(cv::Range( 0, nScales ), [&](const cv::Range& r)
+  // Idea From: https://github.com/elucideye/acf/blob/master/src/lib/acf/acf/chnsPyramid.cpp
+  // The per scale/type operations are easily parallelized, but with a parallel_for approach
+  // using simple uniform slicing will tend to starve some threads due to the nature of the
+  // pyramid layout.  Randomizing the scale indices should do better.  More optimal strategies
+  // may exist with further testing (work stealing, etc).
+  const auto scalesIndex = create_random_indices(nScales);
+
+  cv::parallel_for_(cv::Range( 0, int(scalesIndex.size()) ), [&](const cv::Range& r)
+//  cv::parallel_for_(cv::Range( 0, nScales ), [&](const cv::Range& r)
   {
     for (int i = r.start; i < r.end; i++)
     {
-      double s = scales[i];
+//      double s = scales[i];
+      double s = scales[scalesIndex[i]];
       cv::Size sz1;
       sz1.width = round((sz.width * s) / clf.shrink) * clf.shrink;
       sz1.height = round((sz.height * s) / clf.shrink) * clf.shrink;
 
       cv::Mat I1;
       ImgResample(imageUse, I1, sz1.width , sz1.height);
-      chnsPyramidData[i] = ldcfExtractor.extractFeatures(I1);
+      chnsPyramidData[scalesIndex[i]] = ldcfExtractor.extractFeatures(I1);
+//      chnsPyramidData[i] = ldcfExtractor.extractFeatures(I1);
     }
   });
 

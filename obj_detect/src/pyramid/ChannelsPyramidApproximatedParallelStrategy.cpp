@@ -89,8 +89,6 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   // using simple uniform slicing will tend to starve some threads due to the nature of the
   // pyramid layout.  Randomizing the scale indices should do better.  More optimal strategies
   // may exist with further testing (work stealing, etc).
-  const auto scalesIndex = create_random_indices(nScales);
-
   auto isAIndex = isA;
   std::shuffle(isAIndex.begin(), isAIndex.end(), std::mt19937(std::random_device()()));
 
@@ -123,6 +121,12 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   ChannelsExtractorLDCF ldcfExtractor(filters, clf);//, clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full); //clf.padding, clf.shrink, m_gradientMag_normRad, m_gradientMag_normConst, m_gradientHist_binSize, m_gradientHist_nOrients,m_gradientHist_softBin,m_gradientHist_full);
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
 
+  // Idea From: https://github.com/elucideye/acf/blob/master/src/lib/acf/acf/chnsPyramid.cpp
+  // The per scale/type operations are easily parallelized, but with a parallel_for approach
+  // using simple uniform slicing will tend to starve some threads due to the nature of the
+  // pyramid layout.  Randomizing the scale indices should do better.  More optimal strategies
+  // may exist with further testing (work stealing, etc).
+  const auto scalesIndex = create_random_indices(nScales);
   cv::parallel_for_(cv::Range( 0, chnsPyramidDataACF.size()), [&](const cv::Range& r)
   {
     for (int i = r.start; i < r.end; i++)

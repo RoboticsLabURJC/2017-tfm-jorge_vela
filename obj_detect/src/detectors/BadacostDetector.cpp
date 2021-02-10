@@ -104,7 +104,7 @@ bool BadacostDetector::load
   clfData.cascThr = float(classifier["cascThr"]["data"][0]);//*0.1;
 
   clfData.luv.smooth = classifier["pChns.pColor"]["smooth"];
-  std::cout << "smooth: " << clfData.luv.smooth << std::endl;
+//  std::cout << "smooth: " << clfData.luv.smooth << std::endl;
 
   clfData.luv.smooth_kernel_size = 1;
 
@@ -115,7 +115,7 @@ bool BadacostDetector::load
   clfData.nApprox = classifier["nApprox"]["data"][0]; //2; //
   clfData.shrink = classifier["pChns.shrink"]["data"];
 
-  printf("%d %d %d \n", clfData.nOctUp, clfData.nPerOct, clfData.nApprox );
+//  std::cout << clfData.nOctUp << " " << clfData.nPerOct << " " << clfData.nApprox << std::endl;
   
   m_shrink = clfData.shrink*2;
 

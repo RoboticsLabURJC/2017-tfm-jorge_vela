@@ -175,17 +175,6 @@ convTri
   dst = dst(myRoi2);
 }
 
-
-
-
-
-
-
-
-
-
-
-
 std::vector<int>
 create_random_indices
   (

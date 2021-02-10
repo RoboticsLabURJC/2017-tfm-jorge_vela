@@ -29,12 +29,14 @@ int main
     std::string detect_strategy_str = argv[1];
     std::string acf_channels_impl_str = argv[2];
 
-    if ((detect_strategy_str != "all") &&
-            (detect_strategy_str != "all_parallel") &&
-            (detect_strategy_str != "approx") &&
-            (detect_strategy_str != "approx_parallel"))
+    if ((detect_strategy_str != "opencl") &&
+        (detect_strategy_str != "all") &&
+        (detect_strategy_str != "all_parallel") &&
+        (detect_strategy_str != "approx") &&
+        (detect_strategy_str != "approx_parallel"))
     {
         cout <<"ERROR EN LA FORMA DE INDICAR EL TIPO DE ESTRATEGIA. FORMATOS POSIBLES:" << endl;
+        cout <<"opencl" << endl;
         cout <<"all" << endl;
         cout <<"all_parallel" << endl;
         cout <<"approx" << endl;
@@ -43,11 +45,13 @@ int main
     }
 
     if ((acf_channels_impl_str != "pdollar") &&
-            (acf_channels_impl_str != "opencv"))
+        (acf_channels_impl_str != "opencv") &&
+        (acf_channels_impl_str != "opencl"))
     {
         cout <<"ERROR EN LA FORMA DE INDICAR LA IMPLEMENTACIÓN DE CANALES ACF. FORMATOS POSIBLES:" << endl;
         cout <<"pdollar" << endl;
         cout <<"opencv" << endl;
+        cout <<"opencl" << endl;
         return 1;
     }
 
