@@ -29,17 +29,43 @@
  * @return cv::Mat: Imagen redimensionada
  * 
  */
-cv::Mat
+//cv::Mat
+//ImgResample
+//  (
+//  cv::Mat src,
+//  int width,
+//  int height,
+//  std::string method,
+//  float norm
+//  )
+//{
+//  cv::Mat dst;
+//  if (method == "antialiasing")
+//  {
+//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
+//  }
+//  else
+//  {
+//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
+//  }
+
+//  dst *= norm;
+
+//  return dst;
+//}
+
+void
 ImgResample
   (
   cv::Mat src,
+  cv::Mat& dst,
   int width,
   int height,
   std::string method,
   float norm
   )
 {
-  cv::Mat dst;
+
   if (method == "antialiasing")
   {
     cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
@@ -50,9 +76,11 @@ ImgResample
   }
 
   dst *= norm;
-
-  return dst;
+//  cv::Mat norm_mat(dst.size(), dst.type(), cv::Scalar(norm));
+//  cv::multiply(dst, norm_mat, dst);
 }
+
+
 
 /**
  * Función Imgresample. Encargada de redimensionar una imagen de entrada, al tamaño de ancho y alto
@@ -65,17 +93,56 @@ ImgResample
  * @return cv::Mat: Imagen redimensionada
  *
  */
-cv::UMat
+//cv::UMat
+//ImgResample
+//  (
+//  cv::UMat src,
+//  int width,
+//  int height,
+//  std::string method,
+//  float norm
+//  )
+//{
+//  cv::UMat dst;
+//  if (method == "antialiasing")
+//  {
+//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
+//  }
+//  else
+//  {
+//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
+//  }
+
+//  cv::UMat norm_mat(dst.size(), dst.type(), cv::Scalar(norm));
+//  cv::multiply(dst, norm_mat, dst);
+
+//  return dst;
+//}
+
+
+
+/**
+ * Función Imgresample. Encargada de redimensionar una imagen de entrada, al tamaño de ancho y alto
+ * que se le pase por parámetros.
+ *
+ * @param src: Imagen que se quiere redimensionar
+ * @param width: Ancho de la imagen de salida
+ * @param height: Alto de la imagen de salida
+ * @param norm: [1] Valor por el que se multiplican los píxeles de salida
+ * @return cv::Mat: Imagen redimensionada
+ *
+ */
+void
 ImgResample
   (
   cv::UMat src,
+  cv::UMat& dst,
   int width,
   int height,
   std::string method,
   float norm
   )
 {
-  cv::UMat dst;
   if (method == "antialiasing")
   {
     cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
@@ -87,8 +154,6 @@ ImgResample
 
   cv::UMat norm_mat(dst.size(), dst.type(), cv::Scalar(norm));
   cv::multiply(dst, norm_mat, dst);
-
-  return dst;
 }
 
 /**

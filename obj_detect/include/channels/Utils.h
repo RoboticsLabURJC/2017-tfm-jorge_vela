@@ -13,22 +13,44 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-cv::Mat ImgResample
+//cv::Mat ImgResample
+//  (
+//    cv::Mat src,
+//    int width,
+//    int height,
+//    std::string method = "antialiasing",
+//    float norm = 1
+//  );
+
+//cv::UMat ImgResample
+//  (
+//    cv::UMat src,
+//    int width,
+//    int height,
+//    std::string method = "antialiasing",
+//    float norm = 1
+//  );
+
+void
+ImgResample
   (
-    cv::Mat src,
-    int width,
-    int height,
-    std::string method = "antialiasing",
-    float norm = 1
+  cv::Mat src,
+  cv::Mat& dst,
+  int width,
+  int height,
+  std::string method = "antialiasing",
+  float norm = 1
   );
 
-cv::UMat ImgResample
+void
+ImgResample
   (
-    cv::UMat src,
-    int width,
-    int height,
-    std::string method = "antialiasing",
-    float norm = 1
+  cv::UMat src,
+  cv::UMat& dst,
+  int width,
+  int height,
+  std::string method = "antialiasing",
+  float norm = 1
   );
 
 cv::Mat convTri

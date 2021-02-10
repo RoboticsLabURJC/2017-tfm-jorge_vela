@@ -50,7 +50,8 @@ ChannelsPyramidComputeAllParallelStrategy::compute
       sz1.width = round((sz.width * s) / clf.shrink) * clf.shrink;
       sz1.height = round((sz.height * s) / clf.shrink) * clf.shrink;
 
-      cv::Mat I1 = ImgResample(imageUse, sz1.width , sz1.height);
+      cv::Mat I1;
+      ImgResample(imageUse, I1, sz1.width , sz1.height);
       chnsPyramidData[i] = ldcfExtractor.extractFeatures(I1);
     }
   });

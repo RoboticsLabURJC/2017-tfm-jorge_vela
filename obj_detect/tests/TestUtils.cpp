@@ -58,7 +58,9 @@ public:
 TEST_F(TestUtils, TestResample1){
   float I[9] = {1 ,1 ,1,2,2,2,3,3,3};
   cv::Mat dummy_query = cv::Mat(3,3, CV_32F, I);
-  cv::Mat dst = ImgResample(dummy_query, 4,4, "linear");
+//  cv::Mat dst = ImgResample(dummy_query, 4,4, "linear");
+  cv::Mat dst;
+  ImgResample(dummy_query, dst, 4,4, "linear");
 
   transpose(dst, dst);
   cv::Mat img1;
@@ -83,7 +85,9 @@ TEST_F(TestUtils, TestResample1){
 TEST_F(TestUtils, TestResample2){
   float I[9] = {1 ,1 ,1,2,2,2,3,3,3};
   cv::Mat dummy_query = cv::Mat(3,3, CV_32F, I);
-  cv::Mat dst = ImgResample(dummy_query, 4,4,"linear",2);
+//  cv::Mat dst = ImgResample(dummy_query, 4,4,"linear",2);
+  cv::Mat dst;
+  ImgResample(dummy_query, dst, 4,4,"linear",2);
 
   transpose(dst, dst);
   cv::Mat img1;
@@ -109,7 +113,9 @@ TEST_F(TestUtils, TestResample2){
 TEST_F(TestUtils, TestResampleReduce){
   float I[42] = {1 ,1 ,1,2,2,2,2, 2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5,5,5,6,6,6,6,6,6,6,7,7,7,7};
   cv::Mat dummy_query = cv::Mat(6,7, CV_32F, I);
-  cv::Mat dst = ImgResample(dummy_query, 3,4,"antialiasing",4);
+//  cv::Mat dst = ImgResample(dummy_query, 3,4,"antialiasing",4);
+  cv::Mat dst;
+  ImgResample(dummy_query, dst, 3,4,"antialiasing",4);
 
   transpose(dst, dst);
   cv::Mat img1;
@@ -157,7 +163,9 @@ TEST_F(TestUtils, TestResampleReal){
   cv::Mat img2;
   image.convertTo(img2, CV_32F, 1.0 / 255, 0);
 
-  cv::Mat dst = ImgResample(img2, 10, 10, "antialiasing", 2);
+//  cv::Mat dst = ImgResample(img2, 10, 10, "antialiasing", 2);
+  cv::Mat dst;
+  ImgResample(img2, dst, 10, 10, "antialiasing", 2);
 
   std::vector<cv::Mat> splitted;
   split(dst, splitted);
@@ -261,7 +269,9 @@ void testResample
   FileNode cols = fs1["img_resampled_1"]["cols"];
 
   // Actual call to our implementation of resampling.
-  cv::Mat resampledImage = ImgResample(image, w, h);
+//  cv::Mat resampledImage = ImgResample(image, w, h);
+  cv::Mat resampledImage;
+  ImgResample(image, resampledImage, w, h);
 
   std::vector<cv::Mat> imResample_matlab_float(3);
   std::vector<cv::Mat> resampledImage_channels(3);

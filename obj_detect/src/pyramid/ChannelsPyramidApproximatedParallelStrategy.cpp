@@ -62,7 +62,6 @@ ChannelsPyramidApproximatedParallelStrategy::compute
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
   ChannelsExtractorACF acfExtractor(clf, postprocess_acf_channels, m_channels_impl_type);
 
-  //uint i;
   cv::parallel_for_(cv::Range( 0, isR.size() ), [&](const cv::Range& r)
   {
     for (int i = r.start; i < r.end; i++)
@@ -79,7 +78,7 @@ ChannelsPyramidApproximatedParallelStrategy::compute
       }
       else
       {
-        I1 = ImgResample(img, sz1.width , sz1.height);
+        ImgResample(img, I1, sz1.width , sz1.height);
       }
       chnsPyramidDataACF[isR[i]-1] = acfExtractor.extractFeatures(I1);
     }
@@ -114,8 +113,7 @@ ChannelsPyramidApproximatedParallelStrategy::compute
         }
         
         float ratio = pow((scales[i1]/scales[iR]),-clf.lambdas[type_of_channel_index]);
-        cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio);
-        resampleVect[k] = resample;
+        ImgResample(chnsPyramidDataACF[iR][k], resampleVect[k], sz1.width , sz1.height, "antialiasing", ratio);
       }
       chnsPyramidDataACF[i1] = resampleVect;
     }

@@ -28,7 +28,7 @@ ChannelsExtractorLDCF::ChannelsExtractorLDCF
       //       We do it before using then.
       cv::Mat f_flipped;
       cv::flip(f, f_flipped, -1);
-      m_flipped_filters.push_back(f); /// TODO: It f what it was puuted on the m_flipped_filters. Is this right?
+      m_flipped_filters.push_back(f); /// TODO: It f what it is pushed on the m_flipped_filters. Is this right?
       if (acf_impl_type == "opencl")
       {
         cv::UMat f_flipped_umat;
@@ -83,7 +83,8 @@ ChannelsExtractorLDCF::extractFeaturesFromACF
                 m_flipped_filters[i+(num_acf_channels*j)],
                 cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
 
-      out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
+//      out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
+      ImgResample(out_image, out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
       ldcf_channels.push_back(out_image);
     }
   }
@@ -134,7 +135,8 @@ ChannelsExtractorLDCF::extractFeaturesFromACF
                 m_flipped_filters_umat[i+(num_acf_channels*j)],
                 cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
 
-      out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
+//      out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
+      ImgResample(out_image, out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
       ldcf_channels.push_back(out_image);
     }
   }

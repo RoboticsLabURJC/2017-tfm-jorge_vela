@@ -90,20 +90,20 @@ public:
 
 private:
 
-  cv::Mat
-  processChannels
+  void
+  processChannel
     (
-    cv::Mat img,
+    cv::Mat& img,
     cv::BorderTypes,
     int x,
     int y
     );
 
 
-  cv::UMat
-  processChannels
+  void
+  processChannel
     (
-    cv::UMat img,
+    cv::UMat& img,
     cv::BorderTypes,
     int x,
     int y

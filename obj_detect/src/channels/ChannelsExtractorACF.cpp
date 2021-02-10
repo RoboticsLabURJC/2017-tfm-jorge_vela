@@ -45,10 +45,10 @@ ChannelsExtractorACF::ChannelsExtractorACF
                                                           m_clf.luv.smooth_kernel_size);
 };
 
-cv::Mat
-ChannelsExtractorACF::processChannels
+void
+ChannelsExtractorACF::processChannel
 (
-  cv::Mat image,
+  cv::Mat& image,
   cv::BorderTypes borderType,
   int x,
   int y
@@ -56,7 +56,6 @@ ChannelsExtractorACF::processChannels
 {
   image = convTri(image, 1);
   copyMakeBorder(image, image, y, y, x, x, borderType, 0 );
-  return image;
 }
 
 std::vector<cv::Mat>
@@ -94,29 +93,32 @@ ChannelsExtractorACF::extractFeatures
   std::vector<cv::Mat> chnsCompute;
   for (cv::Mat luv_i: luvChannels)
   {
-    cv::Mat resampleLuv = ImgResample(luv_i, wResample, hResample);
+    cv::Mat resampleLuv;
+    ImgResample(luv_i, resampleLuv, wResample, hResample);
     if (m_postprocess_channels)
     {
-      resampleLuv = processChannels(resampleLuv, cv::BORDER_REFLECT,x,y);
+      processChannel(resampleLuv, cv::BORDER_REFLECT,x,y);
     }
 
     chnsCompute.push_back(resampleLuv);
   }
 
-  cv::Mat resampleMag = ImgResample(gMagOrient[0], wResample, hResample);
+  cv::Mat resampleMag;
+  ImgResample(gMagOrient[0], resampleMag, wResample, hResample);
   if (m_postprocess_channels)
   {
-    resampleMag = processChannels(resampleMag, cv::BORDER_CONSTANT,x,y);
+    processChannel(resampleMag, cv::BORDER_CONSTANT,x,y);
   }
 
   chnsCompute.push_back(resampleMag);
 
   for(cv::Mat mh_c: gMagHist)
   {
-    cv::Mat resampleHist = ImgResample(mh_c, wResample, hResample);
+    cv::Mat resampleHist;
+    ImgResample(mh_c, resampleHist, wResample, hResample);
     if (m_postprocess_channels)
     {
-      resampleHist = processChannels(resampleHist, cv::BORDER_CONSTANT,x,y);
+      processChannel(resampleHist, cv::BORDER_CONSTANT,x,y);
     }
 
     chnsCompute.push_back(resampleHist);
@@ -156,10 +158,10 @@ ChannelsExtractorACF::postProcessChannels
 // -----------------------------------------------------------
 // ------ UMat as input and outputs
 // -----------------------------------------------------------
-cv::UMat
-ChannelsExtractorACF::processChannels
+void
+ChannelsExtractorACF::processChannel
 (
-  cv::UMat image,
+  cv::UMat& image,
   cv::BorderTypes borderType,
   int x,
   int y
@@ -167,7 +169,6 @@ ChannelsExtractorACF::processChannels
 {
   image = convTri(image, 1);
   copyMakeBorder(image, image, y, y, x, x, borderType, 0 );
-  return image;
 }
 
 std::vector<cv::UMat>
@@ -215,29 +216,35 @@ ChannelsExtractorACF::extractFeatures
   std::vector<cv::UMat> chnsCompute;
   for (cv::UMat luv_i: luvChannels)
   {
-    cv::UMat resampleLuv = ImgResample(luv_i, wResample, hResample);
+//    cv::UMat resampleLuv = ImgResample(luv_i, wResample, hResample);
+    cv::UMat resampleLuv;
+    ImgResample(luv_i, resampleLuv, wResample, hResample);
     if (m_postprocess_channels)
     {
-      resampleLuv = processChannels(resampleLuv, cv::BORDER_REFLECT,x,y);
+      processChannel(resampleLuv, cv::BORDER_REFLECT,x,y);
     }
 
     chnsCompute.push_back(resampleLuv);
   }
 
-  cv::UMat resampleMag = ImgResample(gMagOrient[0], wResample, hResample);
+//  cv::UMat resampleMag = ImgResample(gMagOrient[0], wResample, hResample);
+  cv::UMat resampleMag;
+  ImgResample(gMagOrient[0], resampleMag, wResample, hResample);
   if (m_postprocess_channels)
   {
-      resampleMag = processChannels(resampleMag, cv::BORDER_CONSTANT,x,y);
+    processChannel(resampleMag, cv::BORDER_CONSTANT,x,y);
   }
 
   chnsCompute.push_back(resampleMag);
 
   for(cv::UMat mh_c: gMagHist)
   {
-    cv::UMat resampleHist = ImgResample(mh_c, wResample, hResample);
+//    cv::UMat resampleHist = ImgResample(mh_c, wResample, hResample);
+    cv::UMat resampleHist;
+    ImgResample(mh_c, resampleHist, wResample, hResample);
     if (m_postprocess_channels)
     {
-      resampleHist = processChannels(resampleHist, cv::BORDER_CONSTANT,x,y);
+      processChannel(resampleHist, cv::BORDER_CONSTANT,x,y);
     }
 
     chnsCompute.push_back(resampleHist);

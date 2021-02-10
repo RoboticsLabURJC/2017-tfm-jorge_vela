@@ -37,7 +37,7 @@ ChannelsPyramidComputeAllStrategy::compute
   int nScales = static_cast<int>(scales.size());
   std::vector<std::vector<cv::Mat>> chnsPyramidData(nScales);
   std::vector<cv::Mat> pChnsCompute;
-  ChannelsExtractorLDCF ldcfExtractor(filters, clf, m_channels_impl_type);// clf.padding, clf.shrink, clf.gradMag.normRad, clf.gradMag.normConst, clf.gradHist.binSize, clf.gradHist.nOrients, clf.gradHist.softBin,clf.gradHist.full);
+  ChannelsExtractorLDCF ldcfExtractor(filters, clf, m_channels_impl_type);
   for(int i=0; i< nScales; i++)
   {
     double s = scales[i];
@@ -52,7 +52,7 @@ ChannelsPyramidComputeAllStrategy::compute
     }
     else
     {
-      I1 = ImgResample(imageUse, sz1.width , sz1.height);
+      ImgResample(imageUse, I1, sz1.width , sz1.height);
     }
 
     if ((s == 0.5) && (clf.nApprox > 0 || clf.nPerOct == 1))

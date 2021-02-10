@@ -79,7 +79,7 @@ ChannelsPyramidApproximatedStrategy::compute
     }
     else
     {
-      I1 = ImgResample(img, sz1.width , sz1.height);
+      ImgResample(img, I1, sz1.width , sz1.height);
     }
 
     if ((s == 0.5) && (clf.nApprox > 0 || clf.nPerOct == 1))
@@ -90,8 +90,7 @@ ChannelsPyramidApproximatedStrategy::compute
     chnsPyramidDataACF[i-1] = acfExtractor.extractFeatures(I1);
   }
 
-
-  //  COMPUTE IMAGE PYRAMID [APPROXIMATE SCALES]-------------------------------
+  //  Compute approximated scales in the pyramid
   for (const auto& i : isA)
   {
     int i1 = i - 1;
@@ -114,8 +113,7 @@ ChannelsPyramidApproximatedStrategy::compute
           type_of_channel_index = 0; // HoG channels.*/
       
       float ratio = pow((scales[i1]/scales[iR]),-clf.lambdas[type_of_channel_index]);
-      cv::Mat resample = ImgResample(chnsPyramidDataACF[iR][k], sz1.width , sz1.height, "antialiasing", ratio);
-      resampleVect[k] = resample;//.push_back(resample);
+      ImgResample(chnsPyramidDataACF[iR][k], resampleVect[k], sz1.width , sz1.height, "antialiasing", ratio);
     }
     chnsPyramidDataACF[i1] = resampleVect;
   }
