@@ -170,7 +170,9 @@ ChannelsExtractorGradMagOpenCL::extractFeatures
 
   if (m_normRad != 0)
   {
-    cv::UMat S = convTri(channelsGradMag[0], m_normRad);
+//    cv::UMat S = convTri(channelsGradMag[0], m_normRad);
+    cv::UMat S;
+    convTri(channelsGradMag[0], S, m_normRad);
     cv::add(S, m_normConst, S);
     cv::UMat T;
     cv::divide(channelsGradMag[0], S, T);

@@ -20,17 +20,6 @@ ChannelsExtractorLUVOpenCL::ChannelsExtractorLUVOpenCL
   m_smooth_kernel_size = smooth_kernel_size;
 }
 
-cv::UMat
-ChannelsExtractorLUVOpenCL::smoothImage
-  (
-  cv::UMat imgLUV
-  )
-{
-  cv::UMat outputImg = convTri(imgLUV, m_smooth_kernel_size); //5
-
-  return outputImg;
-}
-
 std::vector<cv::Mat>
 ChannelsExtractorLUVOpenCL::extractFeatures
   (
@@ -53,7 +42,7 @@ ChannelsExtractorLUVOpenCL::extractFeatures
 
   if (m_smooth)
   {
-    imgLUV = smoothImage(imgLUV);
+    convTri(imgLUV, imgLUV, m_smooth_kernel_size); //5
   }
 
   // GPU -> CPU
@@ -82,7 +71,7 @@ ChannelsExtractorLUVOpenCL::extractFeatures
 
   if (m_smooth)
   {
-    imgLUV = smoothImage(imgLUV);
+    convTri(imgLUV, imgLUV, m_smooth_kernel_size); //5
   }
 
   cv::split(imgLUV, channelsLUV);

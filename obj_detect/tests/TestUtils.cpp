@@ -383,7 +383,9 @@ TEST_F(TestUtils, TestResampleConv){
 
   cv::Mat dummy_query = cv::Mat(10,10, CV_32F, I);
   cv::Mat dst;
-  cv::Mat output_image = convTri(dummy_query, 3);
+//  cv::Mat output_image = convTri(dummy_query, 3);
+  cv::Mat output_image;
+  convTri(dummy_query, output_image, 3);
   transpose(output_image, output_image);
   cv::Mat img1;
   output_image.convertTo(img1, CV_32F);    
@@ -411,7 +413,9 @@ TEST_F(TestUtils, TestResampleConv2)
   cv::Mat dummy_query = cv::Mat(5,5, CV_32F, I);
   cv::Mat dst;
 
-  cv::Mat output_image = convTri(dummy_query, 5);
+//  cv::Mat output_image = convTri(dummy_query, 5);
+  cv::Mat output_image;
+  convTri(dummy_query, output_image, 5);
   transpose(output_image, output_image);
   cv::Mat img1;
   output_image.convertTo(img1, CV_32F);    
@@ -439,7 +443,9 @@ TEST_F(TestUtils, TestResampleConvReal)
 {
   cv::Mat image = cv::imread("images/imgGrayScale.jpeg", cv::IMREAD_GRAYSCALE);
 
-  cv::Mat output_image = convTri(image, 5);
+//  cv::Mat output_image = convTri(image, 5);
+  cv::Mat output_image;
+  convTri(image, output_image, 5);
 
   transpose(output_image, output_image);
   cv::Mat img1;

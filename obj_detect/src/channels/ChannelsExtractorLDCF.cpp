@@ -135,7 +135,6 @@ ChannelsExtractorLDCF::extractFeaturesFromACF
                 m_flipped_filters_umat[i+(num_acf_channels*j)],
                 cv::Point( -1,-1 ), 0, cv::BORDER_CONSTANT );
 
-//      out_image = ImgResample(out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
       ImgResample(out_image, out_image, round(0.5*out_image.size().width), round(0.5*out_image.size().height));
       ldcf_channels.push_back(out_image);
     }

@@ -22,17 +22,6 @@ ChannelsExtractorLUVOpenCV::ChannelsExtractorLUVOpenCV
   m_smooth_kernel_size = smooth_kernel_size;
 }
 
-cv::Mat
-ChannelsExtractorLUVOpenCV::smoothImage
-  (
-  cv::Mat inputImg
-  )
-{
-  cv::Mat outputImg = convTri(inputImg, m_smooth_kernel_size); //5
-
-  return outputImg;
-}
-
 std::vector<cv::Mat>
 ChannelsExtractorLUVOpenCV::extractFeatures
   (
@@ -54,7 +43,7 @@ ChannelsExtractorLUVOpenCV::extractFeatures
 
   if (m_smooth)
   {
-    imgLUV = smoothImage(imgLUV);
+    convTri(imgLUV, imgLUV, m_smooth_kernel_size); //5
   }
   cv::split(imgLUV, channelsLUV);
 

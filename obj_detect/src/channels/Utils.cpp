@@ -29,31 +29,6 @@
  * @return cv::Mat: Imagen redimensionada
  * 
  */
-//cv::Mat
-//ImgResample
-//  (
-//  cv::Mat src,
-//  int width,
-//  int height,
-//  std::string method,
-//  float norm
-//  )
-//{
-//  cv::Mat dst;
-//  if (method == "antialiasing")
-//  {
-//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
-//  }
-//  else
-//  {
-//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
-//  }
-
-//  dst *= norm;
-
-//  return dst;
-//}
-
 void
 ImgResample
   (
@@ -81,51 +56,12 @@ ImgResample
 }
 
 
-
 /**
  * Función Imgresample. Encargada de redimensionar una imagen de entrada, al tamaño de ancho y alto
  * que se le pase por parámetros.
  *
  * @param src: Imagen que se quiere redimensionar
- * @param width: Ancho de la imagen de salida
- * @param height: Alto de la imagen de salida
- * @param norm: [1] Valor por el que se multiplican los píxeles de salida
- * @return cv::Mat: Imagen redimensionada
- *
- */
-//cv::UMat
-//ImgResample
-//  (
-//  cv::UMat src,
-//  int width,
-//  int height,
-//  std::string method,
-//  float norm
-//  )
-//{
-//  cv::UMat dst;
-//  if (method == "antialiasing")
-//  {
-//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
-//  }
-//  else
-//  {
-//    cv::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_LINEAR);
-//  }
-
-//  cv::UMat norm_mat(dst.size(), dst.type(), cv::Scalar(norm));
-//  cv::multiply(dst, norm_mat, dst);
-
-//  return dst;
-//}
-
-
-
-/**
- * Función Imgresample. Encargada de redimensionar una imagen de entrada, al tamaño de ancho y alto
- * que se le pase por parámetros.
- *
- * @param src: Imagen que se quiere redimensionar
+ * @param dst: Imagen destino.
  * @param width: Ancho de la imagen de salida
  * @param height: Alto de la imagen de salida
  * @param norm: [1] Valor por el que se multiplican los píxeles de salida
@@ -164,22 +100,22 @@ ImgResample
  *
  * @return cv::Mat: Imagen de retorno despues del filtro.
  */
-cv::Mat
+void
 convTri
   (
   cv::Mat input_image,
+  cv::Mat& dst,
   int kernel_size
   )
 {
-  cv::Mat dst;
   cv::copyMakeBorder(input_image, dst, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_REFLECT, 0);
 
-  //FUNCION CONVTRI
+  // FUNCION CONVTRI
   int widthSize = input_image.size().width;
   int heightSize = input_image.size().height;
   float valReduce = (kernel_size + 1)*(kernel_size + 1);
   cv::Mat kernel = cv::Mat::zeros(1, kernel_size*2+1, CV_32FC1);
-    
+
   for(int i = 1; i <= kernel_size + 1; i++)
   {
     kernel.at<float>(0, i-1) = static_cast<float>(i);
@@ -189,23 +125,14 @@ convTri
   {
     kernel.at<float>(0, j) = kernel.at<float>(0, j-1)-1;
   }
-
   kernel /= valReduce;
 
-  cv::Mat output_image;
-  cv::Mat help_image;
-  filter2D(dst, help_image, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
-
-  int heightHelp = help_image.size().height;
-  cv::Rect myRoi(kernel_size, 0, widthSize, heightHelp);
-  help_image = help_image(myRoi);
-
-  filter2D(help_image, output_image, CV_32FC1 , kernel.t(), cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
-  cv::Rect myRoi2(0, kernel_size, widthSize, heightSize);
-  output_image = output_image(myRoi2);
-  return output_image;
+  cv::Mat aux;
+  cv::filter2D(dst, aux, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  cv::filter2D(aux, dst, CV_32FC1 , kernel.t(), cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  cv::Rect myRoi2(kernel_size, kernel_size, widthSize, heightSize);
+  dst = dst(myRoi2);
 }
-
 
 /**
  * Funcion convTri. Convoluciona una imagen por un filtro de triangulo 2D. 
@@ -215,22 +142,19 @@ convTri
  *
  * @return cv::Mat: Imagen de retorno despues del filtro.
  */
-cv::UMat
+void
 convTri
   (
   cv::UMat input_image,
+  cv::UMat& dst,
   int kernel_size
   )
 {
-  cv::UMat dst;
-  cv::copyMakeBorder(input_image, dst, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_REFLECT, 0);
 
-  //FUNCION CONVTRI
   int widthSize = input_image.size().width;
   int heightSize = input_image.size().height;
   float valReduce = (kernel_size + 1)*(kernel_size + 1);
   cv::Mat kernel = cv::Mat::zeros(1, kernel_size*2+1, CV_32FC1);
-    
   for(int i = 1; i <= kernel_size + 1; i++)
   {
     kernel.at<float>(0, i-1) = static_cast<float>(i);
@@ -240,22 +164,26 @@ convTri
   {
     kernel.at<float>(0, j) = kernel.at<float>(0, j-1)-1;
   }
-
   kernel /= valReduce;
 
-  cv::UMat output_image;
-  cv::UMat help_image;
-  filter2D(dst, help_image, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  cv::copyMakeBorder(input_image, dst, kernel_size, kernel_size, kernel_size, kernel_size, cv::BORDER_REFLECT, 0);
 
-  int heightHelp = help_image.size().height;
-  cv::Rect myRoi(kernel_size, 0, widthSize, heightHelp);
-  help_image = help_image(myRoi);
-
-  filter2D(help_image, output_image, CV_32FC1 , kernel.t(), cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
-  cv::Rect myRoi2(0, kernel_size, widthSize, heightSize);
-  output_image = output_image(myRoi2);
-  return output_image;
+  cv::UMat aux;
+  cv::filter2D(dst, aux, CV_32FC1 , kernel, cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  cv::filter2D(aux, dst, CV_32FC1 , kernel.t(), cv::Point( -1, -1 ), 0, cv::BORDER_CONSTANT );
+  cv::Rect myRoi2(kernel_size, kernel_size, widthSize, heightSize);
+  dst = dst(myRoi2);
 }
+
+
+
+
+
+
+
+
+
+
 
 
 std::vector<int>

@@ -121,7 +121,9 @@ ChannelsExtractorGradMagOpenCV::extractFeatures
 
   if (m_normRad != 0)
   {
-    cv::Mat S = convTri(channelsGradMag[0], m_normRad);
+//    cv::Mat S = convTri(channelsGradMag[0], m_normRad);
+    cv::Mat S;
+    convTri(channelsGradMag[0], S, m_normRad);
     channelsGradMag[0] = channelsGradMag[0] / (S + m_normConst);
   }
 

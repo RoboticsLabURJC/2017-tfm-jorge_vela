@@ -36,11 +36,6 @@ private:
 
   float m_smooth;
   int m_smooth_kernel_size;
-
-  cv::Mat smoothImage
-    (
-    cv::Mat imgLUV
-    );
 };
 
 #endif

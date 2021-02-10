@@ -162,9 +162,12 @@ ChannelsExtractorLUVPDollar::smoothImage
 )
 {
     std::vector<cv::Mat> channelsLUV_output(3);
-    channelsLUV_output[0] = convTri(inputImg[0], m_smooth_kernel_size); //5
-    channelsLUV_output[1] = convTri(inputImg[1], m_smooth_kernel_size); //5
-    channelsLUV_output[2] = convTri(inputImg[2], m_smooth_kernel_size); //5
+//    channelsLUV_output[0] = convTri(inputImg[0], m_smooth_kernel_size); //5
+//    channelsLUV_output[1] = convTri(inputImg[1], m_smooth_kernel_size); //5
+//    channelsLUV_output[2] = convTri(inputImg[2], m_smooth_kernel_size); //5
+    convTri(inputImg[0], channelsLUV_output[0], m_smooth_kernel_size); //5
+    convTri(inputImg[1], channelsLUV_output[1], m_smooth_kernel_size); //5
+    convTri(inputImg[2], channelsLUV_output[2], m_smooth_kernel_size); //5
 
     return channelsLUV_output;
 }

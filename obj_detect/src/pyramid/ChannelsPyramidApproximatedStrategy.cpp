@@ -59,7 +59,6 @@ ChannelsPyramidApproximatedStrategy::compute
     }
   }
 
-
   std::vector<std::vector<cv::Mat>> chnsPyramidDataACF(nScales);
   bool postprocess_acf_channels = false; // here we do not postprocess ACF channels!!
   ChannelsExtractorACF acfExtractor(clf, postprocess_acf_channels, m_channels_impl_type);
