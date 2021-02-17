@@ -72,38 +72,34 @@ int main(int argc, char** argv) {
     std::string detect_strategy_str = argv[1];
     std::string acf_channels_impl_str = argv[2];
 
-    if ((detect_strategy_str != "opencl") &&
-        (detect_strategy_str != "all") &&
-        (detect_strategy_str != "all_parallel") &&
-        (detect_strategy_str != "approx") &&
-        (detect_strategy_str != "approx_parallel"))
+    if ((detect_strategy_str != "all") &&
+            (detect_strategy_str != "all_parallel") &&
+            (detect_strategy_str != "approx") &&
+            (detect_strategy_str != "approx_parallel"))
     {
-        cout << "ERROR EN LA FORMA DE INDICAR EL TIPO DE ESTRATEGIA. FORMATOS POSIBLES:" << endl;
-        cout << "opencl" << endl;
-        cout << "all" << endl;
-        cout << "all_parallel" << endl;
-        cout << "approx" << endl;
-        cout << "approx_parallel" << endl;
+        cout <<"ERROR EN LA FORMA DE INDICAR EL TIPO DE ESTRATEGIA. FORMATOS POSIBLES:" << endl;
+        cout <<"all" << endl;
+        cout <<"all_parallel" << endl;
+        cout <<"approx" << endl;
+        cout <<"approx_parallel" << endl;
         return 1;
     }
 
     if ((acf_channels_impl_str != "pdollar") &&
-        (acf_channels_impl_str != "opencv") &&
-        (acf_channels_impl_str != "opencl"))
+            (acf_channels_impl_str != "opencv"))
     {
         cout <<"ERROR EN LA FORMA DE INDICAR LA IMPLEMENTACIÓN DE CANALES ACF. FORMATOS POSIBLES:" << endl;
         cout <<"pdollar" << endl;
         cout <<"opencv" << endl;
-        cout <<"opencl" << endl;
         return 1;
     }
 
-    std::string clfPath = "obj_detect/tests/yaml/00_facesDetector_AFLW.yml";
-    std::string filtersPath = "obj_detect/tests/yaml/00_filterTest_faces_AFLW.yml";
-    BadacostDetector badacost(detect_strategy_str, acf_channels_impl_str, 10);
+	std::string clfPath = "obj_detect/tests/yaml/00_facesDetector_AFLW.yml";
+	std::string filtersPath = "obj_detect/tests/yaml/00_filterTest_faces_AFLW.yml"; 
+    BadacostDetector badacost(detect_strategy_str, acf_channels_impl_str, 0);
     bool loadVal = badacost.load(clfPath, filtersPath); 
 
-    ofstream myfile;
+	ofstream myfile;
     myfile.open (argv[3]);
 
     std::string typeDataBase = argv[4];
@@ -115,7 +111,10 @@ int main(int argc, char** argv) {
 	       	return 1;
 	    }
 
+	    int i = 0;
 	    while ((entry = readdir(dir)) != NULL) {
+	    	i = i + 1;
+	    	std::cout << i << std::endl;
 	    	std::string ext =  getFileExt(entry->d_name);
 	    	if(ext == "jpg"){
 	    		std::string name = entry->d_name;
@@ -126,10 +125,14 @@ int main(int argc, char** argv) {
 	    		//std::cout << detections << std::endl;
 
 	    		for(int i = 0; i < detections.size(); i++){
-	    			myfile << name + "," + to_string(detections[i].bbox.x) + "," + to_string(detections[i].bbox.y) + "," + 
-	    			to_string(detections[i].bbox.x + detections[i].bbox.width) + ","  + to_string(detections[i].bbox.y + detections[i].bbox.height) + "," + to_string(detections[i].score) + ",-"<< std::endl;
+	    			std::string token = name.substr(0, name.find("."));
+	    			//myfile << name + "," + to_string(detections[i].bbox.x) + "," + to_string(detections[i].bbox.y) + "," + 
+	    			//to_string(detections[i].bbox.x + detections[i].bbox.width) + ","  + to_string(detections[i].bbox.y + detections[i].bbox.height) + "," + to_string(detections[i].score) + ",-"<< std::endl;
+	    			myfile << token + " " + to_string(detections[i].score) + " " + to_string(detections[i].bbox.x) + " " + to_string(detections[i].bbox.y) + " " + 
+	    			to_string(detections[i].bbox.x + detections[i].bbox.width) + " "  + to_string(detections[i].bbox.y + detections[i].bbox.height)   << std::endl;
+
+						
 					
-					std::string token = name.substr(0, name.find("."));
 	    			std::string nameFile = "afw_results/" + token + "_" +to_string(i) + ".pts";
 	    			ofstream myfileSpec;
 	    			myfileSpec.open(nameFile);
