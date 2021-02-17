@@ -101,18 +101,17 @@ bool BadacostDetector::load
   clfData.modelDsPad.height = classifier["modelDsPad"]["data"][0];
 
   clfData.stride = classifier["stride"]["data"][0];
-  clfData.cascThr = float(classifier["cascThr"]["data"][0]);//*0.1;
+  clfData.cascThr = float(classifier["cascThr"]["data"][0]);
 
   clfData.luv.smooth = classifier["pChns.pColor"]["smooth"];
-//  std::cout << "smooth: " << clfData.luv.smooth << std::endl;
 
   clfData.luv.smooth_kernel_size = 1;
 
-  clfData.padding.width = classifier["pad"]["data"][1]; //6; //
-  clfData.padding.height = classifier["pad"]["data"][0]; //4; //
-  clfData.nOctUp = classifier["nOctUp"]["data"][0]; //0; //
-  clfData.nPerOct = classifier["nPerOct"]["data"][0]; //3; //
-  clfData.nApprox = classifier["nApprox"]["data"][0]; //2; //
+  clfData.padding.width = classifier["pad"]["data"][1];
+  clfData.padding.height = classifier["pad"]["data"][0];
+  clfData.nOctUp = classifier["nOctUp"]["data"][0];
+  clfData.nPerOct = classifier["nPerOct"]["data"][0];
+  clfData.nApprox = classifier["nApprox"]["data"][0];
   clfData.shrink = classifier["pChns.shrink"]["data"];
 
 //  std::cout << clfData.nOctUp << " " << clfData.nPerOct << " " << clfData.nApprox << std::endl;
@@ -244,7 +243,7 @@ BadacostDetector::detect(cv::Mat img)
   else
   {
     // CPU->GPU
-    cv::UMat img_gpu;
+    cv::UMat img_gpu = cv::UMat(img.size(), img.type(), cv::USAGE_ALLOCATE_DEVICE_MEMORY);
     img.copyTo(img_gpu);
 
     // Computation in GPU and GPU->CPU

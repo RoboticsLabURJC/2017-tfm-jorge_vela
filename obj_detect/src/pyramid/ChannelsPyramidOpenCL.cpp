@@ -193,7 +193,9 @@ ChannelsPyramidOpenCL::compute
 
   // Create the packed image with filled with zeros.
   cv::Size packed_img_size = computePackedImageSize(pyr_imgs_rois);
-  cv::UMat packed_img = cv::UMat::zeros(packed_img_size, img.type());
+  cv::UMat packed_img = cv::UMat(packed_img_size, img.type(), cv::USAGE_ALLOCATE_DEVICE_MEMORY);
+
+//  std::cout << "packed_img_size = " << packed_img_size << std::endl;
 
 #ifdef DEBUG
   int kk=0;
@@ -213,8 +215,7 @@ ChannelsPyramidOpenCL::compute
   }
 
   // We only need to compute the channels over the packed image
-  std::vector<cv::UMat> chnsCompute;
-  chnsCompute = ldcfExtractor.extractFeatures(packed_img);
+  std::vector<cv::UMat> chnsCompute = ldcfExtractor.extractFeatures(packed_img);
 
   // GPU -> CPU
 #ifdef DEBUG

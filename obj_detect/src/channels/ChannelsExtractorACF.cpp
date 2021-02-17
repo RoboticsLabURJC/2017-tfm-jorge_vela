@@ -243,7 +243,7 @@ ChannelsExtractorACF::extractFeatures
 
   for(cv::UMat mh_c: gMagHist)
   {
-    cv::UMat resampleHist;
+    cv::UMat resampleHist = cv::UMat(cv::Size(wResample, hResample), CV_32FC1, cv::USAGE_ALLOCATE_DEVICE_MEMORY);
     ImgResample(mh_c, resampleHist, wResample, hResample);
     if (m_postprocess_channels)
     {

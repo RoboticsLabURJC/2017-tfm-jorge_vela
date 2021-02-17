@@ -31,7 +31,7 @@ ChannelsExtractorLDCF::ChannelsExtractorLDCF
       m_flipped_filters.push_back(f); /// TODO: It f what it is pushed on the m_flipped_filters. Is this right?
       if (acf_impl_type == "opencl")
       {
-        cv::UMat f_flipped_umat;
+        cv::UMat f_flipped_umat(f.size(), CV_32FC1, cv::USAGE_ALLOCATE_DEVICE_MEMORY);
         f.copyTo(f_flipped_umat);
         m_flipped_filters_umat.push_back(f_flipped_umat);
       }
@@ -126,7 +126,7 @@ ChannelsExtractorLDCF::extractFeaturesFromACF
   {
     for(int i = 0; i < num_acf_channels; i++)
     {
-      cv::UMat out_image;
+      cv::UMat out_image = cv::UMat(acf_channels[i].size(), CV_32FC1, cv::USAGE_ALLOCATE_DEVICE_MEMORY);
 
       // NOTE: filter2D is not making real convolution as conv2 in matlab, it performs correlation.
       // Thus, we have to flip the kernel and change the anchor point. We have already flipped the filters

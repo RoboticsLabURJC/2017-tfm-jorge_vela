@@ -142,9 +142,6 @@ ChannelsExtractorGradHistOpenCV::gradHist
 
   if ( (softBin < 0) && (softBin % 2 == 0) )
   {
-#ifdef DEBUG
-    std::cout << "=======> 1111111 " << std::endl;
-#endif
     // no interpolation w.r.t. either orientation or spatial bin
     cv::Mat Haux;
 
@@ -152,7 +149,7 @@ ChannelsExtractorGradHistOpenCV::gradHist
     // with a given quantized orientation and 0 in the rest of pixels.
     for (int i=0; i<nOrients; i++)
     {
-      O0_eq_i = (O0 == i)/255; // Matrix with values 0 (false) and 1 (true)
+      O0_eq_i = (O0 == i)/255.0; // Matrix with values 0 (false) and 1 (true)
       cv::multiply(O0_eq_i, M0, M0_orient_i, 1.0, CV_32F);
 
       // We use convolution with a full of ones kernel to sum over a window of
@@ -171,10 +168,6 @@ ChannelsExtractorGradHistOpenCV::gradHist
   }
   else if ( (softBin % 2 == 0) || (bin == 1) )
   {
-#ifdef DEBUG
-    std::cout << "=======> 2222222 " << std::endl;
-#endif
-
     // interpolate w.r.t. orientation only, not spatial bin
     cv::Mat Haux0, Haux1, Hi1;
 
@@ -189,7 +182,7 @@ ChannelsExtractorGradHistOpenCV::gradHist
 
       // We use convolution with a full of ones kernel to sum over a window of
       // bin x bin pixels. We are doing more computation than needed as the
-      // histogram, do not need overlaping windows and we should be doing convolution with
+      // histogram do not need overlaping windows. We should be doing convolution with
       // stride = bin. On the other hand, filter2D do not support stride.
       // For speed, we perform computation with two kernels as the box filter is separable.
       cv::Mat kernel = cv::Mat::ones(bin, 1, CV_32F);
@@ -207,10 +200,6 @@ ChannelsExtractorGradHistOpenCV::gradHist
   }
   else
   {
-#ifdef DEBUG
-    std::cout << "=======> 333333333 " << std::endl;
-#endif
-
     //------------------------------------------------------------------------------
     // interpolate using trilinear interpolation:
     //   bilinear spatially, linear in the orientation
