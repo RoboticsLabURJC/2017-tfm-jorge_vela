@@ -10,6 +10,9 @@ FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramid.cpp
   ${PROJECT_SOURCE_DIR}/obj_detect/include/pyramid/ChannelsPyramid.h
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidPackedImgStrategy.cpp
+  ${PROJECT_SOURCE_DIR}/obj_detect/include/pyramid/ChannelsPyramidPackedImgStrategy.h
+
   ${CMAKE_CURRENT_SOURCE_DIR}/ChannelsPyramidComputeAllStrategy.cpp
   ${PROJECT_SOURCE_DIR}/obj_detect/include/pyramid/ChannelsPyramidComputeAllStrategy.h
 
