@@ -1,5 +1,6 @@
 
 #include <pyramid/ChannelsPyramid.h>
+#include <pyramid/ChannelsPyramidPackedImgStrategy.h>
 #include <pyramid/ChannelsPyramidComputeAllStrategy.h>
 #include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
 #include <pyramid/ChannelsPyramidApproximatedStrategy.h>
@@ -105,7 +106,11 @@ ChannelsPyramid::createChannelsPyramid
   )
 {
   std::shared_ptr<ChannelsPyramid> pPyramid;
-  if (pyramid_impl_type == "all")
+  if (pyramid_impl_type == "packed_img")
+  {
+    pPyramid.reset(new ChannelsPyramidPackedImgStrategy(channels_impl_type));
+  }
+  else if (pyramid_impl_type == "all")
   {
     pPyramid.reset(new ChannelsPyramidComputeAllStrategy(channels_impl_type));
   }

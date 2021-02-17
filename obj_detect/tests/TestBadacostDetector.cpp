@@ -69,10 +69,14 @@ public:
 
       // Use T-API OpenCL.
       cv::ocl::Context context;
+//      std::cout << "OpenCL available:" << bool(cv::ocl::haveOpenCL()) << std::endl;
       if (!context.create(cv::ocl::Device::TYPE_GPU))
       {
         std::cout << "Failed creating OpenCL context..." << std::endl;
       }
+//      std::cout << "isIntel: " << bool(context.device(0).isIntel()) << std::endl;
+//      std::cout << "name: " << context.device(0).name() << std::endl;
+//      std::cout << "OpenCL version: " << context.device(0).OpenCLVersion() << std::endl;
       cv::ocl::Device(context.device(0));
       cv::ocl::setUseOpenCL(true);
     }
@@ -224,6 +228,21 @@ TestBadacostDetector::testDetector
 //  P.Dollar ACF implementation
 // --------------------------------------------------------------------------
 
+TEST_F(TestBadacostDetector, TestDetectorPyramidComputePackedImgStrategyPDollar)
+{
+  std::string clfPath = "yaml/detectorComplete_2.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  BadacostDetector badacost("packed_img", "pdollar");
+  bool loadVal = badacost.load(clfPath, filtersPath);
+  ASSERT_TRUE(loadVal);
+
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  testDetector(image, badacost);
+}
+
+
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategyPDollar)
 {
   std::string clfPath = "yaml/detectorComplete_2.yml";
@@ -283,6 +302,20 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategyPDol
 // --------------------------------------------------------------------------
 //  OpenCV ACF implementation
 // --------------------------------------------------------------------------
+
+TEST_F(TestBadacostDetector, TestDetectorPyramidPackedImgStrategyOpenCV)
+{
+  std::string clfPath = "yaml/detectorComplete_2.yml";
+  std::string filtersPath = "yaml/filterTest.yml";
+
+  BadacostDetector badacost("packed_img", "opencv");
+  bool loadVal = badacost.load(clfPath, filtersPath);
+  ASSERT_TRUE(loadVal);
+
+  cv::Mat image = cv::imread("images/coches10.jpg", cv::IMREAD_COLOR);
+
+  testDetector(image, badacost);
+}
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategyOpenCV)
 {
