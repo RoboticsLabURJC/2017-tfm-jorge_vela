@@ -21,7 +21,6 @@ int main
     if (argc != 5)
     {
         cout << "Error en la introducción de argumentos." << endl;
-        //cout << "[Estrategia ChannelsPyramid] [Imagen entrada] [Fichero de salida de detecciones .yml] [Fichero salida estadísticas velocidad]" << endl;
         cout << "[Estrategia ChannelsPyramid] [Estrategia obtención características] [Fichero de salida de detecciones .yml] [Fichero salida estadísticas velocidad]" << endl;
         return 1;
     }
