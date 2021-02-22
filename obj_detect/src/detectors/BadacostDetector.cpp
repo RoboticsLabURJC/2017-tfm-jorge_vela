@@ -46,8 +46,8 @@ BadacostDetector::~BadacostDetector
 bool BadacostDetector::load
   (
   std::string clfPath,
-  //std::string pyrPath,
-  std::string filtersPath)
+  std::string filtersPath
+  )
 {
   if (m_classifierIsLoaded)
   {
@@ -82,7 +82,6 @@ bool BadacostDetector::load
     // Read wl_weights data
     m_wl_weights = readMatrixFromFileNode(classifier["w1_weights"]);
    
-
     // Read aRatio data
     if (!classifier["aRatio"].empty())
     {
@@ -114,9 +113,12 @@ bool BadacostDetector::load
   clfData.nApprox = classifier["nApprox"]["data"][0];
   clfData.shrink = classifier["pChns.shrink"]["data"];
 
-//  std::cout << clfData.nOctUp << " " << clfData.nPerOct << " " << clfData.nApprox << std::endl;
-  
-  m_shrink = clfData.shrink*2;
+  std::cout << "clfData.nOctUp = " << clfData.nOctUp << std::endl;
+  std::cout << "clfData.nPerOct = " << clfData.nPerOct << std::endl;
+  std::cout << "clfData.nApprox = " << clfData.nApprox << std::endl;
+  std::cout << "clfData.shrink = " << clfData.shrink << std::endl;
+
+  m_shrink = clfData.shrink*2; // JM: only x2 with LDCF features!!!
 
   clfData.gradMag.normRad = classifier["pChns.pGradMag"]["normRad"]; 
   clfData.gradMag.normConst = classifier["pChns.pGradMag"]["normConst"]; 
@@ -129,7 +131,9 @@ bool BadacostDetector::load
 
   int lambdasSize = classifier["lambdas"]["rows"];
   for(int i = 0; i < lambdasSize; i++)
+  {
     clfData.lambdas.push_back((float)classifier["lambdas"]["data"][i]);
+  }
 
   clfData.minDs.width = classifier["minDs"]["data"][1]; 
   clfData.minDs.height = classifier["minDs"]["data"][0]; 
@@ -143,18 +147,18 @@ bool BadacostDetector::load
     m_filters = loadFilters(filtersPath);
   }
 
-  m_classifierIsLoaded = loadedOK;// && loadedOKPyr;
+  m_classifierIsLoaded = loadedOK; // && loadedOKPyr;
   return loadedOK;
 }
 
 std::vector<cv::Mat>
 BadacostDetector::loadFilters(std::string filtersPath)
 {
-  //CARGAR EL FILTRO CREADO POR MATLAB DESDE UN YML
+  // Load the LDCF filters
   cv::FileStorage filter;
   filter.open(filtersPath.c_str(), cv::FileStorage::READ);
 
-  //OBTENER EL NOMBRE DE LOS DISTINTOS FILTROS PARA ESTE CASO
+  // Obtain the LDCF filters names
   std::vector<std::string> namesFilters;
   int num_filters_per_channel = 4; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
   int num_channels = 10; // <-- TODO: JM: Estos números tienen que venir en el fichero yaml!
@@ -327,14 +331,12 @@ BadacostDetector::detectSingleScale
   std::cout << "hs.size().height = " << m_classifier["hs"].size().height << std::endl;
 #endif
 
-//  int nTreeNodes = m_classifier["fids"].size().width;
   int nTrees = m_classifier["fids"].size().height;
   int height1 = ceil(float((height*m_shrink)-m_clfData.modelDsPad.height+1)/m_clfData.stride);
   int width1 = ceil(float((width*m_shrink)-m_clfData.modelDsPad.width+1)/m_clfData.stride);
 
 #ifdef DEBUG
   std::cout << "nTrees = " << nTrees << std::endl;
-//  std::cout << "nTreeNodes = " << nTreeNodes << std::endl;
   std::cout << "height1 = " << height1 << std::endl;
   std::cout << "width1 = " << width1 << std::endl;
 #endif
@@ -346,31 +348,12 @@ BadacostDetector::detectSingleScale
     num_windows = 0;   
   }
 
-  // These are needed for parallel processing of detection windows with OpenMP.
-  // In any case it should works as is without OpenMP.
+  // These are needed for parallel processing of detection windows.
+  // In any case it should works as is without a parallel execution.
   std::vector<int> rs(num_windows, 0);
   std::vector<int> cs(num_windows, 0);
   std::vector<float> hs1(num_windows, 1.0); // Initialized to background class ("not object")
   std::vector<float> scores(num_windows, -1500.0); // Initialized to a very negative trace == score.
-
-/*
-  int nFtrs = (modelHt/shrink)*(modelWd/shrink)*nChan;
-  int *cids =  new int[nFtrs];
-  int *zsA = new int[nFtrs];
-  int *csA = new int[nFtrs];
-  int *rsA = new int[nFtrs];
-  int m=0;
-  for( int z=0; z<nChan; z++ )
-    for( int c=0; c<modelWd/shrink; c++ )
-      for( int r=0; r<modelHt/shrink; r++ ){
-        //if(z*width*height + c*height + r == 389760)
-        //  printf("%d %d %d \n", z,c,r);
-        zsA[m] = z; 
-        csA[m] = c;
-        rsA[m] = r;
-        //cids[m++] = z*width*height + c*height + r;
-      }
-*/
 
   int modelWd_s = m_clfData.modelDsPad.width/m_shrink;
   int modelHt_s = m_clfData.modelDsPad.height/m_shrink;
@@ -383,15 +366,13 @@ BadacostDetector::detectSingleScale
       int r = k / width1;
       int c = k % width1;
 
-      //std::cout << "c = " << c << ", " << "r = " << r << ", " << "width1 = " << width1 << ", " << "height1 = " << height1 << std::endl;
+      // std::cout << "c = " << c << ", " << "r = " << r << ", " << "width1 = " << width1 << ", " << "height1 = " << height1 << std::endl;
 
       // Initialise the margin_vector memory to 0.0
       cv::Mat margin_vector = cv::Mat::zeros(m_num_classes, 1, CV_32F);
       cv::Mat costs_vector = cv::Mat::zeros(m_num_classes, 1, CV_32F);
       float trace = 0.0;
       int h;
-
-      //float *chns1=chns+(r*stride/shrink) + (c*stride/shrink)*height;
       int posHeight = (r*m_clfData.stride/m_shrink);
       int posWidth = (c*m_clfData.stride/m_shrink);
 
@@ -407,8 +388,8 @@ BadacostDetector::detectSingleScale
         int ftrId;
         while( child_node_index ) // While k node is not a leave it has children (child_node_index != 0).
         {
+          // std::cout << "child : " << (int)m_classifier["child"].at<float>(t,k) << std::endl;
 
-          //printf("child : %d \n", (int)m_classifier["child"].at<float>(t,k));
           // Obtain the feature Id used in the split node.
           ftrId = static_cast<int>(m_classifier["fids"].at<float>(t, k));
 
@@ -455,6 +436,7 @@ BadacostDetector::detectSingleScale
           k = child_node_index  - child_choosen;
           child_node_index = static_cast<int>(m_classifier["child"].at<float>(t, k));
         }
+
         h = static_cast<int>(m_classifier["hs"].at<float>(t, k));
 
         // Add to the margin vector the codified output class h as a vector
@@ -470,8 +452,12 @@ BadacostDetector::detectSingleScale
         // The negative class is the first and the rest are the positives
         double min_positive_cost;
         double max_positive_cost;
-        cv::minMaxIdx(costs_vector.rowRange(1, m_num_classes), 
-                      &min_positive_cost, &max_positive_cost);
+        int min_ind[2];
+        int max_ind[2];
+        cv::minMaxIdx(costs_vector.rowRange(1,m_num_classes),
+                      &min_positive_cost, &max_positive_cost, min_ind, max_ind, cv::Mat());
+        // Assign the class of the min cost in costs_vector.
+        h = min_ind[0] + 2; // +2 because the first positive class should have this label and the array is 0 index.
 
         // Obtain the cost for the negative class (the background).
         // The negative class is the first and the rest are the positives
@@ -491,36 +477,17 @@ BadacostDetector::detectSingleScale
       {
         h = 1;
       }
-      else
-      {
-        // WARNING: Change with respect to the Matlab's implementation ... there is a bug in the matlab implementation
-        //          as it returns the h (positive class) of the last executed tree and not the minimum cost one !!! :-(.
-        // If trace is negative we have a background window (class is 1)
-        // Otherwise we have a positive (object) class)
-        double min_cost;
-        double max_cost;
-        int min_ind[2];
-        int max_ind[2];
-        cv::minMaxIdx(costs_vector.rowRange(1,m_num_classes),
-                      &min_cost, &max_cost, min_ind, max_ind, cv::Mat());
-        h = min_ind[0] + 2; // +1 because of 0 index, and +1 because of negative class is 1.
-        // End of corrected code w.r.t. Matlab's implementation.
 
+      if (h>1)
+      {
         int index = c + (r * width1);
         cs[index] = c; 
         rs[index] = r; 
-        hs1[index] = h; 
-        scores[index] = trace; 
+        hs1[index] = h;
+        scores[index] = trace;
       }
     } // for (int k = rang.start; k < rang.end; k++)
   }); // parallel_for_ clossing.
-
-/*
-  delete [] cids;
-  delete [] zsA;
-  delete [] csA;
-  delete [] rsA;
-*/
 
   // Obtain detection rectangles
   std::vector<DetectionRectangle> detections;
