@@ -374,7 +374,7 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategyOpen
 
 
 // --------------------------------------------------------------------------
-//  OpenCL ACF implementation (per image call)
+//  OpenCL ACF implementation using the T-API (per image call)
 // --------------------------------------------------------------------------
 
 TEST_F(TestBadacostDetector, TestDetectorPyramidComputeAllStrategyOpenCL)
@@ -434,7 +434,7 @@ TEST_F(TestBadacostDetector, TestDetectorPyramidApproximatedParallelStrategyOpen
 
 
 // --------------------------------------------------------------------------
-//  OpenCL ACF implementation
+//  OpenCL ACF implementation using the T-API implementation (packed image)
 // --------------------------------------------------------------------------
 TEST_F(TestBadacostDetector, TestDetectorPyramidOpenCL)
 {
