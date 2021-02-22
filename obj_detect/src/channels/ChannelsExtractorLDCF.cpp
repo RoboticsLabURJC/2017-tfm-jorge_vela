@@ -28,7 +28,7 @@ ChannelsExtractorLDCF::ChannelsExtractorLDCF
       //       We do it before using then.
       cv::Mat f_flipped;
       cv::flip(f, f_flipped, -1);
-      m_flipped_filters.push_back(f); /// TODO: It f what it is pushed on the m_flipped_filters. Is this right?
+      m_flipped_filters.push_back(f); // TODO: It f what it is pushed on the m_flipped_filters. Is this right?
       if (acf_impl_type == "opencl")
       {
         cv::UMat f_flipped_umat(f.size(), CV_32FC1, cv::USAGE_ALLOCATE_DEVICE_MEMORY);
