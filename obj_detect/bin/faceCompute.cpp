@@ -1,26 +1,8 @@
-#include <detectors/BadacostDetector.h>
-#include <pyramid/ChannelsPyramid.h>
-
-#include <pyramid/ChannelsPyramidApproximatedStrategy.h>
-#include <pyramid/ChannelsPyramidComputeAllStrategy.h>
-#include <pyramid/ChannelsPyramidComputeAllParallelStrategy.h>
-#include <pyramid/ChannelsPyramidApproximatedParallelStrategy.h>
-
-#include <bits/stdc++.h> 
-#include <iostream> 
-#include <sys/stat.h> 
-#include <sys/types.h> 
-
-
 #include <iostream>
+#include <string>
+#include <detectors/BadacostDetector.h>
 #include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/highgui.hpp>
-
-using namespace std;
-
-//#undef DEBUG
-#define DEBUG
+#include <opencv2/core/ocl.hpp>
 
 int main
   (
@@ -28,47 +10,109 @@ int main
   char** argv
   )
 {
+  const char* keys =
+          "{ h help      |     | print help message }"
+          "{ c camera    | 0   | capture video from camera (device index starting from 0) }"
+          "{ f features  | pdollar  | features (supported: pdollar, opencv, opencl)}"
+          "{ p pyramid   | approximated_parallel  | pyramid (supported: all, all_parallel, approximated, approximated_parallel, packed_img)}"
+          "{ d detector  |  ../tests/yaml/00_facesDetector_AFLW.yml   | detector file}"
+          "{ t filters   |  ../tests/yaml/00_filterTest_faces_AFLW.yml | filters file}"
+          "{ m cpu       |     | run without OpenCL }"
+          "{ v video     |     | use video as input }"
+          "{ o original  |     | use original frame size (do not resize to 320x240)}"
+          ;
 
-    std::string clfPath = "obj_detect/tests/yaml/00_facesDetector_AFLW.yml";
-    std::string filtersPath = "obj_detect/tests/yaml/00_filterTest_faces_AFLW.yml"; 
-    BadacostDetector badacost("pdollar", "approx_parallel", 10);
-    bool loadVal = badacost.load(clfPath, filtersPath); 
+  cv::CommandLineParser parser(argc, argv, keys);
+  parser.about("This sample demonstrates using BAdaCost face detection.");
+  if (parser.has("help"))
+  {
+      parser.printMessage();
+      return 0;
+  }
+  int camera = parser.get<int>("camera");
+  std::string features_impl = parser.get<std::string>("features");
+  std::string pyramid_strategy = parser.get<std::string>("pyramid");
+  std::string detector_file = parser.get<std::string>("detector");
+  std::string filters_file = parser.get<std::string>("filters");
+  bool useCPU = parser.has("cpu");
+  std::string filename = parser.get<std::string>("video");
+  bool useOriginalSize = parser.has("original");
+  if (!parser.check())
+  {
+    parser.printErrors();
+    return 1;
+  }
+
+  if (!useCPU)
+  {
+    cv::ocl::Context context;
+    if (!context.create(cv::ocl::Device::TYPE_GPU))
+    {
+      std::cout << "Failed creating OpenCL context..." << std::endl;
+    }
+    cv::ocl::Device(context.device(0));
+    cv::ocl::setUseOpenCL(true);
+  }
+
+  BadacostDetector badacost(features_impl, pyramid_strategy, 10);
+  bool loadVal = badacost.load(detector_file, filters_file);
  
-    // open the first webcam plugged in the computer
-    cv::VideoCapture camera(0);
-    if (!camera.isOpened()) {
-        std::cerr << "ERROR: Could not open camera" << std::endl;
-        return 1;
+  // open the first webcam plugged in the computer
+  cv::VideoCapture cap;
+  if (filename.empty())
+  {
+      cap.open(camera);
+  }
+  else
+  {
+      cap.open(filename);
+  }
+
+  if (!cap.isOpened())
+  {
+      std::cout << "Can not open video stream: '" << (filename.empty() ? "<camera>" : filename) << "'" << std::endl;
+      return 2;
+  }
+
+  // Set properties. Each returns === True on success (i.e. correct resolution)
+  if (!useOriginalSize)
+  {
+//    cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+//    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 320);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 240);
+  }
+
+
+  cv::namedWindow("Webcam", cv::WINDOW_AUTOSIZE);
+
+  // Print frame size
+  cv::Mat frame;
+  cap >> frame;
+  std::cout << frame.size() << std::endl;
+
+  while (1)
+  {
+    cap >> frame;
+    int64 start = cv::getTickCount();
+    std::vector<DetectionRectangle> detections = badacost.detect(frame);
+    badacost.showResults(frame, detections);
+    int64 end = cv::getTickCount();
+
+
+    std::ostringstream buf;
+    buf << "Mode: " << (useCPU ? "CPU" : "GPU") << " | "
+        << "FPS: " << std::fixed << std::setprecision(1) << (cv::getTickFrequency() / (double)(end-start));
+    putText(frame, buf.str(), cv::Point(10, frame.rows-20), cv::FONT_HERSHEY_PLAIN, 1.0, cv::Scalar(0, 0, 255), 2, cv::LINE_AA);
+
+    cv::imshow("Webcam", frame);
+    if (cv::waitKey(1) >= 0)
+    {
+      break;
     }
 
-    cv::namedWindow("Webcam", cv::WINDOW_AUTOSIZE);
-
-    cv::Mat frame;
-        
-    camera >> frame;
-
-    std::cout << frame.size() << std::endl;
-    
-    time_t start, end;
-    time(&start);
-    int nFrames = 0;
-    while (1) {
-        camera >> frame;
-        cv::resize(frame,frame,cv::Size(640,360));
-
-        std::vector<DetectionRectangle> detections = badacost.detect(frame);
-        badacost.showResults(frame, detections);
-        cv::imshow("Webcam", frame);
-        if (cv::waitKey(1) >= 0)
-            break;
-
-        nFrames +=1;
-        time(&end);
-        double seconds = difftime (end, start);
-        cout << "Time taken : " << nFrames/seconds << " fps" << endl;
-
-    }
-    return 0;
+  }
+  return 0;
 }
 
 

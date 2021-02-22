@@ -37,6 +37,20 @@ target_link_libraries(
        ${OpenCV_LIBS}
 )
 
+# ----------------- faceCompute -----------------------------------------
+add_executable(faceCompute faceCompute.cpp)
+target_include_directories(
+	faceCompute
+        PUBLIC
+        "${PROJECT_SOURCE_DIR}/obj_detect/include"
+        ${OpenCV_INCLUDE_DIRS}
+)
+target_link_libraries(
+       faceCompute
+       ${OpenCV_LIBS}
+       ${PROJECT_NAME}
+)
+
 # ------------------ computeDetectionFaces ----------------------------
 add_executable(computeDetFaces computeDetectionFaces.cpp)
 target_include_directories(computeDetFaces
